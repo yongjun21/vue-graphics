@@ -1,0 +1,31 @@
+{
+  "name": "vue-chart-library",
+  "version": "0.0.0",
+  "description": "Library of reusable and extensible chart components built from ground up using VueJS",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rollup --config",
+    "dev": "rollup --config --watch",
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yongjun21/vue-chart-library.git"
+  },
+  "author": "Yong Jun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yongjun21/vue-chart-library/issues"
+  },
+  "homepage": "https://github.com/yongjun21/vue-chart-library#readme",
+  "dependencies": {
+    "gsap": "^1.20.4"
+  },
+  "devDependencies": {
+    "rollup": "^0.57.1",
+    "rollup-plugin-node-resolve": "^3.3.0"
+  },
+  "standard": {
+    "globals": ["Vue", "TweenLite"]
+  }
+}
