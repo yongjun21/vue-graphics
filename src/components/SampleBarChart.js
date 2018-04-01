@@ -1,8 +1,8 @@
 import AnimatedBar from './chart-elements/AnimatedBar'
-import responsiveMixin from '../mixins/responsiveMixin'
+// import responsiveMixin from '../mixins/responsiveMixin'
 
 export default {
-  props: ['data'],
+  props: ['data', 'sized', 'width', 'height'],
   data () {
     return {
       barWidth: 50,
@@ -30,7 +30,7 @@ export default {
       })
     }
   },
-  mixins: [responsiveMixin],
+  // mixins: [responsiveMixin],
   render (h) {
     return h('svg', this.bars.map(bar => h(AnimatedBar, bar)))
   }

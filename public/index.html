@@ -17,7 +17,12 @@
 </head>
 <body>
   <div id="app">
-    <bar-chart :data="[10, 20, 50, 40]"></bar-chart>
+    <responsive-wrapper>
+      <bar-chart slot-scope="sizing"
+        :data="[10, 20, 50, 40]"
+        v-bind="sizing">
+      </bar-chart>
+    </responsive-wrapper>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <script src="bundle.js"></script>

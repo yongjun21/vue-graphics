@@ -26,6 +26,9 @@
     "rollup-plugin-node-resolve": "^3.3.0"
   },
   "standard": {
-    "globals": ["Vue", "TweenLite"]
+    "globals": [
+      "Vue",
+      "TweenLite"
+    ]
   }
 }
