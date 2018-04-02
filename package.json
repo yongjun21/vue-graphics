@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/yongjun21/vue-chart-library#readme",
   "dependencies": {
+    "d3-scale": "^2.0.0",
     "gsap": "^1.20.4"
   },
   "devDependencies": {

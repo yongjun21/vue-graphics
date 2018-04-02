@@ -1,28 +1,42 @@
 import AnimatedBar from './chart-elements/AnimatedBar'
-// import responsiveMixin from '../mixins/responsiveMixin'
+import {scaleBand, scaleLinear} from 'd3-scale'
 
 export default {
   props: ['data', 'sized', 'width', 'height'],
   data () {
     return {
-      barWidth: 50,
-      barGap: 10,
+      paddingInner: 0.2,
+      paddingOuter: 1,
       maxValue: 80
     }
   },
   computed: {
+    xScale () {
+      const scale = scaleBand()
+      scale.domain(this.data.map((d, i) => i))
+      scale.range(this.width && [0, this.width])
+      scale.paddingInner(this.paddingInner)
+      scale.paddingOuter(this.paddingOuter)
+      return scale
+    },
+    yScale () {
+      const scale = scaleLinear()
+      scale.domain([0, this.maxValue])
+      scale.range(this.height && [0, this.height])
+      return scale
+    },
     bars () {
-      const {height, barWidth, barGap, maxValue} = this
       if (!this.sized) return []
+      const {height, xScale, yScale} = this
       return this.data.map((d, i) => {
-        const h = d / maxValue * height
+        const h = yScale(d)
         return {
           key: i,
           props: {
             attrs: {
-              width: barWidth,
+              width: xScale.bandwidth(),
               height: h,
-              x: barGap + i * (barWidth + barGap),
+              x: xScale(i),
               y: height - h
             }
           }
@@ -30,7 +44,6 @@ export default {
       })
     }
   },
-  // mixins: [responsiveMixin],
   render (h) {
     return h('svg', this.bars.map(bar => h(AnimatedBar, bar)))
   }
