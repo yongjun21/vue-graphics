@@ -15,15 +15,38 @@
       max-width: 800px;
       margin: 0 auto;
     }
+
+    path {
+      pointer-events: stroke;
+    }
+
+    path.highlight {
+      stroke: red;
+      stroke-width: 2px;
+      animation: draw 500ms forwards;
+      pointer-events: none;
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    path.overall, path.overall:hover {
+      stroke: blue;
+      stroke-width: 2px;
+    }
   </style>
 </head>
 <body>
   <div id="app">
     <responsive-wrapper>
-      <bar-chart slot-scope="sizing"
+      <waterfall-line slot-scope="sizing"
         :data="data"
+        :domain="domain"
         v-bind="sizing">
-      </bar-chart>
+      </waterfall-line>
     </responsive-wrapper>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
