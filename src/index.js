@@ -9,6 +9,7 @@ window.fetch('waterfall.json')
     data.forEach(d => {
       if (d.id === '__OVERALL__') {
         d.class = {overall: true}
+        d.highlight = {class: {overall: true}}
       }
     })
     window.vm = new Vue({

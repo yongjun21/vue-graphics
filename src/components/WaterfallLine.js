@@ -1,4 +1,3 @@
-import AnimatedLine from './chart-elements/AnimatedLine'
 import {scalePoint, scaleLinear} from 'd3-scale'
 import {path as d3path} from 'd3-path'
 
@@ -6,7 +5,8 @@ export default {
   props: ['data', 'domain', 'sized', 'width', 'height'],
   data () {
     return {
-      highlight: null
+      baseColor: '#CCC',
+      highlighted: {}
     }
   },
   computed: {
@@ -23,10 +23,10 @@ export default {
       scale.rangeRound(this.height && [this.height, 0])
       return scale
     },
-    paths () {
-      if (!this.sized) return []
+    pathString () {
+      if (!this.sized) return {}
       const {domain, width, xScale, yScale} = this
-      return this.data.map((d, i) => {
+      return this.data.reduce((obj, d) => {
         let cumulative = 0
         const p = d3path()
         p.moveTo(0, yScale(cumulative))
@@ -34,27 +34,81 @@ export default {
           const x = xScale(point)
           p.lineTo(x, yScale(cumulative))
           cumulative += d[point]
-          if (isNaN(cumulative)) console.log(JSON.stringify(d))
           p.lineTo(x, yScale(cumulative))
         })
         p.lineTo(width, yScale(cumulative))
 
-        return {
-          key: d.id,
-          props: {
-            attrs: {
-              d: p.toString(),
-              'stroke': 'black',
-              'fill': 'none',
-              'shape-rendering': 'crispEdges'
-            }
-          },
-          class: Object.assign({}, d.class)
+        return Object.assign(obj, {[d.id]: p.toString()})
+      }, {})
+    }
+  },
+  methods: {
+    getClickHandler (d) {
+      return () => {
+        if (d.id in this.highlighted) {
+          this.$delete(this.highlighted, d.id)
+        } else {
+          this.$set(this.highlighted, d.id, this.$refs[d.id].getTotalLength())
         }
-      })
+      }
+    },
+    getMouseoverHandler (d, highlight) {
+      return () => {
+        if (highlight) {
+          this.$set(this.highlighted, d.id, this.$refs[d.id].getTotalLength())
+        } else {
+          this.$delete(this.highlighted, d.id)
+        }
+      }
     }
   },
   render (h) {
-    return h('svg', this.paths.map(path => h(AnimatedLine, path)))
+    const {pathString, highlighted, baseColor} = this
+    const $overlay = []
+    const $content = this.data.filter(d => d.id in pathString).map(d => {
+      if (d.id in highlighted) {
+        $overlay.push(h('path', {
+          key: d.id,
+          attrs: {
+            d: pathString[d.id],
+            'stroke': 'none',
+            'fill': 'none',
+            'stroke-dasharray': highlighted[d.id],
+            'stroke-dashoffset': highlighted[d.id]
+          },
+          class: Object.assign({highlight: true}, d.highlight && d.highlight.class),
+          style: d.highlight && d.highlight.style
+        }))
+      }
+      return h('g', {key: d.id}, [
+        h('path', {
+          attrs: {
+            d: pathString[d.id],
+            'stroke': 'none',
+            'fill': 'none',
+            'stroke-width': '9'
+          },
+          class: {clickable: true},
+          on: {
+            // click: this.getClickHandler(d),
+            mouseover: this.getMouseoverHandler(d, true),
+            mouseout: this.getMouseoverHandler(d, false)
+          }
+        }),
+        h('path', {
+          ref: d.id,
+          attrs: {
+            d: pathString[d.id],
+            'stroke': baseColor,
+            'fill': 'none',
+            'shape-rendering': 'crispEdges'
+          },
+          class: d.class,
+          style: d.style
+        })
+      ])
+    })
+    $content.push(h('g', $overlay))
+    return h('svg', $content)
   }
 }
