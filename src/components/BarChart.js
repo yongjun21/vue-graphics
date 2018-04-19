@@ -1,14 +1,9 @@
-import AnimatedBar from './chart-elements/AnimatedBar'
+import Bar from './chart-elements/Bar'
+// import AnimatedBar from './chart-elements/AnimatedBar'
 
 export default {
-  props: ['data', 'width', 'height'],
-  data () {
-    return {
-      paddingInner: 0.2,
-      paddingOuter: 1,
-      maxValue: 80
-    }
-  },
+  name: 'BarChart',
+  props: ['data', 'domain', 'width', 'height', 'paddingInner', 'paddingOuter'],
   computed: {
     xScale () {
       const scale = d3.scaleBand()
@@ -20,7 +15,7 @@ export default {
     },
     yScale () {
       const scale = d3.scaleLinear()
-      scale.domain([0, this.maxValue])
+      scale.domain(this.domain)
       scale.range(this.height && [0, this.height])
       return scale
     },
@@ -28,15 +23,18 @@ export default {
       if (this.width == null || this.height == null) return []
       const {height, xScale, yScale} = this
       return this.data.map((d, i) => {
-        const h = yScale(d)
+        const h = yScale(d.value)
         return {
-          key: i,
+          key: d.label || i,
           props: {
+            class: d.class,
+            style: d.style,
             attrs: {
               width: xScale.bandwidth(),
               height: h,
               x: xScale(i),
-              y: height - h
+              y: height - h,
+              stroke: 'none'
             }
           }
         }
@@ -44,6 +42,6 @@ export default {
     }
   },
   render (h) {
-    return h('svg', this.bars.map(bar => h(AnimatedBar, bar)))
+    return h('svg', this.bars.map(bar => h(Bar, bar)))
   }
 }
