@@ -6,11 +6,6 @@ export default {
       height: null
     }
   },
-  computed: {
-    sized () {
-      return this.width != null && this.height != null
-    }
-  },
   methods: {
     _resize () {
       if (this._resizing) return

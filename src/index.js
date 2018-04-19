@@ -1,3 +1,4 @@
+import BarChart from './components/BarChart'
 import WaterfallLine from './components/WaterfallLine'
 import ResponsiveWrapper from './components/hocs/ResponsiveWrapper'
 
@@ -14,7 +15,7 @@ window.fetch('waterfall.json')
     })
     window.vm = new Vue({
       el: '#app',
-      components: {WaterfallLine, ResponsiveWrapper},
+      components: {BarChart, WaterfallLine, ResponsiveWrapper},
       data: {
         data,
         domain: ['1', '2A', '2B', '2C', '2CS']

@@ -1,8 +1,7 @@
 import AnimatedBar from './chart-elements/AnimatedBar'
-import {scaleBand, scaleLinear} from 'd3-scale'
 
 export default {
-  props: ['data', 'sized', 'width', 'height'],
+  props: ['data', 'width', 'height'],
   data () {
     return {
       paddingInner: 0.2,
@@ -12,7 +11,7 @@ export default {
   },
   computed: {
     xScale () {
-      const scale = scaleBand()
+      const scale = d3.scaleBand()
       scale.domain(this.data.map((d, i) => i))
       scale.range(this.width && [0, this.width])
       scale.paddingInner(this.paddingInner)
@@ -20,13 +19,13 @@ export default {
       return scale
     },
     yScale () {
-      const scale = scaleLinear()
+      const scale = d3.scaleLinear()
       scale.domain([0, this.maxValue])
       scale.range(this.height && [0, this.height])
       return scale
     },
     bars () {
-      if (!this.sized) return []
+      if (this.width == null || this.height == null) return []
       const {height, xScale, yScale} = this
       return this.data.map((d, i) => {
         const h = yScale(d)
