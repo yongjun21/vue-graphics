@@ -1,3 +1,6 @@
+import {scalePoint, scaleLinear} from 'd3-scale'
+import {path as d3Path} from 'd3-path'
+
 export default {
   props: ['data', 'domain', 'width', 'height'],
   data () {
@@ -8,14 +11,14 @@ export default {
   },
   computed: {
     xScale () {
-      const scale = d3.scalePoint()
+      const scale = scalePoint()
       scale.domain(this.domain)
       scale.rangeRound(this.width && [0, this.width])
       scale.padding(1)
       return scale
     },
     yScale () {
-      const scale = d3.scaleLinear()
+      const scale = scaleLinear()
       scale.domain([-0.01, 1.01])
       scale.rangeRound(this.height && [this.height, 0])
       return scale
@@ -25,7 +28,7 @@ export default {
       const {domain, width, xScale, yScale} = this
       return this.data.reduce((obj, d) => {
         let cumulative = 0
-        const p = d3.path()
+        const p = d3Path()
         p.moveTo(0, yScale(cumulative))
         domain.forEach(point => {
           const x = xScale(point)

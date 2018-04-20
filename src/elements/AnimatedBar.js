@@ -1,3 +1,5 @@
+import 'gsap/TweenLite'
+
 export default {
   name: 'AnimatedBar',
   props: {

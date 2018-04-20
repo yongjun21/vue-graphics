@@ -1,2 +1,5 @@
-# vue-chart-library
-Library of reusable and extensible chart components built from ground up using VueJS
+# vue-graphics
+
+A set of Vue-powered graphics elements and components for building web visualizations and interactive graphics.
+
+Created by The Straits Times Graphics Team.

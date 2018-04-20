@@ -1,24 +1,29 @@
 {
-  "name": "vue-chart-library",
+  "name": "vue-graphics",
   "version": "0.0.0",
   "description": "Library of reusable and extensible chart components built from ground up using VueJS",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rollup --config",
-    "dev": "rollup --config --watch",
-    "bundle": "node build.js",
-    "test": "exit 0"
+    "build": "rm -r dist/ && node build.js",
+    "dev": "rm -r dist/ && node build.js -w",
+    "test": "rollup -c public/rollup.config.js -w",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yongjun21/vue-chart-library.git"
+    "url": "git+https://github.com/yongjun21/vue-graphics.git"
   },
   "author": "Yong Jun",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yongjun21/vue-chart-library/issues"
+    "url": "https://github.com/yongjun21/vue-graphics/issues"
   },
-  "homepage": "https://github.com/yongjun21/vue-chart-library#readme",
+  "homepage": "https://github.com/yongjun21/vue-graphics#readme",
+  "peerDependencies": {
+    "d3-scale": "^2.0.0",
+    "d3-path": "^1.0.5",
+    "gsap": "^1.20.4"
+  },
   "devDependencies": {
     "mkdirp": "^0.5.1",
     "rollup": "^0.57.1",
@@ -27,7 +32,6 @@
   "standard": {
     "globals": [
       "Vue",
-      "d3",
       "TweenLite"
     ]
   }

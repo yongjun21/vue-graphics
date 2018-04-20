@@ -1,4 +1,4 @@
-import responsiveMixin from '../../mixins/responsiveMixin'
+import responsiveMixin from '../mixins/responsiveMixin'
 
 export default {
   name: 'ResponsiveWrapper',

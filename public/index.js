@@ -1,6 +1,6 @@
-import BarChart from './components/BarChart'
-import WaterfallLine from './components/WaterfallLine'
-import ResponsiveWrapper from './components/hocs/ResponsiveWrapper'
+import BarChart from '../dist/components/BarChart'
+import WaterfallLine from '../dist/components/WaterfallLine'
+import ResponsiveWrapper from '../dist/hocs/ResponsiveWrapper'
 
 window.fetch('waterfall.json')
   .then(res => res.json())

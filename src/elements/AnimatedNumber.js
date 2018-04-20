@@ -1,3 +1,5 @@
+import 'gsap/TweenLite'
+
 export default {
   name: 'AnimatedNumber',
   props: {
