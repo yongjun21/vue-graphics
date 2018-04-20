@@ -1,5 +1,4 @@
 node_modules/
-dist/
 public/bundle.js
 
 package-lock.json

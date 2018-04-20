@@ -1,13 +1,12 @@
 {
   "name": "vue-graphics",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "Library of reusable and extensible chart components built from ground up using VueJS",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
-    "build": "rm -r dist/ && node build.js",
-    "dev": "rm -r dist/ && node build.js -w",
-    "test": "rollup -c public/rollup.config.js -w",
-    "prepublishOnly": "npm run build"
+    "build": "rollup -c public/rollup.config.js",
+    "dev": "rollup -c public/rollup.config.js -w",
+    "test": "exit 0"
   },
   "repository": {
     "type": "git",
@@ -19,13 +18,12 @@
     "url": "https://github.com/yongjun21/vue-graphics/issues"
   },
   "homepage": "https://github.com/yongjun21/vue-graphics#readme",
-  "peerDependencies": {
+  "dependencies": {
     "d3-scale": "^2.0.0",
     "d3-path": "^1.0.5",
     "gsap": "^1.20.4"
   },
   "devDependencies": {
-    "mkdirp": "^0.5.1",
     "rollup": "^0.57.1",
     "rollup-plugin-node-resolve": "^3.3.0"
   },

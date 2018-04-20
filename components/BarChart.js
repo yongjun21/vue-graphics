@@ -1,7 +1,7 @@
 import {scaleBand, scaleLinear} from 'd3-scale'
 
-// import Bar from '../elements/Bar'
-import AnimatedBar from '../elements/AnimatedBar'
+import Bar from '../elements/Bar'
+// import AnimatedBar from '../elements/AnimatedBar'
 
 export default {
   name: 'BarChart',
@@ -44,6 +44,6 @@ export default {
     }
   },
   render (h) {
-    return h('svg', this.bars.map(bar => h(AnimatedBar, bar)))
+    return h('svg', this.bars.map(bar => h(Bar, bar)))
   }
 }
