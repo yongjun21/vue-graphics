@@ -4,6 +4,7 @@ export default {
   name: 'AnimatedBar',
   props: {
     attrs: Object,
+    on: Object,
     duration: {
       type: Number,
       default: 0.2
@@ -19,7 +20,8 @@ export default {
   },
   render (h) {
     return h('rect', {
-      attrs: this.$data
+      attrs: this.$data,
+      on: this.on
     })
   }
 }

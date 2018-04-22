@@ -1,6 +1,5 @@
 import {scalePoint, scaleLinear} from 'd3-scale'
-import {path as d3Path} from 'd3-path'
-import {line} from 'd3-shape'
+import {line, curveStep} from 'd3-shape'
 
 import Line from '../elements/Line'
 import AnimatedLine from '../elements/AnimatedLine'
@@ -9,7 +8,6 @@ export default {
   props: ['data', 'domain', 'width', 'height'],
   data () {
     return {
-      baseColor: '#CCC',
       highlighted: {}
     }
   },
@@ -18,7 +16,7 @@ export default {
       const scale = scalePoint()
       scale.domain(this.domain)
       scale.rangeRound(this.width && [0, this.width])
-      scale.padding(1)
+      scale.padding(0.5)
       return scale
     },
     yScale () {
@@ -30,19 +28,19 @@ export default {
     pathString () {
       if (this.width == null || this.height == null) return {}
       const {domain, width, xScale, yScale} = this
+      const padding = xScale.step() / 2
+      const lineGenerator = line().curve(curveStep)
       return this.data.reduce((obj, d) => {
         let cumulative = 0
-        const p = d3Path()
-        p.moveTo(0, yScale(cumulative))
-        domain.forEach(point => {
-          const x = xScale(point)
-          p.lineTo(x, yScale(cumulative))
-          cumulative += d[point]
-          p.lineTo(x, yScale(cumulative))
+        const points = [[-padding, yScale(cumulative)]]
+        domain.forEach(key => {
+          points.push([
+            xScale(key),
+            yScale(cumulative += d[key])
+          ])
         })
-        p.lineTo(width, yScale(cumulative))
-
-        return Object.assign(obj, {[d.id]: p.toString()})
+        points.push([width + padding, yScale(cumulative)])
+        return Object.assign(obj, {[d.id]: lineGenerator(points)})
       }, {})
     }
   },
@@ -72,25 +70,28 @@ export default {
         }))
       }
       return h('g', {key: d.id}, [
-        h('path', {
-          attrs: {
-            d: pathString[d.id],
-            'stroke': 'none',
-            'fill': 'none',
-            'stroke-width': '9'
-          },
-          class: {clickable: true},
-          on: {
-            // click: this.getClickHandler(d),
-            mouseover: this.getHighlighter(d, true),
-            mouseout: this.getHighlighter(d, false)
+        h(Line, {
+          props: {
+            attrs: {
+              d: pathString[d.id],
+              'stroke': 'none',
+              'stroke-width': 9
+            },
+            style: {
+              'pointer-events': 'stroke',
+              'cursor': 'pointer'
+            },
+            on: {
+              // click: this.getHighlighter(d),
+              mouseover: this.getHighlighter(d, true),
+              mouseout: this.getHighlighter(d, false)
+            }
           }
         }),
         h(Line, {
           props: {
             attrs: {
-              d: pathString[d.id],
-              fill: 'none'
+              d: pathString[d.id]
             },
             class: d.class,
             style: d.style

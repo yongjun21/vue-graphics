@@ -5,6 +5,7 @@ export default {
   name: 'AnimatedLine',
   props: {
     attrs: Object,
+    on: Object,
     duration: {
       type: Number,
       default: 0.5
@@ -43,9 +44,9 @@ export default {
         key: this.attrs.d,
         attrs: Object.assign({
           'stroke-dasharray': this.length,
-          'stroke-dashoffset': this.offset,
-          'fill': 'none'
-        }, this.attrs)
+          'stroke-dashoffset': this.offset
+        }, this.attrs),
+        on: this.on
       })
     ])
   }
