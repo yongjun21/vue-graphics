@@ -4,8 +4,8 @@
   "description": "Library of reusable and extensible chart components built from ground up using VueJS",
   "main": "index.js",
   "scripts": {
-    "build": "rollup -c public/rollup.config.js",
-    "dev": "rollup -c public/rollup.config.js -w",
+    "build": "rollup -c",
+    "dev": "rollup -cw",
     "test": "exit 0"
   },
   "repository": {
@@ -19,9 +19,11 @@
   },
   "homepage": "https://github.com/yongjun21/vue-graphics#readme",
   "dependencies": {
-    "d3-scale": "^2.0.0",
     "d3-path": "^1.0.5",
-    "gsap": "^1.20.4"
+    "d3-scale": "^2.0.0",
+    "d3-shape": "^1.2.0",
+    "gsap": "^1.20.4",
+    "lodash-es": "^4.17.8"
   },
   "devDependencies": {
     "rollup": "^0.57.1",
@@ -30,7 +32,8 @@
   "standard": {
     "globals": [
       "Vue",
-      "TweenLite"
+      "TweenLite",
+      "Linear"
     ]
   }
 }

@@ -6,9 +6,11 @@ window.fetch('waterfall.json')
   .then(data => {
     data = data.filter(d => Object.keys(d).length > 1)
     data.forEach(d => {
+      d.class = 'base'
+      d.highlight = {class: 'highlight'}
       if (d.id === '__OVERALL__') {
-        d.class = {overall: true}
-        d.highlight = {class: {overall: true}}
+        d.class = 'overall'
+        d.highlight = {class: 'overall'}
       }
     })
     window.vm = new Vue({

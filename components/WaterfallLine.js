@@ -1,5 +1,9 @@
 import {scalePoint, scaleLinear} from 'd3-scale'
 import {path as d3Path} from 'd3-path'
+import {line} from 'd3-shape'
+
+import Line from '../elements/Line'
+import AnimatedLine from '../elements/AnimatedLine'
 
 export default {
   props: ['data', 'domain', 'width', 'height'],
@@ -43,40 +47,27 @@ export default {
     }
   },
   methods: {
-    getClickHandler (d) {
+    getHighlighter (d, highlight) {
       return () => {
-        if (d.id in this.highlighted) {
-          this.$delete(this.highlighted, d.id)
-        } else {
-          this.$set(this.highlighted, d.id, this.$refs[d.id].getTotalLength())
+        if (highlight == null) {
+          highlight = this.highlighted[d.id]
         }
-      }
-    },
-    getMouseoverHandler (d, highlight) {
-      return () => {
-        if (highlight) {
-          this.$set(this.highlighted, d.id, this.$refs[d.id].getTotalLength())
-        } else {
-          this.$delete(this.highlighted, d.id)
-        }
+        this.$set(this.highlighted, d.id, highlight)
       }
     }
   },
   render (h) {
-    const {pathString, highlighted, baseColor} = this
+    const {pathString, highlighted} = this
     const $overlay = []
     const $content = this.data.filter(d => d.id in pathString).map(d => {
-      if (d.id in highlighted) {
-        $overlay.push(h('path', {
-          key: d.id,
-          attrs: {
-            d: pathString[d.id],
-            'stroke': 'none',
-            'fill': 'none',
-            'stroke-dasharray': highlighted[d.id],
-            'stroke-dashoffset': highlighted[d.id]
+      if (highlighted[d.id]) {
+        $overlay.push(h(AnimatedLine, {
+          props: {
+            attrs: {
+              d: pathString[d.id]
+            }
           },
-          class: Object.assign({highlight: true}, d.highlight && d.highlight.class),
+          class: d.highlight && d.highlight.class,
           style: d.highlight && d.highlight.style
         }))
       }
@@ -91,20 +82,19 @@ export default {
           class: {clickable: true},
           on: {
             // click: this.getClickHandler(d),
-            mouseover: this.getMouseoverHandler(d, true),
-            mouseout: this.getMouseoverHandler(d, false)
+            mouseover: this.getHighlighter(d, true),
+            mouseout: this.getHighlighter(d, false)
           }
         }),
-        h('path', {
-          ref: d.id,
-          attrs: {
-            d: pathString[d.id],
-            'stroke': baseColor,
-            'fill': 'none',
-            'shape-rendering': 'crispEdges'
-          },
-          class: d.class,
-          style: d.style
+        h(Line, {
+          props: {
+            attrs: {
+              d: pathString[d.id],
+              fill: 'none'
+            },
+            class: d.class,
+            style: d.style
+          }
         })
       ])
     })

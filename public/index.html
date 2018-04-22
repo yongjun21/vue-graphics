@@ -21,6 +21,10 @@
       pointer-events: none;
     }
 
+    path.base {
+      stroke: #CCC;
+    }
+
     path.clickable {
       pointer-events: stroke;
       cursor: pointer;
@@ -29,19 +33,11 @@
     path.highlight {
       stroke: red;
       stroke-width: 2px;
-      animation: draw 500ms forwards;
-    }
-
-    @keyframes draw {
-      to {
-        stroke-dashoffset: 0;
-      }
     }
 
     path.overall, path.overall.highlight {
       stroke: blue;
       stroke-width: 2px;
-      animation: none;
     }
   </style>
 </head>
