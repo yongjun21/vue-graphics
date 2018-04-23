@@ -1,6 +1,6 @@
 export default {
   functional: true,
-  render (h, {props}) {
-    return h('rect', props)
+  render (h, {data}) {
+    return h('rect', data)
   }
 }

@@ -62,9 +62,7 @@ export default {
       if (highlighted[d.id]) {
         $overlay.push(h(AnimatedLine, {
           props: {
-            attrs: {
-              d: pathString[d.id]
-            }
+            d: pathString[d.id]
           },
           class: d.highlight && d.highlight.class,
           style: d.highlight && d.highlight.style
@@ -72,31 +70,27 @@ export default {
       }
       return h('g', {key: d.id}, [
         h(Line, {
-          props: {
-            attrs: {
-              d: pathString[d.id],
-              'stroke': 'none',
-              'stroke-width': 9
-            },
-            style: {
-              'pointer-events': 'stroke',
-              'cursor': 'pointer'
-            },
-            on: {
-              // click: this.getHighlighter(d),
-              mouseover: this.getHighlighter(d, true),
-              mouseout: this.getHighlighter(d, false)
-            }
+          attrs: {
+            d: pathString[d.id],
+            'stroke': 'none',
+            'stroke-width': 9
+          },
+          style: {
+            'pointer-events': 'stroke',
+            'cursor': 'pointer'
+          },
+          on: {
+            // click: this.getHighlighter(d),
+            mouseover: this.getHighlighter(d, true),
+            mouseout: this.getHighlighter(d, false)
           }
         }),
         h(Line, {
-          props: {
-            attrs: {
-              d: pathString[d.id]
-            },
-            class: d.class,
-            style: d.style
-          }
+          attrs: {
+            d: pathString[d.id]
+          },
+          class: d.class,
+          style: d.style
         })
       ])
     })

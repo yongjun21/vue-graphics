@@ -1,6 +1,17 @@
 import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper} from '../index.js'
 
 /*
+window.vm = new Vue({
+  el: '#app',
+  components: {BarChart, ResponsiveWrapper},
+  data: {
+    data: [10, 20, 50, 40],
+    domain: [0, 60]
+  }
+})
+*/
+
+/*
 window.fetch('waterfall.json')
   .then(res => res.json())
   .then(json => json['2017'])
@@ -16,14 +27,14 @@ window.fetch('waterfall.json')
     })
     window.vm = new Vue({
       el: '#app',
-      components: {BarChart, WaterfallLine, ResponsiveWrapper},
+      components: {WaterfallLine, ResponsiveWrapper},
       data: {
         data,
         domain: ['1', '2A', '2B', '2C', '2CS']
       }
     })
   })
-  */
+*/
 
 Papa.parse('visa.csv', {
   header: true,
@@ -35,7 +46,7 @@ Papa.parse('visa.csv', {
     })
     window.vm = new Vue({
       el: '#app',
-      components: {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper},
+      components: {ChordDiagram, ResponsiveWrapper},
       data: {
         data: parsed.data,
         domain: parsed.data.map(row => row.id)

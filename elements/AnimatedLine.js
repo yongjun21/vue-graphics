@@ -4,14 +4,13 @@ import _debounce from 'lodash-es/debounce'
 export default {
   name: 'AnimatedLine',
   props: {
-    attrs: Object,
-    on: Object,
+    d: String,
+    debounce: Number,
     speed: Number,
     duration: {
       type: Number,
       default: 0.5
-    },
-    debounce: Number
+    }
   },
   data () {
     return {
@@ -35,7 +34,7 @@ export default {
   },
   created () {
     if (this.debounce != null) {
-      this.$options.methods.animate = _debounce(this.$options.methods.animate, this.debounce)
+      this.animate = _debounce(this.animate, this.debounce).bind(this)
     }
   },
   render (h) {
@@ -49,12 +48,13 @@ export default {
       }
     }, [
       h('path', {
-        key: this.attrs.d,
-        attrs: Object.assign({
+        key: this.d,
+        attrs: Object.assign({}, this.$attrs, {
+          d: this.d,
           'stroke-dasharray': this.length,
           'stroke-dashoffset': this.offset
-        }, this.attrs),
-        on: this.on
+        }),
+        on: this.$listeners
       })
     ])
   }

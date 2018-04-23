@@ -3,25 +3,32 @@ import 'gsap/TweenLite'
 export default {
   name: 'AnimatedBar',
   props: {
-    attrs: Object,
-    on: Object,
+    x: Number,
+    y: Number,
+    width: Number,
+    height: Number,
     duration: {
       type: Number,
       default: 0.2
     }
   },
   data () {
-    return Object.assign({}, this.attrs)
+    return {
+      props: Object.assign({}, this.$props)
+    }
   },
   watch: {
-    attrs (attrs) {
-      TweenLite.to(this.$data, this.duration, attrs)
+    $props: {
+      handler (props) {
+        TweenLite.to(this.props, this.duration, props)
+      },
+      deep: true
     }
   },
   render (h) {
     return h('rect', {
-      attrs: this.$data,
-      on: this.on
+      attrs: Object.assign({}, this.$attrs, this.props),
+      on: this.$listeners
     })
   }
 }

@@ -50,8 +50,12 @@ export default {
           p.moveTo(...points[d.id])
           p.quadraticCurveTo(...center, ...points[key])
           paths.push({
-            d: p.toString(),
-            'data-value': d[key]
+            props: {
+              d: p.toString()
+            },
+            attrs: {
+              'data-value': d[key]
+            }
           })
         })
         return Object.assign(obj, {[d.id]: paths})
@@ -59,7 +63,7 @@ export default {
     }
   },
   render (h) {
-    const connections = this.connections[this.selected] || []
-    return h('svg', connections.map(attrs => h(AnimatedLine, {props: {attrs}})))
+    const lines = this.connections[this.selected] || []
+    return h('svg', lines.map(line => h(AnimatedLine, line)))
   }
 }
