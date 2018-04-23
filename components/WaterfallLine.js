@@ -32,7 +32,8 @@ export default {
       const lineGenerator = line().curve(curveStep)
       return this.data.reduce((obj, d) => {
         let cumulative = 0
-        const points = [[-padding, yScale(cumulative)]]
+        const points = []
+        points.push([-padding, yScale(cumulative)])
         domain.forEach(key => {
           points.push([
             xScale(key),

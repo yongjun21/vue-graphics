@@ -6,10 +6,12 @@ export default {
   props: {
     attrs: Object,
     on: Object,
+    speed: Number,
     duration: {
       type: Number,
       default: 0.5
-    }
+    },
+    debounce: Number
   },
   data () {
     return {
@@ -18,9 +20,10 @@ export default {
     }
   },
   methods: {
-    animate: _debounce(function (el, done) {
+    animate (el, done) {
       const length = el.getTotalLength()
-      TweenLite.fromTo(this.$data, this.duration, {
+      const duration = this.speed ? this.speed * length : this.duration
+      TweenLite.fromTo(this.$data, duration, {
         length: length,
         offset: length
       }, {
@@ -28,7 +31,12 @@ export default {
         ease: Linear.easeNone,
         onComplete: done
       })
-    }, 100)
+    }
+  },
+  created () {
+    if (this.debounce != null) {
+      this.$options.methods.animate = _debounce(this.$options.methods.animate, this.debounce)
+    }
   },
   render (h) {
     return h('transition', {

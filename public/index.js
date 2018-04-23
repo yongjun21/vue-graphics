@@ -1,5 +1,6 @@
-import {BarChart, WaterfallLine, ResponsiveWrapper} from '../index.js'
+import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper} from '../index.js'
 
+/*
 window.fetch('waterfall.json')
   .then(res => res.json())
   .then(json => json['2017'])
@@ -22,3 +23,23 @@ window.fetch('waterfall.json')
       }
     })
   })
+  */
+
+Papa.parse('visa.csv', {
+  header: true,
+  dynamicTyping: true,
+  download: true,
+  complete (parsed) {
+    parsed.data.forEach(row => {
+      row.id = row.code
+    })
+    window.vm = new Vue({
+      el: '#app',
+      components: {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper},
+      data: {
+        data: parsed.data,
+        domain: parsed.data.map(row => row.id)
+      }
+    })
+  }
+})
