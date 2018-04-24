@@ -1,6 +1,6 @@
 {
   "name": "vue-graphics",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Library of reusable and extensible chart components built from ground up using VueJS",
   "main": "index.js",
   "scripts": {

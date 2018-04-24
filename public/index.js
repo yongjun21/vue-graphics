@@ -34,17 +34,19 @@ function testChordDiagram () {
     complete (parsed) {
       parsed.data.forEach(row => {
         row.id = row.code
+        row.label = row.country
       })
       window.vm = createVM(
         ChordDiagram,
         parsed.data,
-        parsed.data.map(row => row.id)
+        parsed.data.map(row => row.id),
+        'chord-diagram'
       )
     }
   })
 }
 
-function createVM (Component, data, domain) {
+function createVM (Component, data, domain, className) {
   return new Vue({
     el: 'main',
     provide: {
@@ -54,6 +56,7 @@ function createVM (Component, data, domain) {
     data: {data, domain},
     render (h) {
       return h(ResponsiveWrapper, {
+        class: className,
         scopedSlots: {
           default: sizing => h(Component, {
             props: Object.assign(sizing, this.$data)

@@ -1,6 +1,8 @@
 import {scalePoint} from 'd3-scale'
 import {path} from 'd3-path'
+import {mapRadialToCartesian} from '../util'
 
+import RadialAxis from './RadialAxis'
 import AnimatedLine from '../elements/AnimatedLine'
 
 export default {
@@ -32,11 +34,7 @@ export default {
       const {aScale, center, radius} = this
       return this.domain.reduce((obj, key) => {
         const a = aScale(key)
-        const xy = [
-          Math.round(Math.cos(a) * radius + center[0]),
-          Math.round(Math.sin(a) * radius + center[1])
-        ]
-        return Object.assign(obj, {[key]: xy})
+        return Object.assign(obj, {[key]: mapRadialToCartesian(a, radius, center)})
       }, {})
     },
     connections () {
@@ -60,11 +58,37 @@ export default {
         })
         return Object.assign(obj, {[d.id]: paths})
       }, {})
+    },
+    labelFormatter () {
+      const labels = this.data.reduce((obj, d) => {
+        return Object.assign(obj, {[d.id]: d.label})
+      }, {})
+      return key => labels[key]
+    }
+  },
+  methods: {
+    select (key) {
+      this.selected = key
     }
   },
   render (h) {
     const lines = this.connections[this.selected] || []
-    const filtered = lines.filter(line => line.attrs['data-value'] > 0)
-    return h('svg', filtered.map(line => h(AnimatedLine, line)))
+    const $lines = lines.filter(line => line.attrs['data-value'] > 0)
+                        .map(line => h(AnimatedLine, line))
+    return h('svg', this.center && [
+      h(RadialAxis, {
+        props: {
+          center: this.center,
+          radius: this.radius,
+          scale: this.aScale,
+          domain: this.domain,
+          formatter: this.labelFormatter
+        },
+        on: {
+          click: this.select
+        }
+      }),
+      h('g', $lines)
+    ])
   }
 }
