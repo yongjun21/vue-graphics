@@ -21,11 +21,11 @@ export default {
     },
     center () {
       if (this.width == null || this.height == null) return null
-      return [this.width / 2, this.height / 2]
+      return [Math.round(this.width / 2), Math.round(this.height / 2)]
     },
     radius () {
       if (this.center == null) return null
-      return Math.min(this.width, this.height) * (0.5 - (this.padding || 0))
+      return Math.min(this.width, this.height) * (0.5 - (this.padding || 0.1))
     },
     points () {
       if (this.center == null) return {}
@@ -64,6 +64,7 @@ export default {
   },
   render (h) {
     const lines = this.connections[this.selected] || []
-    return h('svg', lines.map(line => h(AnimatedLine, line)))
+    const filtered = lines.filter(line => line.attrs['data-value'] > 0)
+    return h('svg', filtered.map(line => h(AnimatedLine, line)))
   }
 }

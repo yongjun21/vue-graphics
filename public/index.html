@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Demo</title>
   <style>
-    html, body, #app {
+    html, body {
       height: 100%;
       margin: 0;
     }
@@ -52,19 +52,12 @@
   </style>
 </head>
 <body>
-  <div id="app">
-    <responsive-wrapper>
-      <chord-diagram slot-scope="sizing"
-        :data="data"
-        :domain="domain"
-        v-bind="sizing">
-      </chord-diagram>
-    </responsive-wrapper>
-  </div>
+  <main></main>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.3.7/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenLite.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TimelineLite.min.js"></script>
   <script src="bundle.js"></script>
 </body>
 </html>

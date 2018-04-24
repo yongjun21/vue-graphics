@@ -40,7 +40,7 @@ export default {
             width: xScale.bandwidth(),
             height: h,
             x: xScale(i),
-            y: height - h,
+            y: Math.round(height - h),
             stroke: 'none'
           }
         }

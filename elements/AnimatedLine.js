@@ -1,61 +1,67 @@
 import 'gsap/TweenLite'
-import _debounce from 'lodash-es/debounce'
 
 export default {
   name: 'AnimatedLine',
   props: {
     d: String,
-    debounce: Number,
     speed: Number,
     duration: {
       type: Number,
       default: 0.5
+    },
+    debounce: {
+      type: Number,
+      default: 0
+    },
+    auto: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
     return {
-      length: null,
-      offset: null
+      offset: getLength(this.d)
+    }
+  },
+  computed: {
+    length () {
+      return getLength(this.d)
     }
   },
   methods: {
-    animate (el, done) {
-      const length = el.getTotalLength()
-      const duration = this.speed ? this.speed * length : this.duration
-      TweenLite.fromTo(this.$data, duration, {
-        length: length,
-        offset: length
-      }, {
+    animate () {
+      const duration = this.speed ? this.speed * this.length : this.duration
+      return TweenLite.to(this.$data, duration, {
         offset: 0,
         ease: Linear.easeNone,
-        onComplete: done
+        delay: this.debounce,
+        overwrite: 'all'
       })
     }
   },
-  created () {
-    if (this.debounce != null) {
-      this.animate = _debounce(this.animate, this.debounce).bind(this)
+  watch: {
+    d () {
+      this.offset = this.length
+      if (this.auto) this.animate()
     }
+  },
+  mounted () {
+    if (this.auto) this.animate()
   },
   render (h) {
-    return h('transition', {
-      on: {
-        beforeEnter: () => {
-          this.length = 999999
-          this.offset = 999999
-        },
-        enter: this.animate
-      }
-    }, [
-      h('path', {
-        key: this.d,
-        attrs: Object.assign({}, this.$attrs, {
-          d: this.d,
-          'stroke-dasharray': this.length,
-          'stroke-dashoffset': this.offset
-        }),
-        on: this.$listeners
-      })
-    ])
+    return h('path', {
+      attrs: Object.assign({}, this.$attrs, {
+        d: this.d,
+        'stroke-dasharray': this.length,
+        'stroke-dashoffset': this.offset
+      }),
+      on: this.$listeners
+    })
   }
+}
+
+const $path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+function getLength (d) {
+  $path.setAttribute('d', d)
+  return Math.ceil($path.getTotalLength())
 }

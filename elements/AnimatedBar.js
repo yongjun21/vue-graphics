@@ -10,17 +10,36 @@ export default {
     duration: {
       type: Number,
       default: 0.2
+    },
+    auto: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
     return {
-      props: Object.assign({}, this.$props)
+      props: {
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height
+      }
+    }
+  },
+  methods: {
+    animate () {
+      return TweenLite.to(this.props, this.duration, {
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height
+      })
     }
   },
   watch: {
     $props: {
-      handler (props) {
-        TweenLite.to(this.props, this.duration, props)
+      handler () {
+        if (this.auto) this.animate()
       },
       deep: true
     }

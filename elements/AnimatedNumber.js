@@ -6,7 +6,11 @@ export default {
     value: Number,
     duration: {
       type: Number,
-      default: 0.2
+      default: 0.5
+    },
+    auto: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -14,9 +18,14 @@ export default {
       display: this.value
     }
   },
+  methods: {
+    animate () {
+      TweenLite.to(this.$data, this.duration, {display: this.value})
+    }
+  },
   watch: {
-    value (v) {
-      TweenLite.to(this.$data, this.duration, {display: v})
+    value () {
+      if (this.auto) this.animate()
     }
   },
   render (h) {
