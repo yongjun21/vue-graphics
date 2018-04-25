@@ -10,9 +10,15 @@
       margin: 0;
     }
     svg {
-      width: 60vw;
-      height: 60vw;
+      width: 70vw;
+      max-width: 100vh;
+      height: 70vw;
+      max-height: 100vh;
       cursor: auto;
+    }
+
+    line {
+      pointer-events: none;
     }
 
     path {
@@ -36,27 +42,63 @@
     }
 
     path[data-value="1"] {
-      stroke: red;
-      stroke-width: 2px;
+      stroke: #CCC;
+      stroke-width: 1px;
     }
 
     path[data-value="2"] {
-      stroke: blue;
-      stroke-width: 2px;
+      stroke: #CCC;
+      stroke-width: 1px;
     }
 
     path[data-value="3"] {
-      stroke: green;
-      stroke-width: 2px;
+      stroke: #CCC;
+      stroke-width: 1px;
+    }
+
+    path[data-value="4"] {
+      stroke: orange;
+      stroke-width: 1px;
+    }
+
+    path[data-value="5"] {
+      stroke: red;
+      stroke-width: 1px;
+    }
+
+    g[data-value="4"] text {
+      fill: orange;
+    }
+
+    g[data-value="5"] text {
+      fill: red;
     }
     
-    .chord-diagram line {
+    .chord-diagram .axis line,
+    .chord-diagram .axis path {
       stroke: black;
     }
 
     .chord-diagram text {
       font-size: 0.6em;
       cursor: pointer;
+      transition: fill 500ms;
+    }
+
+    .chord-diagram .source text {
+      fill: orange;
+    }
+  
+    .chord-diagram .one text {
+      fill: red;
+    }
+  
+    .chord-diagram .two text {
+      fill: blue;
+    }
+  
+    .chord-diagram .three text {
+      fill: green
     }
   </style>
 </head>

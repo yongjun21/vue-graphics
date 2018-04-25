@@ -1,11 +1,12 @@
-import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper} from '../index.js'
+import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper, AnimatedBar} from '../index.js'
 
 // testBarChart()
 // testWaterfallLine()
 testChordDiagram()
 
 function testBarChart () {
-  window.vm = createVM(BarChart, [10, 20, 50, 40], [0, 60])
+  BarChart.components['bar-element'] = AnimatedBar
+  window.vm = createVM(BarChart, {data: [10, 20, 50, 40], domain: [0, 60]})
 }
 
 function testWaterfallLine () {
@@ -22,7 +23,7 @@ function testWaterfallLine () {
           d.highlight = {class: 'overall'}
         }
       })
-      window.vm = createVM(WaterfallLine, data, ['1', '2A', '2B', '2C', '2CS'])
+      window.vm = createVM(WaterfallLine, {data, domain: ['1', '2A', '2B', '2C', '2CS']})
     })
 }
 
@@ -35,25 +36,24 @@ function testChordDiagram () {
       parsed.data.forEach(row => {
         row.id = row.code
         row.label = row.country
+        row.group = row.region
       })
-      window.vm = createVM(
-        ChordDiagram,
-        parsed.data,
-        parsed.data.map(row => row.id),
-        'chord-diagram'
-      )
+      const data = {
+        data: parsed.data,
+        domain: parsed.data.map(row => row.id),
+        groups: ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania'],
+        exclude: v => v <= 0,
+        padding: 0.15
+      }
+      window.vm = createVM(ChordDiagram, data, 'chord-diagram')
     }
   })
 }
 
-function createVM (Component, data, domain, className) {
+function createVM (Component, data, className) {
   return new Vue({
     el: 'main',
-    provide: {
-      test: 'abc'
-    },
-    components: {ChordDiagram, ResponsiveWrapper},
-    data: {data, domain},
+    data,
     render (h) {
       return h(ResponsiveWrapper, {
         class: className,

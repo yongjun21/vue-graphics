@@ -1,7 +1,6 @@
 import {scaleBand, scaleLinear} from 'd3-scale'
 
 import Bar from '../elements/Bar'
-// import AnimatedBar from '../elements/AnimatedBar'
 
 export default {
   name: 'BarChart',
@@ -36,18 +35,20 @@ export default {
           key: label,
           class: d.class,
           style: d.style,
-          attrs: {
+          props: {
             width: xScale.bandwidth(),
             height: h,
             x: xScale(i),
-            y: Math.round(height - h),
-            stroke: 'none'
+            y: Math.round(height - h)
           }
         }
       })
     }
   },
+  components: {
+    'bar-element': Bar
+  },
   render (h) {
-    return h('svg', this.bars.map(bar => h(Bar, bar)))
+    return h('svg', this.bars.map(bar => h('bar-element', bar)))
   }
 }

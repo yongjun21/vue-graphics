@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     animate () {
-      const duration = this.speed ? this.speed * this.length : this.duration
+      const duration = this.speed ? this.length / this.speed : this.duration
       return TweenLite.to(this.$data, duration, {
         offset: 0,
         ease: Linear.easeNone,

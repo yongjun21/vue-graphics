@@ -1,0 +1,150 @@
+import {scalePoint} from 'd3-scale'
+import {path} from 'd3-path'
+import TimelineLite from 'gsap/TimelineLite'
+import {mapRadialToCartesian} from '../util'
+
+import RadialAxis from '../components/RadialAxis'
+import AnimatedLine from '../elements/AnimatedLine'
+
+export default {
+  props: ['data', 'domain', 'groups', 'exclude', 'width', 'height', 'padding'],
+  data () {
+    return {
+      selected: 'SG'
+    }
+  },
+  computed: {
+    groupedDomain () {
+      const {domain} = this
+      if (!this.groups) return {_: domain}
+      return this.groups.reduce((obj, g) => {
+        const subset = domain.filter(key => {
+          return this.data.some(d => d.id === key && d.group === g)
+        })
+        return Object.assign(obj, {[g]: subset})
+      }, {})
+    },
+    sortedDomain () {
+      const groups = this.groups || ['_']
+      return groups.reduce((arr, g) => arr.concat(this.groupedDomain[g]), [])
+    },
+    aScale () {
+      const scale = scalePoint()
+      scale.domain(this.sortedDomain)
+      scale.range([-0.5 * Math.PI, 1.5 * Math.PI])
+      scale.padding(0.5)
+      scale.align(0)
+      return scale
+    },
+    center () {
+      if (this.width == null || this.height == null) return null
+      return [Math.round(this.width / 2), Math.round(this.height / 2)]
+    },
+    radius () {
+      if (this.center == null) return null
+      return Math.min(this.width, this.height) * (0.5 - (this.padding || 0.1))
+    },
+    points () {
+      if (this.center == null) return {}
+      const {aScale, center, radius} = this
+      return this.sortedDomain.reduce((obj, key) => {
+        const a = aScale(key)
+        return Object.assign(obj, {[key]: mapRadialToCartesian(a, radius, center)})
+      }, {})
+    },
+    connections () {
+      if (this.center == null) return {}
+      const {points, sortedDomain, groupedDomain, exclude, center} = this
+      return this.data.reduce((obj, d) => {
+        if (!points[d.id]) return obj
+
+        const start = (groupedDomain[d.group] || sortedDomain)[0]
+        const startIndex = sortedDomain.indexOf(start)
+        const resorted = sortedDomain.slice(startIndex).concat(sortedDomain.slice(0, startIndex))
+
+        const paths = []
+        resorted.forEach(key => {
+          if (exclude && exclude(d[key])) return
+          const p = path()
+          p.moveTo(...points[d.id])
+          p.quadraticCurveTo(...center, ...points[key])
+          paths.push({
+            key,
+            ref: key,
+            props: {
+              d: p.toString(),
+              auto: false
+            },
+            attrs: {
+              'data-value': d[key]
+            }
+          })
+        })
+        return Object.assign(obj, {[d.id]: paths})
+      }, {})
+    },
+    labelFormatter () {
+      const {selected} = this
+      const labels = this.data.reduce((obj, d) => {
+        return Object.assign(obj, {[d.id]: d.label})
+      }, {})
+      const values = this.data.filter(d => d.id === selected)[0]
+      return key => {
+        return {
+          text: labels[key],
+          class: {
+            source: key === selected
+          },
+          attrs: {
+            'data-value': values[key]
+          }
+        }
+      }
+    }
+  },
+  methods: {
+    animate () {
+      this.$nextTick(function () {
+        const tweens = this.connections[this.selected]
+          .map(line => this.$refs[line.key].animate())
+        return new TimelineLite({tweens, stagger: 0.01})
+      })
+    }
+  },
+  watch: {
+    connections: 'animate',
+    selected: 'animate'
+  },
+  render (h) {
+    if (!this.center) return h('svg')
+    const {groupedDomain, aScale, center, radius, labelFormatter} = this
+    const lines = this.connections[this.selected] || []
+    const $lines = lines.map(line => h(AnimatedLine, line))
+    const $axes = Object.keys(groupedDomain).map(g => {
+      return h(RadialAxis, {
+        props: {
+          center: center,
+          radius: radius,
+          scale: aScale,
+          domain: groupedDomain[g],
+          formatter: labelFormatter,
+          innerPadding: 6,
+          complete: g === '_' ? '' : null
+        },
+        attrs: {'data-group': g},
+        class: 'axis',
+        on: {
+          click: e => {
+            if (e.target.hasAttribute('data-key')) {
+              this.selected = e.target.getAttribute('data-key')
+            }
+          }
+        }
+      })
+    })
+    return h('svg', [
+      h('g', $axes),
+      h('g', $lines)
+    ])
+  }
+}
