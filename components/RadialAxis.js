@@ -7,10 +7,9 @@ export default {
     props = Object.assign({
       tickLength: 6,
       innerPadding: 0,
-      outerPadding: 3,
-      formatter: key => key
+      outerPadding: 3
     }, props)
-    const {center, radius, scale, domain, formatter, tickLength, innerPadding, outerPadding} = props
+    const {center, radius, scale, domain, tickLength, innerPadding, outerPadding} = props
     const range = domain.map(scale)
     const minA = range.reduce((min, a) => a < min ? a : min, Infinity)
     const maxA = range.reduce((max, a) => a > max ? a : max, -Infinity)
@@ -22,11 +21,18 @@ export default {
     baseline.arc(...center, radius + innerPadding, minA, completeArc ? (minA + 2 * Math.PI) : maxA)
     const $baseline = h('path', {
       attrs: {
-        d: baseline.toString()
+        d: baseline.toString(),
+        'fill': 'none'
       }
     })
 
-    const $ticks = domain.map((key, i) => {
+    const labelGenerator = (data.scopedSlots && data.scopedSlots.default) ||
+                           (data => h('text', data, data.key))
+
+    const $tickMarks = []
+    const $tickLabels = []
+
+    domain.forEach((key, i) => {
       let x1 = radius + innerPadding
       let x2 = radius + innerPadding + tickLength
       let x = radius + innerPadding + tickLength + outerPadding
@@ -40,29 +46,27 @@ export default {
 
       const transform = `rotate(${deg} ${center[0]} ${center[1]}) translate(${center[0]} ${center[1]})`
 
-      let formatted = formatter(key)
-      if (typeof formatted !== 'object') formatted = {text: formatted}
-
       const $tickMark = h('line', {
         attrs: {x1, x2, transform}
       })
+      $tickMarks.push($tickMark)
 
-      const $tickLabel = h('text', {
+      const $tickLabel = labelGenerator({
+        key,
         attrs: {
           x,
           transform,
           'dy': '0.35em',
-          'text-anchor': onLeft ? 'end' : 'start',
-          'data-key': key
+          'text-anchor': onLeft ? 'end' : 'start'
         }
-      }, formatted.text)
-
-      return h('g', Object.assign({key}, formatted), [$tickMark, $tickLabel])
+      })
+      $tickLabels.push($tickLabel)
     })
 
     return h('g', data, [
       $baseline,
-      ...$ticks
+      h('g', $tickMarks),
+      h('g', $tickLabels)
     ])
   }
 }

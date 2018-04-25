@@ -22,7 +22,6 @@
     }
 
     path {
-      fill: none;
       pointer-events: none;
     }
 
@@ -39,6 +38,21 @@
     path.overall, path.overall.highlight {
       stroke: blue;
       stroke-width: 2px;
+    }
+    
+    .chord-diagram .axis line,
+    .chord-diagram .axis path {
+      stroke: black;
+    }
+
+    .chord-diagram text {
+      font-size: 0.6em;
+      cursor: pointer;
+      transition: fill 500ms;
+    }
+
+    .chord-diagram text.source {
+      font-weight: 700;
     }
 
     path[data-value="1"] {
@@ -66,39 +80,12 @@
       stroke-width: 1px;
     }
 
-    g[data-value="4"] text {
+    text[data-value="4"] {
       fill: orange;
     }
 
-    g[data-value="5"] text {
+    text[data-value="5"] {
       fill: red;
-    }
-    
-    .chord-diagram .axis line,
-    .chord-diagram .axis path {
-      stroke: black;
-    }
-
-    .chord-diagram text {
-      font-size: 0.6em;
-      cursor: pointer;
-      transition: fill 500ms;
-    }
-
-    .chord-diagram .source text {
-      fill: orange;
-    }
-  
-    .chord-diagram .one text {
-      fill: red;
-    }
-  
-    .chord-diagram .two text {
-      fill: blue;
-    }
-  
-    .chord-diagram .three text {
-      fill: green
     }
   </style>
 </head>

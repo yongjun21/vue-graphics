@@ -7,6 +7,7 @@ import RadialAxis from '../components/RadialAxis'
 import AnimatedLine from '../elements/AnimatedLine'
 
 export default {
+  name: 'ChordDiagram',
   props: ['data', 'domain', 'groups', 'exclude', 'width', 'height', 'padding'],
   data () {
     return {
@@ -83,23 +84,35 @@ export default {
         return Object.assign(obj, {[d.id]: paths})
       }, {})
     },
-    labelFormatter () {
-      const {selected} = this
+    axes () {
+      if (this.center == null) return []
+      const {aScale, center, radius} = this
+      return Object.keys(this.groupedDomain).map(g => {
+        return {
+          props: {
+            center: center,
+            radius: radius,
+            scale: aScale,
+            domain: this.groupedDomain[g],
+            innerPadding: 6,
+            complete: g === '_' ? '' : null
+          },
+          attrs: {'data-group': g},
+          class: 'axis',
+          scopedSlots: {}
+        }
+      })
+    },
+    getLabel () {
       const labels = this.data.reduce((obj, d) => {
         return Object.assign(obj, {[d.id]: d.label})
       }, {})
+      return key => labels[key]
+    },
+    getValue () {
+      const {selected} = this
       const values = this.data.filter(d => d.id === selected)[0]
-      return key => {
-        return {
-          text: labels[key],
-          class: {
-            source: key === selected
-          },
-          attrs: {
-            'data-value': values[key]
-          }
-        }
-      }
+      return key => values[key]
     }
   },
   methods: {
@@ -117,31 +130,25 @@ export default {
   },
   render (h) {
     if (!this.center) return h('svg')
-    const {groupedDomain, aScale, center, radius, labelFormatter} = this
-    const lines = this.connections[this.selected] || []
+    const {selected, getLabel, getValue} = this
+
+    const lines = this.connections[selected] || []
     const $lines = lines.map(line => h(AnimatedLine, line))
-    const $axes = Object.keys(groupedDomain).map(g => {
-      return h(RadialAxis, {
-        props: {
-          center: center,
-          radius: radius,
-          scale: aScale,
-          domain: groupedDomain[g],
-          formatter: labelFormatter,
-          innerPadding: 6,
-          complete: g === '_' ? '' : null
-        },
-        attrs: {'data-group': g},
-        class: 'axis',
-        on: {
-          click: e => {
-            if (e.target.hasAttribute('data-key')) {
-              this.selected = e.target.getAttribute('data-key')
-            }
+
+    const $axes = this.axes.map(axis => {
+      axis.scopedSlots.default = data => {
+        if (data.key === selected) data.class = 'source'
+        data.attrs['data-value'] = getValue(data.key)
+        data.on = {
+          click: () => {
+            this.selected = data.key
           }
         }
-      })
+        return h('text', data, getLabel(data.key))
+      }
+      return h(RadialAxis, axis)
     })
+
     return h('svg', [
       h('g', $axes),
       h('g', $lines)

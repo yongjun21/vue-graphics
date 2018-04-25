@@ -52,6 +52,7 @@ export default {
     return h('path', {
       attrs: Object.assign({}, this.$attrs, {
         d: this.d,
+        'fill': 'none',
         'stroke-dasharray': this.length,
         'stroke-dashoffset': this.offset
       }),
