@@ -50,12 +50,12 @@ export default {
   },
   render (h) {
     return h('path', {
-      attrs: Object.assign({}, this.$attrs, {
+      attrs: {
         d: this.d,
         'fill': 'none',
         'stroke-dasharray': this.length,
         'stroke-dashoffset': this.offset
-      }),
+      },
       on: this.$listeners
     })
   }

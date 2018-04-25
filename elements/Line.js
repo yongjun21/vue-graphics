@@ -1,8 +1,8 @@
 export default {
   functional: true,
-  render (h, {data, props}) {
+  render (h, {data}) {
     data.attrs = data.attrs || {}
-    Object.assign(data.attrs, {'fill': 'none'}, props)
+    Object.assign(data.attrs, {'fill': 'none'})
     return h('path', data)
   }
 }

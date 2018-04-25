@@ -35,7 +35,7 @@ export default {
           key: label,
           class: d.class,
           style: d.style,
-          props: {
+          attrs: {
             width: xScale.bandwidth(),
             height: h,
             x: xScale(i),

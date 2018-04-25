@@ -46,7 +46,7 @@ export default {
   },
   render (h) {
     return h('rect', {
-      attrs: Object.assign({}, this.$attrs, this.props),
+      attrs: this.props,
       on: this.$listeners
     })
   }

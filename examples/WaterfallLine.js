@@ -61,7 +61,7 @@ export default {
     const $content = this.data.filter(d => d.id in pathString).map(d => {
       if (highlighted[d.id]) {
         $overlay.push(h(AnimatedLine, {
-          props: {
+          attrs: {
             d: pathString[d.id]
           },
           class: d.highlight && d.highlight.class,

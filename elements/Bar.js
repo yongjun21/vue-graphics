@@ -1,8 +1,6 @@
 export default {
   functional: true,
-  render (h, {data, props}) {
-    data.attrs = data.attrs || {}
-    Object.assign(data.attrs, props)
+  render (h, {data}) {
     return h('rect', data)
   }
 }

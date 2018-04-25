@@ -72,12 +72,12 @@ export default {
           paths.push({
             key,
             ref: key,
-            props: {
-              d: p.toString(),
-              auto: false
-            },
             attrs: {
+              d: p.toString(),
               'data-value': d[key]
+            },
+            props: {
+              auto: false
             }
           })
         })
@@ -89,6 +89,7 @@ export default {
       const {aScale, center, radius} = this
       return Object.keys(this.groupedDomain).map(g => {
         return {
+          attrs: {'data-group': g},
           props: {
             center: center,
             radius: radius,
@@ -97,7 +98,6 @@ export default {
             innerPadding: 6,
             complete: g === '_' ? '' : null
           },
-          attrs: {'data-group': g},
           class: 'axis',
           scopedSlots: {}
         }
