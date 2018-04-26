@@ -87,7 +87,7 @@ export default {
     axes () {
       if (this.center == null) return []
       const {aScale, center, radius} = this
-      return Object.keys(this.groupedDomain).map(g => {
+      return Object.keys(this.groupedDomain).map((g, i) => {
         return {
           attrs: {'data-group': g},
           props: {
@@ -95,7 +95,7 @@ export default {
             radius: radius,
             scale: aScale,
             domain: this.groupedDomain[g],
-            innerPadding: 6,
+            innerPadding: 6 + (i % 2) * 6,
             complete: g === '_' ? '' : null
           },
           class: 'axis',

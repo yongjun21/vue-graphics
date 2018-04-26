@@ -1,5 +1,4 @@
 import {path} from 'd3-path'
-import {mapRadialToCartesian} from '../util'
 
 export default {
   functional: true,
@@ -16,15 +15,26 @@ export default {
     const onLeft = Math.cos((minA + maxA) / 2) < 0
     const completeArc = props.complete != null
 
+    let x1 = radius + innerPadding
+    let x2 = x1 + tickLength
+    let x3 = x2 + outerPadding
+
     const baseline = path()
-    baseline.moveTo(...mapRadialToCartesian(minA, radius + innerPadding, center))
-    baseline.arc(...center, radius + innerPadding, minA, completeArc ? (minA + 2 * Math.PI) : maxA)
+    baseline.moveTo(x1, 0)
+    baseline.arc(0, 0, x1, 0, completeArc ? 2 * Math.PI : maxA - minA)
     const $baseline = h('path', {
       attrs: {
         d: baseline.toString(),
+        transform: getRotation(minA),
         'fill': 'none'
       }
     })
+
+    if (onLeft) {
+      x1 = -x1
+      x2 = -x2
+      x3 = -x3
+    }
 
     const labelGenerator = (data.scopedSlots && data.scopedSlots.default) ||
                            (data => h('text', data, data.key))
@@ -33,35 +43,25 @@ export default {
     const $tickLabels = []
 
     domain.forEach((key, i) => {
-      let x1 = radius + innerPadding
-      let x2 = radius + innerPadding + tickLength
-      let x = radius + innerPadding + tickLength + outerPadding
-      let deg = range[i] * 180 / Math.PI
-      if (onLeft) {
-        x1 = -x1
-        x2 = -x2
-        x = -x
-        deg += 180
-      }
-
-      const transform = `rotate(${deg} ${center[0]} ${center[1]}) translate(${center[0]} ${center[1]})`
-
+      const transform = getRotation(range[i] + (onLeft ? Math.PI : 0))
       const $tickMark = h('line', {
         attrs: {x1, x2, transform}
       })
-      $tickMarks.push($tickMark)
-
       const $tickLabel = labelGenerator({
         key,
         attrs: {
-          x,
+          x: x3,
+          dy: '0.35em',
           transform,
-          'dy': '0.35em',
           'text-anchor': onLeft ? 'end' : 'start'
         }
       })
+      $tickMarks.push($tickMark)
       $tickLabels.push($tickLabel)
     })
+
+    data.attrs = data.attrs || {}
+    data.attrs.transform = `translate(${center[0]} ${center[1]})`
 
     return h('g', data, [
       $baseline,
@@ -69,4 +69,9 @@ export default {
       h('g', $tickLabels)
     ])
   }
+}
+
+function getRotation (a) {
+  const deg = a * 180 / Math.PI
+  return `rotate(${deg})`
 }
