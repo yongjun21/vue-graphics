@@ -72,11 +72,9 @@ export default {
           paths.push({
             key,
             ref: key,
-            attrs: {
-              d: p.toString(),
-              'data-value': d[key]
-            },
+            attrs: {'data-value': d[key]},
             props: {
+              d: p.toString(),
               auto: false
             }
           })

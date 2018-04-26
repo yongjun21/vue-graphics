@@ -1,12 +1,13 @@
-import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper, AnimatedBar} from '../index.js'
+import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper, AnimatedBar, StackedBarChart} from '../index.js'
 
 // testBarChart()
 // testWaterfallLine()
-testChordDiagram()
+// testChordDiagram()
+testStackedBar()
 
 function testBarChart () {
   BarChart.components['bar-element'] = AnimatedBar
-  window.vm = createVM(BarChart, {data: [10, 20, 50, 40], domain: [0, 60]})
+  window.vm = createVM(BarChart, {data: [10, 20, 50, 40], yDomain: [0, 60]})
 }
 
 function testWaterfallLine () {
@@ -48,6 +49,26 @@ function testChordDiagram () {
       window.vm = createVM(ChordDiagram, data, 'chord-diagram')
     }
   })
+}
+
+function testStackedBar () {
+  window.fetch('progress.json')
+    .then(res => res.json())
+    .then(json => json['2017']['2B'])
+    .then(data => {
+      data.forEach(d => {
+        d.label = d.school
+      })
+      window.vm = createVM(StackedBarChart, {
+        data,
+        domain: ['filled', 'vacancy', 'applicants'],
+        yDomain: [0, 400],
+        height: data.length * 200,
+        paddingInner: 0.4,
+        paddingOuter: 0.2,
+        horizontal: ''
+      })
+    })
 }
 
 function createVM (Component, data, className) {

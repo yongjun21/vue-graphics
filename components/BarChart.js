@@ -4,25 +4,31 @@ import Bar from '../elements/Bar'
 
 export default {
   name: 'BarChart',
-  props: ['data', 'domain', 'width', 'height', 'paddingInner', 'paddingOuter'],
+  props: ['data', 'yDomain', 'width', 'height', 'paddingInner', 'paddingOuter', 'horizontal'],
   computed: {
+    xRange () {
+      return Math.round(this.horizontal == null ? this.width : this.height)
+    },
+    yRange () {
+      return Math.round(this.horizontal == null ? this.height : this.width)
+    },
     xScale () {
       const scale = scaleBand()
       scale.domain(this.data.map((d, i) => i))
-      scale.rangeRound(this.width && [0, this.width])
+      scale.rangeRound(this.xRange && [0, this.xRange])
       scale.paddingInner(this.paddingInner || 0)
       scale.paddingOuter(this.paddingOuter || 0)
       return scale
     },
     yScale () {
       const scale = scaleLinear()
-      scale.domain(this.domain)
-      scale.rangeRound(this.height && [0, this.height])
+      scale.domain(this.yDomain)
+      scale.rangeRound(this.yRange && [0, this.yRange])
       return scale
     },
     bars () {
       if (this.width == null || this.height == null) return []
-      const {height, xScale, yScale} = this
+      const {yRange, xScale, yScale, horizontal} = this
       return this.data.map((d, i) => {
         let label = i
         let value = d
@@ -30,17 +36,26 @@ export default {
           label = d.label || i
           value = d.value
         }
-        const h = yScale(value)
+        const y = yScale(value)
+
+        const attrs = horizontal == null ? {
+          width: xScale.bandwidth(),
+          height: y,
+          x: xScale(i),
+          y: yRange - y
+        } : {
+          width: y,
+          height: xScale.bandwidth(),
+          x: 0,
+          y: xScale(i)
+        }
+        attrs['data-label'] = label
+
         return {
           key: label,
           class: d.class,
           style: d.style,
-          attrs: {
-            width: xScale.bandwidth(),
-            height: h,
-            x: xScale(i),
-            y: Math.round(height - h)
-          }
+          attrs
         }
       })
     }
