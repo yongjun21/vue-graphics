@@ -1,5 +1,7 @@
 import 'gsap/TweenLite'
 
+import {getPathLength} from '../util'
+
 export default {
   name: 'AnimatedLine',
   props: {
@@ -20,12 +22,12 @@ export default {
   },
   data () {
     return {
-      offset: getLength(this.d)
+      offset: getPathLength(this.d)
     }
   },
   computed: {
     length () {
-      return getLength(this.d)
+      return getPathLength(this.d)
     }
   },
   methods: {
@@ -59,10 +61,4 @@ export default {
       on: this.$listeners
     })
   }
-}
-
-const $path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-function getLength (d) {
-  $path.setAttribute('d', d)
-  return Math.ceil($path.getTotalLength())
 }

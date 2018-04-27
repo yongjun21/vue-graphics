@@ -1,12 +1,13 @@
 {
   "name": "vue-graphics",
-  "version": "0.0.7",
-  "description": "Library of reusable and extensible chart components built from ground up using VueJS",
+  "version": "0.0.9",
+  "description": "A set of Vue-powered graphics primitives and components for building web visualizations and interactive graphics",
   "main": "index.js",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -cw",
-    "test": "exit 0"
+    "test": "jest",
+    "prepublishOnly": "npm run test"
   },
   "repository": {
     "type": "git",
@@ -26,8 +27,18 @@
     "lodash-es": "^4.17.8"
   },
   "devDependencies": {
+    "@vue/test-utils": "^1.0.0-beta.15",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "jest": "^22.4.3",
     "rollup": "^0.57.1",
-    "rollup-plugin-node-resolve": "^3.3.0"
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "vue": "^2.5.16",
+    "vue-template-compiler": "^2.5.16"
+  },
+  "babel": {
+    "plugins": [
+      "transform-es2015-modules-commonjs"
+    ]
   },
   "standard": {
     "globals": [

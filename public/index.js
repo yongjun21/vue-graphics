@@ -2,8 +2,8 @@ import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper, AnimatedBar, S
 
 // testBarChart()
 // testWaterfallLine()
-// testChordDiagram()
-testStackedBar()
+testChordDiagram()
+// testStackedBar()
 
 function testBarChart () {
   BarChart.components['bar-element'] = AnimatedBar

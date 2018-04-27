@@ -1,3 +1,18 @@
+let $path
+
+export function getPathLength (d) {
+  $path = $path || document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  $path.setAttribute('d', d)
+  return Math.ceil($path.getTotalLength())
+}
+
+export function mapRadialToCartesian (a, radius, center = [0, 0]) {
+  return [
+    Math.round(Math.cos(a) * radius + center[0]),
+    Math.round(Math.sin(a) * radius + center[1])
+  ]
+}
+
 export function mergeClass (...classes) {
   return classes.reduce((obj, cl) => {
     if (typeof cl === 'string') {
@@ -9,13 +24,6 @@ export function mergeClass (...classes) {
     }
     return obj
   }, {})
-}
-
-export function mapRadialToCartesian (a, radius, center = [0, 0]) {
-  return [
-    Math.round(Math.cos(a) * radius + center[0]),
-    Math.round(Math.sin(a) * radius + center[1])
-  ]
 }
 
 export function injectStyle (cssText) {
