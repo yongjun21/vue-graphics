@@ -1,4 +1,7 @@
-import {BarChart, WaterfallLine, ChordDiagram, ResponsiveWrapper, AnimatedBar, StackedBarChart} from '../index.js'
+import {BarChart, ResponsiveWrapper, AnimatedBar, StackedBarChart} from '../index.js'
+
+import WaterfallLine from '../examples/WaterfallLine'
+import ChordDiagram from '../examples/ChordDiagram'
 
 // testBarChart()
 // testWaterfallLine()
