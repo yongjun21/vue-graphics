@@ -2,23 +2,20 @@ import {scaleBand, scaleLinear} from 'd3-scale'
 import {stack} from 'd3-shape'
 
 import Bar from '../elements/Bar'
+import LinearAxis from './LinearAxis'
+import boxLayout from '../mixins/boxLayout'
 
 import {mergeClass} from '../util'
 
 export default {
   name: 'StackedBarChart',
-  props: ['data', 'domain', 'yDomain', 'width', 'height', 'paddingInner', 'paddingOuter', 'horizontal'],
+  extends: boxLayout,
+  props: ['data', 'domain', 'yDomain', 'horizontal', 'paddingInner', 'paddingOuter'],
   computed: {
-    xRange () {
-      return Math.round(this.horizontal == null ? this.width : this.height)
-    },
-    yRange () {
-      return Math.round(this.horizontal == null ? this.height : this.width)
-    },
     xScale () {
       const scale = scaleBand()
       scale.domain(this.data.map((d, i) => i))
-      scale.rangeRound(this.xRange && [0, this.xRange])
+      scale.rangeRound(this.horizontal == null ? this.xRange : this.yRange)
       scale.paddingInner(this.paddingInner || 0)
       scale.paddingOuter(this.paddingOuter || 0)
       return scale
@@ -26,8 +23,16 @@ export default {
     yScale () {
       const scale = scaleLinear()
       scale.domain(this.yDomain)
-      scale.rangeRound(this.yRange && [0, this.yRange])
+      scale.rangeRound(this.horizontal == null ? this.yRange : this.xRange)
       return scale
+    },
+    xMax () {
+      const range = this.xScale.range()
+      return Math.round(range[range.length - 1])
+    },
+    yMax () {
+      const range = this.yScale.range()
+      return Math.round(range[range.length - 1])
     },
     stackedData () {
       const keys = this.domain.map(d => typeof d === 'object' ? d.value : d)
@@ -36,7 +41,8 @@ export default {
     bars () {
       if (this.width == null || this.height == null) return []
 
-      const {yRange, xScale, yScale, horizontal, domain, data} = this
+      const {xScale, yScale, horizontal, domain, data} = this
+      const yMax = yScale.range()[1]
 
       const collection = []
 
@@ -48,7 +54,7 @@ export default {
             width: xScale.bandwidth(),
             height: y2 - y1,
             x: xScale(i),
-            y: yRange - y2
+            y: yMax - y2
           } : {
             width: y2 - y1,
             height: xScale.bandwidth(),
@@ -74,6 +80,61 @@ export default {
     'bar-element': Bar
   },
   render (h) {
-    return h('svg', this.bars.map(bar => h('bar-element', bar)))
+    let $horizontalAxis, $verticalAxis
+    if (this.width != null && this.height != null) {
+      if (this.horizontal == null) {
+        $horizontalAxis = h(LinearAxis, {
+          class: 'axis',
+          props: {
+            horizontal: true,
+            offset: this.y + this.height,
+            scale: this.xScale,
+            domain: this.xScale.domain(),
+            extrapolate: true
+          },
+          scopedSlots: {
+            default: data => h('text', data, this.data[data.key].label || data.key)
+          }
+        })
+        $verticalAxis = h(LinearAxis, {
+          class: 'axis',
+          props: {
+            offset: this.x,
+            scale: this.yScale,
+            domain: this.yScale.ticks(),
+            extrapolate: true
+          }
+        })
+      } else {
+        $horizontalAxis = h(LinearAxis, {
+          class: 'axis',
+          props: {
+            horizontal: true,
+            offset: this.y + this.height,
+            scale: this.yScale,
+            domain: this.yScale.ticks(),
+            extrapolate: true
+          }
+        })
+        $verticalAxis = h(LinearAxis, {
+          class: 'axis',
+          props: {
+            offset: this.x,
+            scale: this.xScale,
+            domain: this.xScale.domain(),
+            extrapolate: true
+          },
+          scopedSlots: {
+            default: data => h('text', data, this.data[data.key].label || data.key)
+          }
+        })
+      }
+    }
+
+    return h('svg', [
+      h('g', this.bars.map(bar => h('bar-element', bar))),
+      $horizontalAxis,
+      $verticalAxis
+    ])
   }
 }

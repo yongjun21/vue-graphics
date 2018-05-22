@@ -1,21 +1,17 @@
 import {scaleBand, scaleLinear} from 'd3-scale'
 
 import Bar from '../elements/Bar'
+import boxLayout from '../mixins/boxLayout'
 
 export default {
   name: 'BarChart',
-  props: ['data', 'yDomain', 'width', 'height', 'paddingInner', 'paddingOuter', 'horizontal'],
+  extends: boxLayout,
+  props: ['data', 'yDomain', 'paddingInner', 'paddingOuter'],
   computed: {
-    xRange () {
-      return Math.round(this.horizontal == null ? this.width : this.height)
-    },
-    yRange () {
-      return Math.round(this.horizontal == null ? this.height : this.width)
-    },
     xScale () {
       const scale = scaleBand()
       scale.domain(this.data.map((d, i) => i))
-      scale.rangeRound(this.xRange && [0, this.xRange])
+      scale.rangeRound(this.xRange)
       scale.paddingInner(this.paddingInner || 0)
       scale.paddingOuter(this.paddingOuter || 0)
       return scale
@@ -23,12 +19,15 @@ export default {
     yScale () {
       const scale = scaleLinear()
       scale.domain(this.yDomain)
-      scale.rangeRound(this.yRange && [0, this.yRange])
+      scale.rangeRound(this.yRange)
       return scale
     },
     bars () {
       if (this.width == null || this.height == null) return []
-      const {yRange, xScale, yScale, horizontal} = this
+
+      const {xScale, yScale, horizontal} = this
+      const yMax = yScale.range()[1]
+
       return this.data.map((d, i) => {
         let label = i
         let value = d
@@ -42,7 +41,7 @@ export default {
           width: xScale.bandwidth(),
           height: y,
           x: xScale(i),
-          y: yRange - y
+          y: yMax - y
         } : {
           width: y,
           height: xScale.bandwidth(),

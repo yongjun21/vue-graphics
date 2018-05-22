@@ -87,16 +87,16 @@ export default {
       const {aScale, center, radius} = this
       return Object.keys(this.groupedDomain).map((g, i) => {
         return {
+          class: 'axis',
           attrs: {'data-group': g},
           props: {
+            label: g,
             center: center,
-            radius: radius,
+            radius: radius + 6 + (i % 2) * 6,
             scale: aScale,
             domain: this.groupedDomain[g],
-            innerPadding: 6 + (i % 2) * 6,
             complete: g === '_' ? '' : null
           },
-          class: 'axis',
           scopedSlots: {}
         }
       })

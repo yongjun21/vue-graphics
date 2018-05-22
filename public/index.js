@@ -5,8 +5,8 @@ import ChordDiagram from '../examples/ChordDiagram'
 
 // testBarChart()
 // testWaterfallLine()
-testChordDiagram()
-// testStackedBar()
+// testChordDiagram()
+testStackedBar()
 
 function testBarChart () {
   BarChart.components['bar-element'] = AnimatedBar
@@ -49,44 +49,51 @@ function testChordDiagram () {
         exclude: v => v <= 0,
         padding: 0.15
       }
-      window.vm = createVM(ChordDiagram, data, 'chord-diagram')
+      window.vm = createVM(ChordDiagram, data, {class: 'chord-diagram'})
     }
   })
 }
 
 function testStackedBar () {
-  window.fetch('progress.json')
+  window.fetch('https://eqrox04mbk.execute-api.ap-southeast-1.amazonaws.com/development?school=AI TONG SCHOOL&phase=2B&runs=0')
     .then(res => res.json())
-    .then(json => json['2017']['2B'])
-    .then(data => {
-      data.forEach(d => {
-        d.label = d.school
+    .then(json => {
+      const data = json.historical
+      data.forEach(row => {
+        row.label = row.year
+        row.vacancyRemaining = row.places - row.filled - row.vacancy
       })
       window.vm = createVM(StackedBarChart, {
         data,
-        domain: ['filled', 'vacancy', 'applicants'],
+        domain: ['filled', 'vacancy', 'vacancyRemaining'],
         yDomain: [0, 400],
-        height: data.length * 200,
         paddingInner: 0.4,
         paddingOuter: 0.2,
         horizontal: ''
+      }, {
+        class: 'stacked-bar',
+        props: {
+          paddingTop: 20,
+          paddingBottom: 20,
+          paddingLeft: 100,
+          paddingRight: 20
+        }
       })
     })
 }
 
-function createVM (Component, data, className) {
+function createVM (Component, data, options) {
   return new Vue({
     el: 'main',
     data,
     render (h) {
-      return h(ResponsiveWrapper, {
-        class: className,
+      return h(ResponsiveWrapper, Object.assign({
         scopedSlots: {
           default: sizing => h(Component, {
             props: Object.assign(sizing, this.$data)
           })
         }
-      })
+      }, options))
     }
   })
 }
