@@ -5,8 +5,8 @@ import ChordDiagram from '../examples/ChordDiagram'
 
 // testBarChart()
 // testWaterfallLine()
-// testChordDiagram()
-testStackedBar()
+testChordDiagram()
+// testStackedBar()
 
 function testBarChart () {
   BarChart.components['bar-element'] = AnimatedBar
@@ -37,17 +37,31 @@ function testChordDiagram () {
     dynamicTyping: true,
     download: true,
     complete (parsed) {
+      const groups = ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania']
+      const groupedData = {}
+
       parsed.data.forEach(row => {
         row.id = row.code
         row.label = row.country
         row.group = row.region
+
+        groupedData[row.group] = groupedData[row.group] || []
+        groupedData[row.group].push(row.id)
       })
+
+      groupedData['Americas'].reverse()
+      groupedData['Africa'].reverse()
+      groupedData['Oceania'].reverse()
+
+      const domain = Object.keys(groupedData).reduce((arr, g) => {
+        return arr.concat(groupedData[g])
+      }, [])
+
       const data = {
         data: parsed.data,
-        domain: parsed.data.map(row => row.id),
-        groups: ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania'],
-        exclude: v => v <= 0,
-        padding: 0.15
+        domain,
+        groups,
+        exclude: v => v <= 1
       }
       window.vm = createVM(ChordDiagram, data, {class: 'chord-diagram'})
     }

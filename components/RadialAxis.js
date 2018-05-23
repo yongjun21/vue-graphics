@@ -14,6 +14,7 @@ export default {
     const maxA = range.reduce((max, a) => a > max ? a : max, -Infinity)
     const midA = (minA + maxA) / 2
     const onLeft = Math.cos(midA) < 0
+    const onTop = Math.sin(midA) >= 0
 
     let x1 = radius
     let x2 = x1 + tickLength
@@ -30,22 +31,17 @@ export default {
       }
     })
 
-    const $axisLabel = props.label && h('text', {
-      attrs: {
-        y: -(radius + labelPadding),
-        transform: getRotation(midA + Math.PI / 2),
-        'text-anchor': 'middle'
-      }
-    }, props.label)
-
     if (onLeft) {
       x1 = -x1
       x2 = -x2
       x3 = -x3
     }
 
-    const tickLabelGenerator = (data.scopedSlots && data.scopedSlots.default) ||
+    const tickLabelGenerator = (data.scopedSlots && data.scopedSlots.tickLabel) ||
                                (data => h('text', data, data.key))
+
+    const axisLabelGenerator = (data.scopedSlots && data.scopedSlots.axisLabel) ||
+                               (({text, textPath}) => h('text', text, [h('textPath', textPath)]))
 
     const $tickMarks = []
     const $tickLabels = []
@@ -68,6 +64,40 @@ export default {
       $tickLabels.push($tickLabel)
     })
 
+    const rLabel = radius + labelPadding
+    const guideId = Math.random().toString(36).slice(2, 7)
+    const guide = path()
+    guide.moveTo(-rLabel, 0)
+    guide.arc(0, 0, rLabel, -Math.PI, 0, onTop)
+    const $axisLabelGuide = h('defs', [
+      h('path', {
+        attrs: {
+          id: guideId,
+          d: guide.toString()
+        }
+      })
+    ])
+
+    const $axisLabel = axisLabelGenerator({
+      text: {
+        attrs: {
+          dy: '0.35em',
+          transform: getRotation(midA + (onTop ? -1 : 1) * Math.PI / 2),
+          'text-anchor': 'middle'
+        }
+      },
+      textPath: {
+        attrs: {
+          href: '#' + guideId,
+          startOffset: rLabel * Math.PI / 2
+        },
+        domProps: {
+          innerHTML: props.label
+        }
+      },
+      props: {minA, maxA}
+    })
+
     data.attrs = data.attrs || {}
     data.attrs.transform = `translate(${center[0]} ${center[1]})`
 
@@ -75,6 +105,7 @@ export default {
       $baseline,
       h('g', $tickMarks),
       h('g', $tickLabels),
+      $axisLabelGuide,
       $axisLabel
     ])
   }
