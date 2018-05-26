@@ -47,11 +47,11 @@ function testChordDiagram () {
 
         groupedData[row.group] = groupedData[row.group] || []
         groupedData[row.group].push(row.id)
-      })
+      });
 
-      groupedData['Americas'].reverse()
-      groupedData['Africa'].reverse()
-      groupedData['Oceania'].reverse()
+      ['Americas', 'Africa', 'Oceania'].forEach(region => {
+        groupedData[region].reverse()
+      })
 
       const domain = Object.keys(groupedData).reduce((arr, g) => {
         return arr.concat(groupedData[g])

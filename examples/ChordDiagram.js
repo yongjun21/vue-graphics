@@ -43,7 +43,7 @@ export default {
     },
     radius () {
       if (this.center == null) return null
-      return Math.min(this.width, this.height) / 2 - (this.padding || 150)
+      return Math.min(this.width, this.height) * (0.5 - (this.padding || 0.2))
     },
     points () {
       if (this.center == null) return {}
@@ -158,6 +158,7 @@ export default {
             attrs: data.attrs,
             on: {
               click: () => {
+                this.$emit('change', data.key)
                 this.selected = data.key
               }
             }
