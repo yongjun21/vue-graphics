@@ -178,7 +178,7 @@ export default {
               fill: 'none'
             }
           }),
-          h('text', text, [h('textPath', textPath)])
+          h('text', text, [h('textPath', textPath, axis.key)])
         ])
       }
       return h(RadialAxis, axis)

@@ -41,7 +41,7 @@ export default {
                                (data => h('text', data, data.key))
 
     const axisLabelGenerator = (data.scopedSlots && data.scopedSlots.axisLabel) ||
-                               (({text, textPath}) => h('text', text, [h('textPath', textPath)]))
+                               (({text, textPath}) => h('text', text, [h('textPath', textPath, props.label)]))
 
     const $tickMarks = []
     const $tickLabels = []
@@ -89,10 +89,7 @@ export default {
       textPath: {
         attrs: {
           href: '#' + guideId,
-          startOffset: rLabel * Math.PI / 2
-        },
-        domProps: {
-          innerHTML: props.label
+          startOffset: '50%'
         }
       },
       props: {minA, maxA}
