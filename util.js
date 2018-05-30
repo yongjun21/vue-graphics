@@ -26,6 +26,17 @@ export function mergeClass (...classes) {
   }, {})
 }
 
+const hashCollection = {}
+
+export function uniqueHash () {
+  let hash
+  do {
+    hash = Math.random().toString(36).slice(2, 7)
+  } while (hash in hashCollection)
+  hashCollection[hash] = true
+  return hash
+}
+
 export function injectStyle (cssText) {
   const $style = document.createElement('style')
   $style.textContent = cssText

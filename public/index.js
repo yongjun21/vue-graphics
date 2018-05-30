@@ -5,8 +5,8 @@ import ChordDiagram from '../examples/ChordDiagram'
 
 // testBarChart()
 // testWaterfallLine()
-testChordDiagram()
-// testStackedBar()
+// testChordDiagram()
+testStackedBar()
 
 function testBarChart () {
   BarChart.components['bar-element'] = AnimatedBar
@@ -80,10 +80,13 @@ function testStackedBar () {
       window.vm = createVM(StackedBarChart, {
         data,
         domain: ['filled', 'vacancy', 'vacancyRemaining'],
-        yDomain: [0, 400],
-        paddingInner: 0.4,
-        paddingOuter: 0.2,
-        horizontal: ''
+        range: [0, 350],
+        height: 60 * data.length + 18,
+        paddingInner: 0.3,
+        paddingOuter: 0.3,
+        horizontal: '',
+        xLabel: 'Places',
+        yLabel: 'Year'
       }, {
         class: 'stacked-bar',
         props: {

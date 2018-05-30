@@ -1,4 +1,5 @@
 import {path} from 'd3-path'
+import {uniqueHash} from '../util'
 
 export default {
   functional: true,
@@ -49,7 +50,7 @@ export default {
     domain.forEach((key, i) => {
       const transform = getRotation(range[i] + (onLeft ? Math.PI : 0))
       const $tickMark = h('line', {
-        attrs: {x1, x2, transform}
+        attrs: {x1, x2, transform, 'stroke': '#888'}
       })
       const $tickLabel = tickLabelGenerator({
         key,
@@ -57,7 +58,8 @@ export default {
           x: x3,
           dy: '0.35em',
           transform,
-          'text-anchor': onLeft ? 'end' : 'start'
+          'text-anchor': onLeft ? 'end' : 'start',
+          'fill': '#666'
         }
       })
       $tickMarks.push($tickMark)
@@ -65,7 +67,7 @@ export default {
     })
 
     const rLabel = radius + labelPadding
-    const guideId = Math.random().toString(36).slice(2, 7)
+    const guideId = uniqueHash()
     const guide = path()
     guide.moveTo(-rLabel, 0)
     guide.arc(0, 0, rLabel, -Math.PI, 0, onTop)
@@ -83,7 +85,8 @@ export default {
         attrs: {
           dy: '0.35em',
           transform: getRotation(midA + (onTop ? -1 : 1) * Math.PI / 2),
-          'text-anchor': 'middle'
+          'text-anchor': 'middle',
+          'fill': '#666'
         }
       },
       textPath: {

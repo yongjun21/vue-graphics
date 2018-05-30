@@ -1,13 +1,13 @@
 export default {
   functional: true,
   render (h, {data, props}) {
+    const horizontal = props.horizontal != null
     props = Object.assign({
       tickLength: 6,
       tickPadding: 3,
-      labelPadding: 100
+      labelPadding: horizontal ? 30 : 60
     }, props)
     const {offset, scale, domain, tickLength, tickPadding, labelPadding, extrapolate} = props
-    const horizontal = props.horizontal != null
 
     let range = domain.map(scale)
     if (typeof scale.bandwidth === 'function') {
@@ -21,18 +21,26 @@ export default {
     let $baseline
     if (extrapolate == null) {
       $baseline = h('line', {
-        attrs: horizontal ? {x1: minD, x2: maxD} : {y1: minD, y2: maxD}
+        attrs: {
+          [horizontal ? 'x1' : 'y1']: minD,
+          [horizontal ? 'x2' : 'y2']: maxD,
+          'stroke': '#888'
+        }
       })
     } else {
       const extend = scale.range()
       const min = extend[0]
       const max = extend[extend.length - 1]
       $baseline = h('line', {
-        attrs: horizontal ? {x1: min, x2: max} : {y1: min, y2: max}
+        attrs: {
+          [horizontal ? 'x1' : 'y1']: min,
+          [horizontal ? 'x2' : 'y2']: max,
+          'stroke': '#888'
+        }
       })
     }
 
-    const tickLabelGenerator = (data.scopedSlots && data.scopedSlots.default) ||
+    const tickLabelGenerator = (data.scopedSlots && data.scopedSlots.tickLabel) ||
                                (data => h('text', data, data.key))
 
     const $tickMarks = []
@@ -42,8 +50,8 @@ export default {
       const transform = horizontal ? `translate(${range[i]} 0)` : `translate(0 ${range[i]})`
       const $tickMark = h('line', {
         attrs: horizontal
-          ? {y2: tickLength, transform}
-          : {x2: -tickLength, transform}
+          ? {y2: tickLength, transform, 'stroke': '#888'}
+          : {x2: -tickLength, transform, 'stroke': '#888'}
       })
       const $tickLabel = tickLabelGenerator({
         key,
@@ -51,12 +59,14 @@ export default {
           y: tickLength + tickPadding,
           dy: '0.70em',
           transform,
-          'text-anchor': 'middle'
+          'text-anchor': 'middle',
+          'fill': '#666'
         } : {
           x: -(tickLength + tickPadding),
           dy: '0.35em',
           transform,
-          'text-anchor': 'end'
+          'text-anchor': 'end',
+          'fill': '#666'
         }
       })
       $tickMarks.push($tickMark)
@@ -65,15 +75,14 @@ export default {
 
     const $axisLabel = props.label && h('text', {
       attrs: horizontal ? {
-        y: labelPadding,
         dy: '0.70em',
-        transform: `translate(${midD} 0)`,
-        'text-anchor': 'middle'
+        transform: `translate(${midD} ${labelPadding})`,
+        'text-anchor': 'middle',
+        'fill': '#666'
       } : {
-        x: -labelPadding,
-        dy: '0.35em',
-        transform: `translate(0 ${midD})`,
-        'text-anchor': 'end'
+        transform: `translate(${-labelPadding} ${midD}) rotate(-90)`,
+        'text-anchor': 'middle',
+        'fill': '#666'
       }
     }, props.label)
 

@@ -39,7 +39,7 @@ export default {
       return this.paddingRight
     }
   },
-  render (h) { 
+  render (h) {
     return this.$scopedSlots.default({
       x: this.paddingLeft_,
       y: this.paddingTop_,

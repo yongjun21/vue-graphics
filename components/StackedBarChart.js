@@ -10,7 +10,7 @@ import {mergeClass} from '../util'
 export default {
   name: 'StackedBarChart',
   extends: boxLayout,
-  props: ['data', 'domain', 'yDomain', 'horizontal', 'paddingInner', 'paddingOuter'],
+  props: ['data', 'domain', 'range', 'horizontal', 'paddingInner', 'paddingOuter', 'xLabel', 'yLabel'],
   computed: {
     xScale () {
       const scale = scaleBand()
@@ -22,7 +22,7 @@ export default {
     },
     yScale () {
       const scale = scaleLinear()
-      scale.domain(this.yDomain)
+      scale.domain(this.range)
       scale.rangeRound(this.horizontal == null ? this.yRange : this.xRange)
       return scale
     },
@@ -90,10 +90,11 @@ export default {
             offset: this.y + this.height,
             scale: this.xScale,
             domain: this.xScale.domain(),
-            extrapolate: true
+            extrapolate: true,
+            label: this.xLabel
           },
           scopedSlots: {
-            default: data => h('text', data, this.data[data.key].label || data.key)
+            tickLabel: data => h('text', data, this.data[data.key].label || data.key)
           }
         })
         $verticalAxis = h(LinearAxis, {
@@ -102,7 +103,8 @@ export default {
             offset: this.x,
             scale: this.yScale,
             domain: this.yScale.ticks(),
-            extrapolate: true
+            extrapolate: true,
+            label: this.yLabel
           }
         })
       } else {
@@ -113,7 +115,8 @@ export default {
             offset: this.y + this.height,
             scale: this.yScale,
             domain: this.yScale.ticks(),
-            extrapolate: true
+            extrapolate: true,
+            label: this.xLabel
           }
         })
         $verticalAxis = h(LinearAxis, {
@@ -122,10 +125,13 @@ export default {
             offset: this.x,
             scale: this.xScale,
             domain: this.xScale.domain(),
-            extrapolate: true
+            extrapolate: true,
+            label: this.yLabel
           },
           scopedSlots: {
-            default: data => h('text', data, this.data[data.key].label || data.key)
+            tickLabel: data => {
+              return h('text', data, this.data[data.key].label || data.key)
+            }
           }
         })
       }
