@@ -10,7 +10,7 @@ testStackedBar()
 
 function testBarChart () {
   BarChart.components['bar-element'] = AnimatedBar
-  window.vm = createVM(BarChart, {data: [10, 20, 50, 40], yDomain: [0, 60]})
+  window.vm = createVM(BarChart, {data: [10, 20, 50, 40], range: [0, 60]})
 }
 
 function testWaterfallLine () {
@@ -80,7 +80,6 @@ function testStackedBar () {
       window.vm = createVM(StackedBarChart, {
         data,
         domain: ['filled', 'vacancy', 'vacancyRemaining'],
-        range: [0, 350],
         height: 60 * data.length + 18,
         paddingInner: 0.3,
         paddingOuter: 0.3,

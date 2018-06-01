@@ -6,7 +6,7 @@ import boxLayout from '../mixins/boxLayout'
 export default {
   name: 'BarChart',
   extends: boxLayout,
-  props: ['data', 'yDomain', 'paddingInner', 'paddingOuter'],
+  props: ['data', 'range', 'horizontal', 'paddingInner', 'paddingOuter'],
   computed: {
     xScale () {
       const scale = scaleBand()
@@ -17,10 +17,27 @@ export default {
       return scale
     },
     yScale () {
+      let domain = this.range
+      if (!domain) {
+        let min = 0
+        let max = 0
+        this.data_.forEach(d => {
+          if (d.value < min) min = d.value
+          if (d.value > max) max = d.value
+        })
+        domain = [min, max]
+      }
       const scale = scaleLinear()
-      scale.domain(this.yDomain)
+      scale.domain(domain).nice()
       scale.rangeRound(this.yRange)
       return scale
+    },
+    data_ () {
+      return this.data.map((d, i) => {
+        const _d = typeof d === 'object' ? d : {value: d}
+        _d.label = _d.label || i
+        return _d
+      })
     },
     bars () {
       if (this.width == null || this.height == null) return []
@@ -28,15 +45,8 @@ export default {
       const {xScale, yScale, horizontal} = this
       const yMax = yScale.range()[1]
 
-      return this.data.map((d, i) => {
-        let label = i
-        let value = d
-        if (typeof d === 'object') {
-          label = d.label || i
-          value = d.value
-        }
-        const y = yScale(value)
-
+      return this.data_.map((d, i) => {
+        const y = yScale(d.value)
         const attrs = horizontal == null ? {
           width: xScale.bandwidth(),
           height: y,
@@ -48,10 +58,10 @@ export default {
           x: 0,
           y: xScale(i)
         }
-        attrs['data-label'] = label
+        attrs['data-label'] = d.label
 
         return {
-          key: label,
+          key: d.label,
           class: d.class,
           style: d.style,
           attrs

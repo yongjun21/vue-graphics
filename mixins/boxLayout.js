@@ -1,6 +1,5 @@
 export default {
   props: {
-    horizontal: null,
     x: {
       type: Number,
       default: 0

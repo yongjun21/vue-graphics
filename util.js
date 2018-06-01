@@ -6,7 +6,8 @@ export function getPathLength (d) {
   return Math.ceil($path.getTotalLength())
 }
 
-export function mapRadialToCartesian (a, radius, center = [0, 0]) {
+export function mapRadialToCartesian (a, radius, center) {
+  center = center || [0, 0]
   return [
     Math.round(Math.cos(a) * radius + center[0]),
     Math.round(Math.sin(a) * radius + center[1])
