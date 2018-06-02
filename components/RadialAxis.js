@@ -91,6 +91,7 @@ export default {
       },
       textPath: {
         attrs: {
+          'xlink:href': '#' + guideId, // for backward compatibility
           href: '#' + guideId,
           startOffset: '50%'
         }
