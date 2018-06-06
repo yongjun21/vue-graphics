@@ -43,3 +43,15 @@ export function injectStyle (cssText) {
   $style.textContent = cssText
   document.head.appendChild($style)
 }
+
+export function frameRateLimited (cb) {
+  let ready = true
+  return function () {
+    if (!ready) return
+    ready = false
+    window.requestAnimationFrame(() => {
+      cb.call(this)
+      ready = true
+    })
+  }
+}

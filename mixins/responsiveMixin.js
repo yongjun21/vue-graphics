@@ -1,22 +1,18 @@
+import {frameRateLimited} from '../util'
+
 export default {
   data () {
     return {
-      _resizing: false,
       width: null,
       height: null
     }
   },
   methods: {
-    _resize () {
-      if (this._resizing) return
-      this._resizing = true
-      window.requestAnimationFrame(() => {
-        const {width, height} = this.$el.getBoundingClientRect()
-        this.width = width
-        this.height = height
-        this._resizing = false
-      })
-    }
+    _resize: frameRateLimited(function () {
+      const {width, height} = this.$el.getBoundingClientRect()
+      this.width = width
+      this.height = height
+    })
   },
   mounted () {
     this._resize()
