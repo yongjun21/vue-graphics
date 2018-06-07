@@ -4,9 +4,9 @@ import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
 
 // testBarChart()
-// testWaterfallLine()
+testWaterfallLine()
 // testChordDiagram()
-testStackedBar()
+// testStackedBar()
 
 function testBarChart () {
   BarChart.components['bar-element'] = AnimatedBar

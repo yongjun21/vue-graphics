@@ -3,8 +3,10 @@ import {line, curveStep} from 'd3-shape'
 
 import Line from '../elements/Line'
 import AnimatedLine from '../elements/AnimatedLine'
+import EnlargeTarget from '../directives/v-enlarge-target'
 
 export default {
+  directives: {EnlargeTarget},
   props: ['data', 'domain', 'width', 'height'],
   data () {
     return {
@@ -68,31 +70,22 @@ export default {
           style: d.highlight && d.highlight.style
         }))
       }
-      return h('g', {key: d.id}, [
-        h(Line, {
-          attrs: {
-            d: pathString[d.id],
-            'stroke': 'none',
-            'stroke-width': 9
-          },
-          style: {
-            'pointer-events': 'stroke',
-            'cursor': 'pointer'
-          },
-          on: {
-            // click: this.getHighlighter(d),
-            mouseover: this.getHighlighter(d, true),
-            mouseout: this.getHighlighter(d, false)
-          }
-        }),
-        h(Line, {
-          attrs: {
-            d: pathString[d.id]
-          },
-          class: d.class,
-          style: d.style
-        })
-      ])
+      return h(Line, {
+        key: d.id,
+        attrs: {
+          d: pathString[d.id],
+          'stroke': '#888',
+          'fill': 'none'
+        },
+        class: d.class,
+        style: d.style,
+        on: {
+          // click: this.getHighlighter(d),
+          mouseover: this.getHighlighter(d, true),
+          mouseout: this.getHighlighter(d, false)
+        },
+        directives: [{name: 'enlarge-target'}]
+      })
     })
     $content.push(h('g', $overlay))
     return h('svg', $content)
