@@ -7,7 +7,7 @@ export default {
       tickPadding: 3,
       labelPadding: horizontal ? 30 : 60
     }, props)
-    const {offset, scale, domain, tickLength, tickPadding, labelPadding, extrapolate} = props
+    const {anchor, scale, domain, tickLength, tickPadding, labelPadding, extrapolate} = props
 
     let range = domain.map(scale)
     if (typeof scale.bandwidth === 'function') {
@@ -87,7 +87,7 @@ export default {
     }, props.label)
 
     data.attrs = data.attrs || {}
-    data.attrs.transform = `translate(${horizontal ? 0 : offset} ${horizontal ? offset : 0})`
+    data.attrs.transform = `translate(${horizontal ? 0 : anchor} ${horizontal ? anchor : 0})`
 
     return h('g', data, [
       $baseline,

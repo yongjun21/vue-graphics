@@ -10,32 +10,31 @@ export default {
     'data',
     'range',
     'baseline',
+    'horizontal',
     'paddingInner',
     'paddingOuter'
   ],
   computed: {
     xScale () {
+      const domain = this.data.map((d, i) => i)
+      const range = this.horizontal == null ? [0, this.width] : [0, this.height]
       const scale = scaleBand()
-      scale.domain(this.data.map((d, i) => i))
-      scale.rangeRound([0, this.width])
+      scale.domain(domain)
+      scale.rangeRound(range)
       scale.paddingInner(this.paddingInner || 0)
       scale.paddingOuter(this.paddingOuter || 0)
       return scale
     },
     yScale () {
-      let domain = this.range
-      if (!domain) {
-        let min = this.baseline || 0
-        let max = this.baseline || 0
-        this.data_.forEach(d => {
-          if (d.value < min) min = d.value
-          if (d.value > max) max = d.value
-        })
-        domain = [min, max]
-      }
+      const domain = this.range || this.data_.reduce((minmax, d) => {
+        if (d.value < minmax[0]) minmax[0] = d.value
+        if (d.value > minmax[1]) minmax[1] = d.value
+        return minmax
+      }, [this.baseline || 0, this.baseline || 0])
+      const range = this.horizontal == null ? [this.height, 0] : [0, this.width]
       const scale = scaleLinear()
       scale.domain(domain).nice()
-      scale.rangeRound([this.height, 0])
+      scale.rangeRound(range)
       return scale
     },
     data_ () {
@@ -46,23 +45,17 @@ export default {
       })
     },
     bars () {
-      const {xScale, yScale, horizontal} = this
+      const {xScale, yScale} = this
       const yBaseline = yScale(this.baseline || 0)
       return this.data_.map((d, i) => {
         const y = yScale(d.value)
-        const attrs = horizontal == null ? {
+        const attrs = {
           width: xScale.bandwidth(),
           height: Math.abs(y - yBaseline),
           x: xScale(i),
-          y: Math.min(yBaseline, y)
-        } : {
-          width: y,
-          height: xScale.bandwidth(),
-          x: 0,
-          y: xScale(i)
+          y: Math.min(y, yBaseline),
+          'data-label': d.label
         }
-        attrs['data-label'] = d.label
-
         return {
           key: d.label,
           class: d.class,
@@ -77,6 +70,10 @@ export default {
   },
   render (h) {
     if (this.width == null || this.height == null) return h('svg')
-    return h('svg', this.bars.map(bar => h('bar-element', bar)))
+    const transform = this.horizontal != null && 'matrix(0, 1, 1, 0, 0, 0)'
+    const $bars = this.bars.map(bar => h('bar-element', bar))
+    return h('svg', [
+      h('g', {attrs: {transform}}, $bars)
+    ])
   }
 }

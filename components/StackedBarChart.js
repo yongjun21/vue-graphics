@@ -14,8 +14,7 @@ export default {
     'data',
     'domain',
     'range',
-    'baseline',
-    'horizontal', 
+    'horizontal',
     'paddingInner',
     'paddingOuter',
     'xLabel',
@@ -24,7 +23,7 @@ export default {
   computed: {
     xScale () {
       const domain = this.data.map((d, i) => i)
-      const range = this.horizontal == null ? [0, this.width] : [this.height, 0]
+      const range = this.horizontal == null ? [0, this.width] : [0, this.height]
       const scale = scaleBand()
       scale.domain(domain)
       scale.rangeRound(range)
@@ -33,20 +32,14 @@ export default {
       return scale
     },
     yScale () {
-      let domain = this.range
-      if (!domain) {
-        let min = this.baseline || 0
-        let max = this.baseline || 0
-        this.stackedData.forEach(row => {
-          row.forEach(d => {
-            if (d[0] < min) min = d[0]
-            if (d[1] > max) max = d[1]
-          })
+      const domain = this.range || this.stackedData.reduce((minmax, row) => {
+        row.forEach(d => {
+          if (d[0] < minmax[0]) minmax[0] = d[0]
+          if (d[1] > minmax[1]) minmax[1] = d[1]
         })
-        domain = [min, max]
-      }
+        return minmax
+      }, [0, 0])
       const range = this.horizontal == null ? [this.height, 0] : [0, this.width]
-
       const scale = scaleLinear()
       scale.domain(domain).nice()
       scale.rangeRound(range)
@@ -60,8 +53,7 @@ export default {
       return stack().keys(keys)(this.data)
     },
     bars () {
-      const {xScale, yScale, horizontal, domain_, data} = this
-      const yBaseline = yScale(this.baseline || 0)
+      const {xScale, yScale, domain_, data} = this
 
       const collection = []
 
@@ -69,21 +61,18 @@ export default {
         row.forEach(([v1, v2], i) => {
           const y1 = yScale(v1)
           const y2 = yScale(v2)
-          const attrs = horizontal == null ? {
-            width: xScale.bandwidth(),
-            height: y1 - y2,
-            x: xScale(i),
-            y: y2
-          } : {
-            width: y2 - y1,
-            height: xScale.bandwidth(),
-            x: y1,
-            y: xScale(i)
-          }
           const label = data[i].label || i
           const group = domain_[j].label || domain_[j].value
-          attrs['data-label'] = label
-          attrs['data-group'] = group
+
+          const attrs = {
+            width: xScale.bandwidth(),
+            height: Math.abs(y2 - y1),
+            x: xScale(i),
+            y: Math.min(y2, y1),
+            'data-label': label,
+            'data-group': group
+          }
+
           collection.push({
             key: label + '__' + group,
             attrs,
@@ -102,13 +91,15 @@ export default {
   render (h) {
     if (this.width == null || this.height == null) return h('svg')
 
-    let $horizontalAxis, $verticalAxis
-    if (this.horizontal == null) {
-      $horizontalAxis = h(LinearAxis, {
+    const transform = this.horizontal != null && 'matrix(0, 1, 1, 0, 0, 0)'
+    const $bars = this.bars.map(bar => h('bar-element', bar))
+
+    const $axes = [
+      h(LinearAxis, {
         class: 'axis',
         props: {
-          horizontal: true,
-          offset: this.yScale(this.baseline || 0),
+          horizontal: this.horizontal == null || null,
+          anchor: this.yScale(0),
           scale: this.xScale,
           domain: this.xScale.domain(),
           extrapolate: true,
@@ -117,52 +108,25 @@ export default {
         scopedSlots: {
           tickLabel: data => h('text', data, this.data[data.key].label || data.key)
         }
-      })
-      $verticalAxis = h(LinearAxis, {
+      }),
+      h(LinearAxis, {
         class: 'axis',
         props: {
-          offset: 0,
+          horizontal: this.horizontal != null || null,
+          anchor: this.horizontal != null ? this.height : 0,
           scale: this.yScale,
           domain: this.yScale.ticks(),
           extrapolate: true,
           label: this.yLabel
         }
       })
-    } else {
-      $horizontalAxis = h(LinearAxis, {
-        class: 'axis',
-        props: {
-          horizontal: true,
-          offset: this.height,
-          scale: this.yScale,
-          domain: this.yScale.ticks(),
-          extrapolate: true,
-          label: this.xLabel
-        }
-      })
-      $verticalAxis = h(LinearAxis, {
-        class: 'axis',
-        props: {
-          offset: this.yScale(this.baseline || 0),
-          scale: this.xScale,
-          domain: this.xScale.domain(),
-          extrapolate: true,
-          label: this.yLabel
-        },
-        scopedSlots: {
-          tickLabel: data => {
-            return h('text', data, this.data[data.key].label || data.key)
-          }
-        }
-      })
-    }
+    ]
 
     const $slots = this.$scopedSlots.default && this.$scopedSlots.default(this)
 
     return h('svg', [
-      h('g', this.bars.map(bar => h('bar-element', bar))),
-      $horizontalAxis,
-      $verticalAxis,
+      h('g', {attrs: {transform}}, $bars),
+      $axes,
       $slots
     ])
   }
