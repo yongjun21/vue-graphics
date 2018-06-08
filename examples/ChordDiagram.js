@@ -38,15 +38,12 @@ export default {
       return scale
     },
     center () {
-      if (this.width == null || this.height == null) return null
       return [Math.round(this.width / 2), Math.round(this.height / 2)]
     },
     radius () {
-      if (this.center == null) return null
       return Math.min(this.width, this.height) * (0.5 - (this.padding || 0.2))
     },
     points () {
-      if (this.center == null) return {}
       const {aScale, center, radius} = this
       return this.sortedDomain.reduce((obj, key) => {
         const a = aScale(key)
@@ -54,7 +51,6 @@ export default {
       }, {})
     },
     connections () {
-      if (this.center == null) return {}
       const {points, sortedDomain, groupedDomain, exclude, center} = this
       return this.data.reduce((obj, d) => {
         if (!points[d.id]) return obj
@@ -83,7 +79,6 @@ export default {
       }, {})
     },
     axes () {
-      if (this.center == null) return []
       const {aScale, center, radius} = this
       return Object.keys(this.groupedDomain).map((g, i) => {
         return {
@@ -127,10 +122,13 @@ export default {
   },
   watch: {
     connections: 'animate',
-    selected: 'animate'
+    selected: {
+      handler: 'animate',
+      immediate: true
+    }
   },
   render (h) {
-    if (!this.center) return h('svg')
+    if (this.width == null || this.height == null) return h('svg')
     const {selected, getLabel, getValue, radius} = this
 
     const lines = this.connections[selected] || []

@@ -1,17 +1,23 @@
 import {scaleBand, scaleLinear} from 'd3-scale'
 
 import Bar from '../elements/Bar'
-import boxLayout from '../mixins/boxLayout'
 
 export default {
   name: 'BarChart',
-  extends: boxLayout,
-  props: ['data', 'range', 'horizontal', 'paddingInner', 'paddingOuter'],
+  props: [
+    'width',
+    'height',
+    'data',
+    'range',
+    'baseline',
+    'paddingInner',
+    'paddingOuter'
+  ],
   computed: {
     xScale () {
       const scale = scaleBand()
       scale.domain(this.data.map((d, i) => i))
-      scale.rangeRound(this.xRange)
+      scale.rangeRound([0, this.width])
       scale.paddingInner(this.paddingInner || 0)
       scale.paddingOuter(this.paddingOuter || 0)
       return scale
@@ -19,8 +25,8 @@ export default {
     yScale () {
       let domain = this.range
       if (!domain) {
-        let min = 0
-        let max = 0
+        let min = this.baseline || 0
+        let max = this.baseline || 0
         this.data_.forEach(d => {
           if (d.value < min) min = d.value
           if (d.value > max) max = d.value
@@ -29,7 +35,7 @@ export default {
       }
       const scale = scaleLinear()
       scale.domain(domain).nice()
-      scale.rangeRound(this.yRange)
+      scale.rangeRound([this.height, 0])
       return scale
     },
     data_ () {
@@ -40,18 +46,15 @@ export default {
       })
     },
     bars () {
-      if (this.width == null || this.height == null) return []
-
       const {xScale, yScale, horizontal} = this
-      const yMax = yScale.range()[1]
-
+      const yBaseline = yScale(this.baseline || 0)
       return this.data_.map((d, i) => {
         const y = yScale(d.value)
         const attrs = horizontal == null ? {
           width: xScale.bandwidth(),
-          height: y,
+          height: Math.abs(y - yBaseline),
           x: xScale(i),
-          y: yMax - y
+          y: Math.min(yBaseline, y)
         } : {
           width: y,
           height: xScale.bandwidth(),
@@ -73,6 +76,7 @@ export default {
     'bar-element': Bar
   },
   render (h) {
+    if (this.width == null || this.height == null) return h('svg')
     return h('svg', this.bars.map(bar => h('bar-element', bar)))
   }
 }

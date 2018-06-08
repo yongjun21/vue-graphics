@@ -3,20 +3,28 @@ import {stack} from 'd3-shape'
 
 import Bar from '../elements/Bar'
 import LinearAxis from './LinearAxis'
-import boxLayout from '../mixins/boxLayout'
 
 import {mergeClass} from '../util'
 
 export default {
   name: 'StackedBarChart',
-  extends: boxLayout,
-  props: ['data', 'domain', 'range', 'horizontal', 'paddingInner', 'paddingOuter', 'xLabel', 'yLabel'],
+  props: [
+    'width',
+    'height',
+    'data',
+    'domain',
+    'range',
+    'baseline',
+    'horizontal', 
+    'paddingInner',
+    'paddingOuter',
+    'xLabel',
+    'yLabel'
+  ],
   computed: {
     xScale () {
       const domain = this.data.map((d, i) => i)
-      const range = this.horizontal == null ? this.xRange : this.yRange
-      if (!range) return
-
+      const range = this.horizontal == null ? [0, this.width] : [this.height, 0]
       const scale = scaleBand()
       scale.domain(domain)
       scale.rangeRound(range)
@@ -27,8 +35,8 @@ export default {
     yScale () {
       let domain = this.range
       if (!domain) {
-        let min = 0
-        let max = 0
+        let min = this.baseline || 0
+        let max = this.baseline || 0
         this.stackedData.forEach(row => {
           row.forEach(d => {
             if (d[0] < min) min = d[0]
@@ -37,8 +45,7 @@ export default {
         })
         domain = [min, max]
       }
-      const range = this.horizontal == null ? this.yRange : this.xRange
-      if (!range) return
+      const range = this.horizontal == null ? [this.height, 0] : [0, this.width]
 
       const scale = scaleLinear()
       scale.domain(domain).nice()
@@ -53,10 +60,8 @@ export default {
       return stack().keys(keys)(this.data)
     },
     bars () {
-      if (this.width == null || this.height == null) return []
-
       const {xScale, yScale, horizontal, domain_, data} = this
-      const yMax = yScale.range()[1]
+      const yBaseline = yScale(this.baseline || 0)
 
       const collection = []
 
@@ -66,9 +71,9 @@ export default {
           const y2 = yScale(v2)
           const attrs = horizontal == null ? {
             width: xScale.bandwidth(),
-            height: y2 - y1,
+            height: y1 - y2,
             x: xScale(i),
-            y: yMax - y2
+            y: y2
           } : {
             width: y2 - y1,
             height: xScale.bandwidth(),
@@ -95,61 +100,61 @@ export default {
     'bar-element': Bar
   },
   render (h) {
+    if (this.width == null || this.height == null) return h('svg')
+
     let $horizontalAxis, $verticalAxis
-    if (this.width != null && this.height != null) {
-      if (this.horizontal == null) {
-        $horizontalAxis = h(LinearAxis, {
-          class: 'axis',
-          props: {
-            horizontal: true,
-            offset: this.y + this.height,
-            scale: this.xScale,
-            domain: this.xScale.domain(),
-            extrapolate: true,
-            label: this.xLabel
-          },
-          scopedSlots: {
-            tickLabel: data => h('text', data, this.data[data.key].label || data.key)
+    if (this.horizontal == null) {
+      $horizontalAxis = h(LinearAxis, {
+        class: 'axis',
+        props: {
+          horizontal: true,
+          offset: this.yScale(this.baseline || 0),
+          scale: this.xScale,
+          domain: this.xScale.domain(),
+          extrapolate: true,
+          label: this.xLabel
+        },
+        scopedSlots: {
+          tickLabel: data => h('text', data, this.data[data.key].label || data.key)
+        }
+      })
+      $verticalAxis = h(LinearAxis, {
+        class: 'axis',
+        props: {
+          offset: 0,
+          scale: this.yScale,
+          domain: this.yScale.ticks(),
+          extrapolate: true,
+          label: this.yLabel
+        }
+      })
+    } else {
+      $horizontalAxis = h(LinearAxis, {
+        class: 'axis',
+        props: {
+          horizontal: true,
+          offset: this.height,
+          scale: this.yScale,
+          domain: this.yScale.ticks(),
+          extrapolate: true,
+          label: this.xLabel
+        }
+      })
+      $verticalAxis = h(LinearAxis, {
+        class: 'axis',
+        props: {
+          offset: this.yScale(this.baseline || 0),
+          scale: this.xScale,
+          domain: this.xScale.domain(),
+          extrapolate: true,
+          label: this.yLabel
+        },
+        scopedSlots: {
+          tickLabel: data => {
+            return h('text', data, this.data[data.key].label || data.key)
           }
-        })
-        $verticalAxis = h(LinearAxis, {
-          class: 'axis',
-          props: {
-            offset: this.x,
-            scale: this.yScale,
-            domain: this.yScale.ticks(),
-            extrapolate: true,
-            label: this.yLabel
-          }
-        })
-      } else {
-        $horizontalAxis = h(LinearAxis, {
-          class: 'axis',
-          props: {
-            horizontal: true,
-            offset: this.y + this.height,
-            scale: this.yScale,
-            domain: this.yScale.ticks(),
-            extrapolate: true,
-            label: this.xLabel
-          }
-        })
-        $verticalAxis = h(LinearAxis, {
-          class: 'axis',
-          props: {
-            offset: this.x,
-            scale: this.xScale,
-            domain: this.xScale.domain(),
-            extrapolate: true,
-            label: this.yLabel
-          },
-          scopedSlots: {
-            tickLabel: data => {
-              return h('text', data, this.data[data.key].label || data.key)
-            }
-          }
-        })
-      }
+        }
+      })
     }
 
     const $slots = this.$scopedSlots.default && this.$scopedSlots.default(this)
