@@ -8,7 +8,7 @@ import AnimatedLine from '../elements/AnimatedLine'
 
 export default {
   name: 'ChordDiagram',
-  props: ['data', 'domain', 'groups', 'exclude', 'width', 'height', 'padding'],
+  props: ['data', 'domain', 'groups', 'exclude', 'width', 'height'],
   data () {
     return {
       selected: 'SG'
@@ -41,7 +41,7 @@ export default {
       return [Math.round(this.width / 2), Math.round(this.height / 2)]
     },
     radius () {
-      return Math.min(this.width, this.height) * (0.5 - (this.padding || 0.2))
+      return Math.min(this.width, this.height) * 0.5
     },
     points () {
       const {aScale, center, radius} = this

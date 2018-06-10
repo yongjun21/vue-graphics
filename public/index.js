@@ -4,8 +4,8 @@ import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
 
 // testBarChart()
-testWaterfallLine()
-// testChordDiagram()
+// testWaterfallLine()
+testChordDiagram()
 // testStackedBar()
 
 function testBarChart () {
@@ -63,7 +63,12 @@ function testChordDiagram () {
         groups,
         exclude: v => v <= 1
       }
-      window.vm = createVM(ChordDiagram, data, {class: 'chord-diagram'})
+      window.vm = createVM(ChordDiagram, data, {
+        class: 'chord-diagram',
+        props: {
+          padding: '20%'
+        }
+      })
     }
   })
 }
@@ -89,10 +94,7 @@ function testStackedBar () {
       }, {
         class: 'stacked-bar',
         props: {
-          paddingTop: 20,
-          paddingBottom: 20,
-          paddingLeft: 100,
-          paddingRight: 20
+          padding: '20 20 20 100'
         }
       })
     })
