@@ -1,6 +1,6 @@
 import 'gsap/TweenLite'
 
-import {getPathLength} from '../util'
+import {createSVGElement} from '../util'
 
 export default {
   name: 'AnimatedLine',
@@ -61,4 +61,11 @@ export default {
       on: this.$listeners
     })
   }
+}
+
+let $path
+function getPathLength (d) {
+  $path = $path || createSVGElement('path')
+  $path.setAttribute('d', d)
+  return Math.ceil($path.getTotalLength())
 }

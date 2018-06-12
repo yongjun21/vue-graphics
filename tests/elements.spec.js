@@ -25,7 +25,11 @@ describe('AnimatedBar', () => {
 
 describe('AnimatedLine', () => {
   const propsData = {d: 'M0 L99,0'}
-  dep.getPathLength = d => 99
+  dep.createSVGElement = function (tag) {
+    const $el = document.createElement(tag)
+    $el.getTotalLength = () => 99
+    return $el
+  }
 
   testAnimatedElement(AnimatedLine, propsData, {d: 'M0 L0,99'})
 

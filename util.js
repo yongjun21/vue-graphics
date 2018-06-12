@@ -1,9 +1,6 @@
-let $path
-
-export function getPathLength (d) {
-  $path = $path || document.createElementNS('http://www.w3.org/2000/svg', 'path')
-  $path.setAttribute('d', d)
-  return Math.ceil($path.getTotalLength())
+// for testing
+export function createSVGElement (tag) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tag)
 }
 
 export function mapRadialToCartesian (a, radius, center) {
