@@ -78,27 +78,6 @@ export default {
         return Object.assign(obj, {[d.id]: paths})
       }, {})
     },
-    axes () {
-      const {aScale, center, radius} = this
-      return Object.keys(this.groupedDomain).map((g, i) => {
-        return {
-          key: g,
-          class: 'axis',
-          attrs: {'data-group': g},
-          props: {
-            label: g,
-            center: center,
-            radius: radius + 6,
-            scale: aScale,
-            domain: this.groupedDomain[g],
-            extrapolate: g === '_' ? '' : null,
-            tickLength: 0,
-            labelPadding: 130
-          },
-          scopedSlots: {}
-        }
-      })
-    },
     getLabel () {
       const labels = this.data.reduce((obj, d) => {
         return Object.assign(obj, {[d.id]: d.label})
@@ -112,6 +91,67 @@ export default {
     }
   },
   methods: {
+    getAxes (h) {
+      const {aScale, center, radius, getLabel, getValue, selected} = this
+      return Object.keys(this.groupedDomain).map((g, i) => {
+        return h(RadialAxis, {
+          key: g,
+          class: 'axis',
+          attrs: {'data-group': g},
+          props: {
+            label: g,
+            center: center,
+            radius: radius + 6,
+            scale: aScale,
+            domain: this.groupedDomain[g],
+            extrapolate: g === '_' ? '' : null,
+            tickLength: 0,
+            labelPadding: 130
+          },
+          scopedSlots: {
+            tickLabel: data => h('g', {
+              class: {
+                'source': data.id === selected,
+                'tick-label': true
+              }
+            }, [
+              h('circle', {
+                attrs: {
+                  r: 3,
+                  cx: -3,
+                  'data-value': getValue(data.id)
+                }
+              }),
+              h('text', {
+                attrs: data.attrs,
+                on: {
+                  click: () => {
+                    this.$emit('change', data.id)
+                    this.selected = data.id
+                  }
+                }
+              }, getLabel(data.id))
+            ]),
+            axisLabel: ({text, textPath, props}) => {
+              const underlineRadius = radius + 120
+              const underline = path()
+              underline.moveTo(underlineRadius, 0)
+              underline.arc(0, 0, underlineRadius, 0, props.maxA - props.minA)
+              return h('g', {class: 'axis-label'}, [
+                h('path', {
+                  attrs: {
+                    d: underline.toString(),
+                    transform: `rotate(${props.minA * 180 / Math.PI})`,
+                    fill: 'none'
+                  }
+                }),
+                h('text', text, [h('textPath', textPath, g)])
+              ])
+            }
+          }
+        })
+      })
+    },
     animate () {
       this.$nextTick(function () {
         const tweens = this.connections[this.selected]
@@ -129,58 +169,9 @@ export default {
   },
   render (h) {
     if (this.width == null || this.height == null) return h('svg')
-    const {selected, getLabel, getValue, radius} = this
 
-    const lines = this.connections[selected] || []
-    const $lines = lines.map(line => h(AnimatedLine, line))
-
-    const $axes = this.axes.map(axis => {
-      axis.scopedSlots.tickLabel = data => {
-        const attrs = data.attrs
-        return h('g', {
-          key: data.key,
-          class: {
-            'source': data.key === selected,
-            'tick-label': true
-          }
-        }, [
-          h('circle', {
-            attrs: {
-              r: 3,
-              cx: attrs.x >= 0 ? attrs.x - 6 : attrs.x + 6,
-              transform: attrs.transform,
-              'data-value': getValue(data.key)
-            }
-          }),
-          h('text', {
-            attrs: data.attrs,
-            on: {
-              click: () => {
-                this.$emit('change', data.key)
-                this.selected = data.key
-              }
-            }
-          }, getLabel(data.key))
-        ])
-      }
-      axis.scopedSlots.axisLabel = ({text, textPath, props}) => {
-        const underlineRadius = radius + 120
-        const underline = path()
-        underline.moveTo(underlineRadius, 0)
-        underline.arc(0, 0, underlineRadius, 0, props.maxA - props.minA)
-        return h('g', {class: 'axis-label'}, [
-          h('path', {
-            attrs: {
-              d: underline.toString(),
-              transform: `rotate(${props.minA * 180 / Math.PI})`,
-              fill: 'none'
-            }
-          }),
-          h('text', text, [h('textPath', textPath, axis.key)])
-        ])
-      }
-      return h(RadialAxis, axis)
-    })
+    const $axes = this.getAxes(h)
+    const $lines = this.connections[this.selected].map(line => h(AnimatedLine, line))
 
     return h('svg', [
       h('g', $axes),

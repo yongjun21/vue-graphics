@@ -55,3 +55,41 @@ export function frameRateLimited (cb) {
     })
   }
 }
+
+export function orientateText (anchor, offset, rotate) {
+  offset = offset || [0, 0]
+
+  function getOffsetAngle (offset) {
+    if (offset[0] === 0 && offset[1] === 0) return null
+    return Math.atan2(offset[1], offset[0]) * 180 / Math.PI - 90
+  }
+
+  const attrs = {
+    'dy': ['topleft', 'top', 'topright'].indexOf(anchor) > -1 ? '0.7em'
+        : ['bottomleft', 'bottom', 'bottomright'].indexOf(anchor) > -1 ? '0'
+        : '0.35em',
+    'text-anchor': ['topleft', 'left', 'bottomleft'].indexOf(anchor) > -1 ? 'start'
+                 : ['topright', 'right', 'bottomright'].indexOf(anchor) > -1 ? 'end'
+                 : 'middle'
+  }
+
+  const anchors = ['top', 'topright', 'right', 'bottomright', 'bottom', 'bottomleft', 'left', 'topleft']
+  const offsetAngle = getOffsetAngle(offset)
+
+  const transformations = []
+  if (offsetAngle != null) {
+    transformations.push(`translate(${offset[0]} ${offset[1]})`)
+  }
+  if (rotate != null) {
+    let deg = rotate
+    if (anchors.indexOf(anchor) > -1 && offsetAngle != null) {
+      deg += anchors.indexOf(anchor) * -45 + offsetAngle
+    }
+    transformations.push(`rotate(${deg})`)
+  }
+  if (transformations.length > 0) {
+    attrs.transform = transformations.join(' ')
+  }
+
+  return attrs
+}

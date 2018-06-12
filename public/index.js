@@ -1,5 +1,6 @@
-import {BarChart, ResponsiveWrapper, AnimatedBar, StackedBarChart} from '../index.js'
+import {BarChart, ResponsiveWrapper, AnimatedBar} from '../index.js'
 
+import StackedBarChart from '../components/withAxis/StackedBarChart'
 import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
 
@@ -9,7 +10,7 @@ testChordDiagram()
 // testStackedBar()
 
 function testBarChart () {
-  BarChart.components['bar-element'] = AnimatedBar
+  BarChart.components = {'bar-element': AnimatedBar}
   window.vm = createVM(BarChart, {data: [10, 20, 50, 40], range: [0, 60]})
 }
 

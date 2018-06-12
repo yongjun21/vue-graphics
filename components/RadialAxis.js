@@ -1,29 +1,56 @@
 import {path} from 'd3-path'
-import {uniqueHash} from '../util'
+import {orientateText, uniqueHash} from '../util'
 
 export default {
   functional: true,
+  props: {
+    center: {
+      type: Array,
+      default: [0, 0]
+    },
+    radius: {
+      type: Number,
+      required: true
+    },
+    scale: {
+      type: Function,
+      required: true
+    },
+    domain: {
+      type: Array,
+      required: true
+    },
+    extrapolate: null,
+    tickLength: {
+      type: Number,
+      default: 6
+    },
+    tickPadding: {
+      type: Number,
+      default: 3
+    },
+    tickAnchor: null,
+    tickRotate: {
+      type: Number,
+      default: 0
+    },
+    label: String,
+    labelPadding: {
+      type: Number,
+      default: 100
+    }
+  },
   render (h, {data, props}) {
-    props = Object.assign({
-      tickLength: 6,
-      tickPadding: 3,
-      labelPadding: 100
-    }, props)
-    const {center, radius, scale, domain, tickLength, tickPadding, labelPadding, extrapolate} = props
-    const range = domain.map(scale)
+    const range = props.domain.map(props.scale)
     const minA = range.reduce((min, a) => a < min ? a : min, Infinity)
     const maxA = range.reduce((max, a) => a > max ? a : max, -Infinity)
     const midA = (minA + maxA) / 2
     const onLeft = Math.cos(midA) < 0
     const onTop = Math.sin(midA) >= 0
 
-    let x1 = radius
-    let x2 = x1 + tickLength
-    let x3 = x2 + tickPadding
-
     const baseline = path()
-    baseline.moveTo(x1, 0)
-    baseline.arc(0, 0, x1, 0, extrapolate != null ? 2 * Math.PI : maxA - minA)
+    baseline.moveTo(props.radius, 0)
+    baseline.arc(0, 0, props.radius, 0, props.extrapolate != null ? 2 * Math.PI : maxA - minA)
     const $baseline = h('path', {
       attrs: {
         d: baseline.toString(),
@@ -32,41 +59,35 @@ export default {
       }
     })
 
-    if (onLeft) {
-      x1 = -x1
-      x2 = -x2
-      x3 = -x3
-    }
-
     const tickLabelGenerator = (data.scopedSlots && data.scopedSlots.tickLabel) ||
-                               (data => h('text', data, data.key))
+                               (data => h('text', data, data.id))
 
     const axisLabelGenerator = (data.scopedSlots && data.scopedSlots.axisLabel) ||
                                (({text, textPath}) => h('text', text, [h('textPath', textPath, props.label)]))
 
-    const $tickMarks = []
-    const $tickLabels = []
-
-    domain.forEach((key, i) => {
-      const transform = getRotation(range[i] + (onLeft ? Math.PI : 0))
+    const $ticks = props.domain.map((key, i) => {
+      const transform = `${getRotation(range[i])} translate(${props.radius} 0)`
       const $tickMark = h('line', {
-        attrs: {x1, x2, transform, 'stroke': '#888'}
+        attrs: {x2: props.tickLength, 'stroke': '#888'}
       })
       const $tickLabel = tickLabelGenerator({
-        key,
-        attrs: {
-          x: x3,
-          dy: '0.35em',
-          transform,
-          'text-anchor': onLeft ? 'end' : 'start',
-          'fill': '#666'
-        }
+        id: key,
+        attrs: getTextAttrs(
+          onLeft ? 'right' : 'left',
+          [props.tickLength + props.tickPadding, 0],
+          props.tickRotate
+        )
       })
-      $tickMarks.push($tickMark)
-      $tickLabels.push($tickLabel)
+      return h('g', {
+        key,
+        attrs: {transform}
+      }, [
+        $tickMark,
+        $tickLabel
+      ])
     })
 
-    const rLabel = radius + labelPadding
+    const rLabel = props.radius + props.labelPadding
     const guideId = uniqueHash()
     const guide = path()
     guide.moveTo(-rLabel, 0)
@@ -100,12 +121,11 @@ export default {
     })
 
     data.attrs = data.attrs || {}
-    data.attrs.transform = `translate(${center[0]} ${center[1]})`
+    data.attrs.transform = `translate(${props.center[0]} ${props.center[1]})`
 
     return h('g', data, [
       $baseline,
-      h('g', $tickMarks),
-      h('g', $tickLabels),
+      h('g', $ticks),
       $axisLabelGuide,
       $axisLabel
     ])
@@ -115,4 +135,11 @@ export default {
 function getRotation (a) {
   const deg = a * 180 / Math.PI
   return `rotate(${deg})`
+}
+
+function getTextAttrs (anchor, offset, rotate) {
+  return Object.assign(
+    {fill: '#666'},
+    orientateText(anchor, offset, rotate)
+  )
 }

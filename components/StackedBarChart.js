@@ -2,7 +2,6 @@ import {scaleBand, scaleLinear} from 'd3-scale'
 import {stack} from 'd3-shape'
 
 import Bar from '../elements/Bar'
-import LinearAxis from './LinearAxis'
 
 import {mergeClass} from '../util'
 
@@ -16,9 +15,7 @@ export default {
     'range',
     'horizontal',
     'paddingInner',
-    'paddingOuter',
-    'xLabel',
-    'yLabel'
+    'paddingOuter'
   ],
   computed: {
     xScale () {
@@ -90,44 +87,10 @@ export default {
   },
   render (h) {
     if (this.width == null || this.height == null) return h('svg')
-
     const transform = this.horizontal != null && 'matrix(0, 1, 1, 0, 0, 0)'
     const $bars = this.bars.map(bar => h('bar-element', bar))
-
-    const $axes = [
-      h(LinearAxis, {
-        class: 'axis',
-        props: {
-          horizontal: this.horizontal == null || null,
-          anchor: this.yScale(0),
-          scale: this.xScale,
-          domain: this.xScale.domain(),
-          extrapolate: true,
-          label: this.xLabel
-        },
-        scopedSlots: {
-          tickLabel: data => h('text', data, this.data[data.key].label || data.key)
-        }
-      }),
-      h(LinearAxis, {
-        class: 'axis',
-        props: {
-          horizontal: this.horizontal != null || null,
-          anchor: this.horizontal != null ? this.height : 0,
-          scale: this.yScale,
-          domain: this.yScale.ticks(),
-          extrapolate: true,
-          label: this.yLabel
-        }
-      })
-    ]
-
-    const $slots = this.$scopedSlots.default && this.$scopedSlots.default(this)
-
     return h('svg', [
-      h('g', {attrs: {transform}}, $bars),
-      $axes,
-      $slots
+      h('g', {attrs: {transform}}, $bars)
     ])
   }
 }
