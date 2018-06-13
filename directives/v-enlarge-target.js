@@ -1,3 +1,5 @@
+import {createSVGElement} from '../util'
+
 const mouseEvents = [
   'click',
   'dblclick',
@@ -13,7 +15,7 @@ const mouseEvents = [
 
 export default {
   bind ($el, binding) {
-    const $enlarged = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+    const $enlarged = createSVGElement('path')
     $enlarged.setAttribute('stroke-width', binding.value || 9)
     $enlarged.setAttribute('stroke', 'none')
     $enlarged.setAttribute('fill', 'none')

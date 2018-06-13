@@ -70,7 +70,16 @@ export function orientateText (anchor, offset, rotate) {
                  : 'middle'
   }
 
-  const anchors = ['top', 'topright', 'right', 'bottomright', 'bottom', 'bottomleft', 'left', 'topleft']
+  const anchorAngles = {
+    'top': 0,
+    'topright': 0,
+    'right': -90,
+    'bottomright': -180,
+    'bottom': -180,
+    'bottomleft': -180,
+    'left': -270,
+    'topleft': 0
+  }
   const offsetAngle = getOffsetAngle(offset)
 
   const transformations = []
@@ -79,8 +88,8 @@ export function orientateText (anchor, offset, rotate) {
   }
   if (rotate != null) {
     let deg = rotate
-    if (anchors.indexOf(anchor) > -1 && offsetAngle != null) {
-      deg += anchors.indexOf(anchor) * -45 + offsetAngle
+    if (anchor in anchorAngles && offsetAngle != null) {
+      deg += anchorAngles[anchor] + offsetAngle
     }
     transformations.push(`rotate(${deg})`)
   }

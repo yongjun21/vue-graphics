@@ -6,8 +6,11 @@ import {mapRadialToCartesian} from '../util'
 import RadialAxis from '../components/RadialAxis'
 import AnimatedLine from '../elements/AnimatedLine'
 
+import MeasureText from '../directives/v-measure-text'
+
 export default {
   name: 'ChordDiagram',
+  directives: {MeasureText},
   props: ['data', 'domain', 'groups', 'exclude', 'width', 'height'],
   data () {
     return {
@@ -174,7 +177,15 @@ export default {
     const $lines = this.connections[this.selected].map(line => h(AnimatedLine, line))
 
     return h('svg', [
-      h('g', $axes),
+      h('g', {
+        directives: [{
+          name: 'measure-text',
+          value: {
+            target: '.tick-label text',
+            callback: console.log
+          }
+        }]
+      }, $axes),
       h('g', $lines)
     ])
   }

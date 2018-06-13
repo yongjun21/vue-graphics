@@ -1,6 +1,6 @@
 {
   "name": "vue-graphics",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A set of Vue-powered graphics primitives and components for building web visualizations and interactive graphics",
   "main": "index.js",
   "scripts": {

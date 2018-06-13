@@ -6,7 +6,7 @@ export default {
   props: {
     center: {
       type: Array,
-      default: [0, 0]
+      default: () => [0, 0]
     },
     radius: {
       type: Number,
