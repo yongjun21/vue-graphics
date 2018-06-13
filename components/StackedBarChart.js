@@ -89,7 +89,7 @@ export default {
     if (this.width == null || this.height == null) return h('svg')
     const transform = this.horizontal != null && 'matrix(0, 1, 1, 0, 0, 0)'
     const $bars = this.bars.map(bar => h('bar-element', bar))
-    return h('svg', [
+    return h('svg', {class: 'vg-chart vg-stacked-bar-chart'}, [
       h('g', {attrs: {transform}}, $bars)
     ])
   }

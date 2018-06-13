@@ -46,6 +46,7 @@ export default {
   },
   render (h) {
     return h('rect', {
+      class: 'vg-bar vg-animated',
       attrs: this.props,
       on: this.$listeners
     })

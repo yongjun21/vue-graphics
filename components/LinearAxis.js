@@ -1,4 +1,4 @@
-import {orientateText} from '../util'
+import {orientateText, mergeClass} from '../util'
 
 const placements = ['top', 'right', 'bottom', 'left']
 
@@ -64,6 +64,7 @@ export default {
     let $baseline
     if (props.extrapolate == null) {
       $baseline = h('line', {
+        class: 'vg-baseline',
         attrs: {
           x1: minD,
           x2: maxD,
@@ -73,6 +74,7 @@ export default {
     } else {
       const extend = props.scale.range()
       $baseline = h('line', {
+        class: 'vg-baseline',
         attrs: {
           x1: extend[0],
           x2: extend[extend.length - 1],
@@ -86,10 +88,12 @@ export default {
 
     const $ticks = props.domain.map((key, i) => {
       const $tickMark = h('line', {
+        class: 'vg-tick-mark',
         attrs: {y2: props.tickLength, 'stroke': '#888'}
       })
       const $tickLabel = tickLabelGenerator({
         id: key,
+        class: 'vg-tick-label',
         attrs: getTextAttrs(
           props.tickAnchor,
           [0, props.tickLength + props.tickPadding],
@@ -107,6 +111,7 @@ export default {
     })
 
     const $axisLabel = props.label && h('text', {
+      class: 'vg-axis-label',
       attrs: getTextAttrs(
         'center',
         [midD, props.labelPadding],
@@ -114,6 +119,7 @@ export default {
       )
     }, props.label)
 
+    data.class = mergeClass('vg-axis vg-linear-axis', data.class)
     data.attrs = data.attrs || {}
     data.attrs.transform = horizontal
                          ? `translate(0 ${props.anchor})`

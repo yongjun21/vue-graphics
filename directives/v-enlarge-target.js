@@ -20,6 +20,7 @@ export default {
     $enlarged.setAttribute('stroke', 'none')
     $enlarged.setAttribute('fill', 'none')
     $enlarged.style.pointerEvents = 'stroke'
+    $enlarged.classList.add('vg-enlarged')
     mouseEvents.forEach(type => {
       $enlarged.addEventListener(type, event => {
         const e = new window.Event(type, event)

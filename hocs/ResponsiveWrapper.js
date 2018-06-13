@@ -1,4 +1,5 @@
 import responsiveMixin from '../mixins/responsiveMixin'
+import {mergeClass} from '../util'
 
 export default {
   name: 'ResponsiveWrapper',
@@ -64,6 +65,7 @@ export default {
       width: this.width - this.paddingLeft_ - this.paddingRight_,
       height: this.height - this.paddingTop_ - this.paddingBottom_
     })
+    $slot.data.class = 'vg-responsive'
     $slot.data.attrs = $slot.data.attrs || {}
     $slot.data.attrs['viewBox'] = `${-this.paddingLeft_} ${-this.paddingTop_} ${this.width} ${this.height}`
     return $slot

@@ -16,7 +16,6 @@ export default {
 
     const $axes = [
       h(LinearAxis, {
-        class: 'axis',
         props: {
           placement: this.horizontal == null ? 'bottom' : 'left',
           anchor: this.yScale(0),
@@ -30,7 +29,6 @@ export default {
         }
       }),
       h(LinearAxis, {
-        class: 'axis',
         props: {
           placement: this.horizontal == null ? 'left' : 'bottom',
           anchor: this.horizontal != null ? this.height : 0,
@@ -44,7 +42,7 @@ export default {
 
     const $slots = this.$scopedSlots.default && this.$scopedSlots.default(this)
 
-    return h('svg', [
+    return h('svg', {class: 'vg-chart vg-stacked-bar-chart'}, [
       h('g', {attrs: {transform}}, $bars),
       $axes,
       $slots

@@ -125,15 +125,14 @@ export default {
                   'data-value': getValue(data.id)
                 }
               }),
-              h('text', {
-                attrs: data.attrs,
+              h('text', Object.assign(data, {
                 on: {
                   click: () => {
                     this.$emit('change', data.id)
                     this.selected = data.id
                   }
                 }
-              }, getLabel(data.id))
+              }), getLabel(data.id))
             ]),
             axisLabel: ({text, textPath, props}) => {
               const underlineRadius = radius + 120

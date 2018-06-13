@@ -1,5 +1,5 @@
 import {path} from 'd3-path'
-import {orientateText, uniqueHash} from '../util'
+import {orientateText, uniqueHash, mergeClass} from '../util'
 
 export default {
   functional: true,
@@ -52,6 +52,7 @@ export default {
     baseline.moveTo(props.radius, 0)
     baseline.arc(0, 0, props.radius, 0, props.extrapolate != null ? 2 * Math.PI : maxA - minA)
     const $baseline = h('path', {
+      class: 'vg-baseline',
       attrs: {
         d: baseline.toString(),
         transform: getRotation(minA),
@@ -68,10 +69,12 @@ export default {
     const $ticks = props.domain.map((key, i) => {
       const transform = `${getRotation(range[i])} translate(${props.radius} 0)`
       const $tickMark = h('line', {
+        class: 'vg-tick-mark',
         attrs: {x2: props.tickLength, 'stroke': '#888'}
       })
       const $tickLabel = tickLabelGenerator({
         id: key,
+        class: 'vg-tick-label',
         attrs: getTextAttrs(
           onLeft ? 'right' : 'left',
           [props.tickLength + props.tickPadding, 0],
@@ -103,6 +106,7 @@ export default {
 
     const $axisLabel = axisLabelGenerator({
       text: {
+        class: 'vg-axis-label',
         attrs: {
           dy: '0.35em',
           transform: getRotation(midA + (onTop ? -1 : 1) * Math.PI / 2),
@@ -120,6 +124,7 @@ export default {
       props: {minA, maxA}
     })
 
+    data.class = mergeClass('vg-axis vg-radial-axis', data.class)
     data.attrs = data.attrs || {}
     data.attrs.transform = `translate(${props.center[0]} ${props.center[1]})`
 

@@ -52,6 +52,7 @@ export default {
   },
   render (h) {
     return h('path', {
+      class: 'vg-line vg-animated',
       attrs: {
         d: this.d,
         'fill': 'none',

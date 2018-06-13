@@ -11,17 +11,23 @@ export function mapRadialToCartesian (a, radius, center) {
   ]
 }
 
-export function mergeClass (...classes) {
-  return classes.reduce((obj, cl) => {
-    if (typeof cl === 'string') {
-      cl.split(' ').forEach(c => {
-        obj[c] = true
+export function mergeClass () {
+  const merged = {}
+  for (let i = 0; i < arguments.length; i++) {
+    const arg = arguments[i]
+    if (Array.isArray(arg)) {
+      arg.forEach(v => {
+        Object.assign(merged, mergeClass(v))
       })
-    } else if (typeof cl === 'object') {
-      Object.assign(obj, cl)
+    } else if (typeof arg === 'object') {
+      Object.assign(merged, arg)
+    } else if (typeof arg === 'string') {
+      arg.split(' ').forEach(s => {
+        if (s.length > 0) merged[s] = true
+      })
     }
-    return obj
-  }, {})
+  }
+  return merged
 }
 
 const hashCollection = {}
