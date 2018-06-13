@@ -4,16 +4,28 @@ import Bar from '../elements/Bar'
 
 export default {
   name: 'BarChart',
-  props: [
-    'width',
-    'height',
-    'data',
-    'range',
-    'baseline',
-    'horizontal',
-    'paddingInner',
-    'paddingOuter'
-  ],
+  props: {
+    width: Number,
+    height: Number,
+    data: {
+      type: Array,
+      required: true
+    },
+    range: Array,
+    baseline: {
+      type: Number,
+      default: 0
+    },
+    horizontal: null,
+    paddingInner: {
+      type: Number,
+      default: 0
+    },
+    paddingOuter: {
+      type: Number,
+      default: 0
+    }
+  },
   computed: {
     xScale () {
       const domain = this.data.map((d, i) => i)
@@ -21,8 +33,8 @@ export default {
       const scale = scaleBand()
       scale.domain(domain)
       scale.rangeRound(range)
-      scale.paddingInner(this.paddingInner || 0)
-      scale.paddingOuter(this.paddingOuter || 0)
+      scale.paddingInner(this.paddingInner)
+      scale.paddingOuter(this.paddingOuter)
       return scale
     },
     yScale () {
@@ -30,7 +42,7 @@ export default {
         if (d.value < minmax[0]) minmax[0] = d.value
         if (d.value > minmax[1]) minmax[1] = d.value
         return minmax
-      }, [this.baseline || 0, this.baseline || 0])
+      }, [this.baseline, this.baseline])
       const range = this.horizontal == null ? [this.height, 0] : [0, this.width]
       const scale = scaleLinear()
       scale.domain(domain).nice()

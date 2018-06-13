@@ -5,23 +5,14 @@ export default {
   name: 'ResponsiveWrapper',
   extends: responsiveMixin,
   props: {
-    paddingTop: {
-      type: [Number, Function],
-      default: 0
-    },
-    paddingRight: {
-      type: [Number, Function],
-      default: 0
-    },
-    paddingBottom: {
-      type: [Number, Function],
-      default: 0
-    },
-    paddingLeft: {
-      type: [Number, Function],
-      default: 0
-    },
-    padding: String
+    paddingTop: [Number, Function],
+    paddingRight: [Number, Function],
+    paddingBottom: [Number, Function],
+    paddingLeft: [Number, Function],
+    padding: {
+      type: String,
+      default: ''
+    }
   },
   computed: {
     padding_ () {
@@ -44,19 +35,19 @@ export default {
     },
     paddingTop_ () {
       if (typeof this.paddingTop === 'function') return this.paddingTop()
-      return this.padding_[0] || this.paddingTop
+      return this.paddingTop != null ? this.paddingTop : this.padding_[0]
     },
     paddingRight_ () {
       if (typeof this.paddingRight === 'function') return this.paddingRight()
-      return this.padding_[1] || this.paddingRight
+      return this.paddingRight != null ? this.paddingRight : this.padding_[1]
     },
     paddingBottom_ () {
       if (typeof this.paddingBottom === 'function') return this.paddingBottom()
-      return this.padding_[2] || this.paddingBottom
+      return this.paddingBottom != null ? this.paddingBottom : this.padding_[2] 
     },
     paddingLeft_ () {
       if (typeof this.paddingLeft === 'function') return this.paddingLeft()
-      return this.padding_[3] || this.paddingLeft
+      return this.paddingLeft != null ? this.paddingLeft : this.padding_[3]
     }
   },
   render (h) {
@@ -65,7 +56,7 @@ export default {
       width: this.width - this.paddingLeft_ - this.paddingRight_,
       height: this.height - this.paddingTop_ - this.paddingBottom_
     })
-    $slot.data.class = 'vg-responsive'
+    $slot.data.class = mergeClass('vg-responsive', $slot.data.class)
     $slot.data.attrs = $slot.data.attrs || {}
     $slot.data.attrs['viewBox'] = `${-this.paddingLeft_} ${-this.paddingTop_} ${this.width} ${this.height}`
     return $slot

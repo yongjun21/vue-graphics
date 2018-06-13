@@ -104,7 +104,7 @@ export default {
       })
     ])
 
-    const $axisLabel = axisLabelGenerator({
+    const $axisLabel = props.label && axisLabelGenerator({
       text: {
         class: 'vg-axis-label',
         attrs: {

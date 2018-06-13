@@ -57,34 +57,25 @@ export default {
       range = range.map(v => v + props.scale.bandwidth() / 2)
     }
 
-    const minD = range.reduce((min, d) => d < min ? d : min, Infinity)
-    const maxD = range.reduce((max, d) => d > max ? d : max, -Infinity)
+    const extent = props.extrapolate == null ? range : props.scale.range()
+
+    const minD = extent.reduce((min, d) => d < min ? d : min, Infinity)
+    const maxD = extent.reduce((max, d) => d > max ? d : max, -Infinity)
     const midD = (minD + maxD) / 2
 
-    let $baseline
-    if (props.extrapolate == null) {
-      $baseline = h('line', {
-        class: 'vg-baseline',
-        attrs: {
-          x1: minD,
-          x2: maxD,
-          'stroke': '#888'
-        }
-      })
-    } else {
-      const extend = props.scale.range()
-      $baseline = h('line', {
-        class: 'vg-baseline',
-        attrs: {
-          x1: extend[0],
-          x2: extend[extend.length - 1],
-          'stroke': '#888'
-        }
-      })
-    }
+    const $baseline = h('line', {
+      class: 'vg-baseline',
+      attrs: {
+        x1: minD,
+        x2: maxD,
+        'stroke': '#888'
+      }
+    })
 
     const tickLabelGenerator = (data.scopedSlots && data.scopedSlots.tickLabel) ||
                                (data => h('text', data, data.id))
+    const axisLabelGenerator = (data.scopedSlots && data.scopedSlots.axisLabel) ||
+                               (data => h('text', data, data.label))
 
     const $ticks = props.domain.map((key, i) => {
       const $tickMark = h('line', {
@@ -110,14 +101,15 @@ export default {
       ])
     })
 
-    const $axisLabel = props.label && h('text', {
+    const $axisLabel = props.label && axisLabelGenerator({
+      label: props.label,
       class: 'vg-axis-label',
       attrs: getTextAttrs(
         'center',
         [midD, props.labelPadding],
         horizontal ? 0 : 180
       )
-    }, props.label)
+    })
 
     data.class = mergeClass('vg-axis vg-linear-axis', data.class)
     data.attrs = data.attrs || {}

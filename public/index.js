@@ -90,6 +90,8 @@ function testStackedBar () {
         paddingInner: 0.3,
         paddingOuter: 0.3,
         horizontal: '',
+        gridlines: '',
+        tickCount: 4,
         xLabel: 'Places',
         yLabel: 'Year'
       }, {

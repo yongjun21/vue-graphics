@@ -7,16 +7,28 @@ import {mergeClass} from '../util'
 
 export default {
   name: 'StackedBarChart',
-  props: [
-    'width',
-    'height',
-    'data',
-    'domain',
-    'range',
-    'horizontal',
-    'paddingInner',
-    'paddingOuter'
-  ],
+  props: {
+    width: Number,
+    height: Number,
+    data: {
+      type: Array,
+      required: true
+    },
+    domain: {
+      type: Array,
+      required: true
+    },
+    range: Array,
+    horizontal: null,
+    paddingInner: {
+      type: Number,
+      default: 0
+    },
+    paddingOuter: {
+      type: Number,
+      default: 0
+    }
+  },
   computed: {
     xScale () {
       const domain = this.data.map((d, i) => i)
@@ -24,8 +36,8 @@ export default {
       const scale = scaleBand()
       scale.domain(domain)
       scale.rangeRound(range)
-      scale.paddingInner(this.paddingInner || 0)
-      scale.paddingOuter(this.paddingOuter || 0)
+      scale.paddingInner(this.paddingInner)
+      scale.paddingOuter(this.paddingOuter)
       return scale
     },
     yScale () {

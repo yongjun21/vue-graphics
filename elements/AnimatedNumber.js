@@ -29,6 +29,8 @@ export default {
     }
   },
   render (h) {
-    return h('span', {class: 'vg-animated'}, Math.round(this.display).toLocaleString())
+    return h('span', {
+      class: 'vg-animated'
+    }, Math.round(this.display).toLocaleString())
   }
 }
