@@ -31,6 +31,14 @@ export function mergeClass () {
   return merged
 }
 
+export function getInstanceProperties (vm) {
+  const props = Object.assign({}, vm.$data)
+  Object.keys(vm.$options.computed).forEach(key => {
+    props[key] = vm[key]
+  })
+  return props
+}
+
 const hashCollection = {}
 
 export function uniqueHash () {

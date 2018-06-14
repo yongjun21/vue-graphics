@@ -2,8 +2,9 @@ import StackedBarChart from '../StackedBarChart'
 import LinearAxis from '../LinearAxis'
 import GridLines from '../GridLines'
 
+import {getInstanceProperties} from '../../util'
+
 export default {
-  name: 'StackedBarChart',
   extends: StackedBarChart,
   props: {
     xLabel: String,
@@ -62,7 +63,8 @@ export default {
       })
     ]
 
-    const $children = this.$scopedSlots.default && this.$scopedSlots.default(this)
+    const $children = this.$scopedSlots.default &&
+                      this.$scopedSlots.default(getInstanceProperties(this))
 
     return h('svg', {class: 'vg-chart vg-stacked-bar-chart'}, [
       $gridlines,
