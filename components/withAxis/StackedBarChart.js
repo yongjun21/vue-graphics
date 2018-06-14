@@ -33,11 +33,14 @@ export default {
       }
     })
 
+    const anchor = this.horizontal == null
+                 ? [0, this.yScale(0)]
+                 : [this.yScale(0), this.height]
     const $axes = [
       h('axis-component', {
         props: {
           placement: this.horizontal == null ? 'bottom' : 'left',
-          anchor: this.yScale(0),
+          anchor,
           scale: this.xScale,
           domain: this.xScale.domain(),
           extrapolate: true,
@@ -50,7 +53,7 @@ export default {
       h('axis-component', {
         props: {
           placement: this.horizontal == null ? 'left' : 'bottom',
-          anchor: this.horizontal != null ? this.height : 0,
+          anchor,
           scale: this.yScale,
           domain: this.yScale.ticks(this.tickCount),
           extrapolate: true,

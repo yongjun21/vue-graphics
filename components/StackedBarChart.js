@@ -7,6 +7,9 @@ import {mergeClass} from '../util'
 
 export default {
   name: 'StackedBarChart',
+  components: {
+    'bar-element': Bar
+  },
   props: {
     width: Number,
     height: Number,
@@ -93,9 +96,6 @@ export default {
 
       return collection
     }
-  },
-  components: {
-    'bar-element': Bar
   },
   render (h) {
     if (this.width == null || this.height == null) return h('svg')

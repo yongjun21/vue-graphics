@@ -35,7 +35,7 @@ export default {
     aScale () {
       const scale = scalePoint()
       scale.domain(this.sortedDomain)
-      scale.range([-0.5 * Math.PI, 1.5 * Math.PI])
+      scale.range([-90, 270])
       scale.padding(0.5)
       scale.align(0)
       return scale
@@ -103,7 +103,7 @@ export default {
           attrs: {'data-group': g},
           props: {
             label: g,
-            center: center,
+            anchor: center,
             radius: radius + 6,
             scale: aScale,
             domain: this.groupedDomain[g],
@@ -138,12 +138,12 @@ export default {
               const underlineRadius = radius + 120
               const underline = path()
               underline.moveTo(underlineRadius, 0)
-              underline.arc(0, 0, underlineRadius, 0, props.maxA - props.minA)
+              underline.arc(0, 0, underlineRadius, 0, (props.maxA - props.minA) * Math.PI / 180)
               return h('g', {class: 'axis-label'}, [
                 h('path', {
                   attrs: {
                     d: underline.toString(),
-                    transform: `rotate(${props.minA * 180 / Math.PI})`,
+                    transform: `rotate(${props.minA})`,
                     fill: 'none'
                   }
                 }),

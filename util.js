@@ -5,9 +5,10 @@ export function createSVGElement (tag) {
 
 export function mapRadialToCartesian (a, radius, center) {
   center = center || [0, 0]
+  const rad = a * Math.PI / 180
   return [
-    Math.round(Math.cos(a) * radius + center[0]),
-    Math.round(Math.sin(a) * radius + center[1])
+    Math.round(Math.cos(rad) * radius + center[0]),
+    Math.round(Math.sin(rad) * radius + center[1])
   ]
 }
 

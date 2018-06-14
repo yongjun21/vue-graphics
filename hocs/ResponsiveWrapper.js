@@ -56,6 +56,7 @@ export default {
       width: this.width - this.paddingLeft_ - this.paddingRight_,
       height: this.height - this.paddingTop_ - this.paddingBottom_
     })
+    if (!$slot.data) return h('svg') // to catch case of when v-if is applied to scoped slot
     $slot.data.class = mergeClass('vg-responsive', $slot.data.class)
     $slot.data.attrs = $slot.data.attrs || {}
     $slot.data.attrs['viewBox'] = `${-this.paddingLeft_} ${-this.paddingTop_} ${this.width} ${this.height}`

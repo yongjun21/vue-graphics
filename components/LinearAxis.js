@@ -12,6 +12,10 @@ export default {
       default: 'bottom'
     },
     anchor: {
+      type: Array,
+      default: () => [0, 0]
+    },
+    angle: {
       type: Number,
       default: 0
     },
@@ -68,7 +72,8 @@ export default {
       attrs: {
         x1: minD,
         x2: maxD,
-        'stroke': '#888'
+        'stroke': '#888',
+        'fill': 'none'
       }
     })
 
@@ -80,7 +85,11 @@ export default {
     const $ticks = props.domain.map((key, i) => {
       const $tickMark = h('line', {
         class: 'vg-tick-mark',
-        attrs: {y2: props.tickLength, 'stroke': '#888'}
+        attrs: {
+          y2: props.tickLength,
+          'stroke': '#888',
+          'fill': 'none'
+        }
       })
       const $tickLabel = tickLabelGenerator({
         id: key,
@@ -114,8 +123,11 @@ export default {
     data.class = mergeClass('vg-axis vg-linear-axis', data.class)
     data.attrs = data.attrs || {}
     data.attrs.transform = horizontal
-                         ? `translate(0 ${props.anchor})`
-                         : `translate(${props.anchor} 0) rotate(90)`
+                         ? `translate(0 ${props.anchor[1]})`
+                         : `translate(${props.anchor[0]} 0) rotate(90)`
+    if (props.angle) {
+      data.attrs.transform = `rotate(${props.angle} ${props.anchor[0]} ${props.anchor[1]}) ${data.attrs.transform}`
+    }
 
     return h('g', data, [
       $baseline,

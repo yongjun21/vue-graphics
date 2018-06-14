@@ -4,7 +4,13 @@ import {orientateText, uniqueHash, mergeClass} from '../util'
 export default {
   functional: true,
   props: {
-    center: {
+    placement: {
+      validator (value) {
+        return ['inside', 'outside'].indexOf(value) > -1
+      },
+      default: 'outside'
+    },
+    anchor: {
       type: Array,
       default: () => [0, 0]
     },
@@ -41,21 +47,38 @@ export default {
     }
   },
   render (h, {data, props}) {
+    if (props.placement === 'inside') {
+      props.tickLength = props.tickLength * -1
+      props.tickPadding = props.tickPadding * -1
+      props.labelPadding = props.labelPadding * -1
+    }
+
     const range = props.domain.map(props.scale)
-    const minA = range.reduce((min, a) => a < min ? a : min, Infinity)
-    const maxA = range.reduce((max, a) => a > max ? a : max, -Infinity)
+    const extent = props.extrapolate == null ? range : props.scale.range()
+    
+    const minA = extent.reduce((min, a) => a < min ? a : min, Infinity)
+    const maxA = extent.reduce((max, a) => a > max ? a : max, -Infinity)
     const midA = (minA + maxA) / 2
-    const onLeft = Math.cos(midA) < 0
-    const onTop = Math.sin(midA) >= 0
+    const onLeft = Math.cos(midA * Math.PI / 180) < 0
+    const onTop = Math.sin(midA * Math.PI / 180) >= 0
+
+    if (props.tickAnchor == null) {
+      if (props.placement === 'inside') {
+        props.tickAnchor = onLeft ? 'left' : 'right'
+      } else {
+        props.tickAnchor = onLeft ? 'right' : 'left'
+      }
+    }
 
     const baseline = path()
     baseline.moveTo(props.radius, 0)
-    baseline.arc(0, 0, props.radius, 0, props.extrapolate != null ? 2 * Math.PI : maxA - minA)
+    baseline.arc(0, 0, props.radius, 0, (maxA - minA) * Math.PI / 180)
     const $baseline = h('path', {
       class: 'vg-baseline',
       attrs: {
         d: baseline.toString(),
-        transform: getRotation(minA),
+        transform: `rotate(${minA})`,
+        'stroke': '#888',
         'fill': 'none'
       }
     })
@@ -67,7 +90,7 @@ export default {
                                (({text, textPath}) => h('text', text, [h('textPath', textPath, props.label)]))
 
     const $ticks = props.domain.map((key, i) => {
-      const transform = `${getRotation(range[i])} translate(${props.radius} 0)`
+      const transform = `rotate(${range[i]}) translate(${props.radius} 0)`
       const $tickMark = h('line', {
         class: 'vg-tick-mark',
         attrs: {x2: props.tickLength, 'stroke': '#888'}
@@ -76,7 +99,7 @@ export default {
         id: key,
         class: 'vg-tick-label',
         attrs: getTextAttrs(
-          onLeft ? 'right' : 'left',
+          props.tickAnchor,
           [props.tickLength + props.tickPadding, 0],
           props.tickRotate
         )
@@ -109,7 +132,7 @@ export default {
         class: 'vg-axis-label',
         attrs: {
           dy: '0.35em',
-          transform: getRotation(midA + (onTop ? -1 : 1) * Math.PI / 2),
+          transform: `rotate(${midA + (onTop ? -90 : 90)})`,
           'text-anchor': 'middle',
           'fill': '#666'
         }
@@ -126,7 +149,7 @@ export default {
 
     data.class = mergeClass('vg-axis vg-radial-axis', data.class)
     data.attrs = data.attrs || {}
-    data.attrs.transform = `translate(${props.center[0]} ${props.center[1]})`
+    data.attrs.transform = `translate(${props.anchor[0]} ${props.anchor[1]})`
 
     return h('g', data, [
       $baseline,
@@ -135,11 +158,6 @@ export default {
       $axisLabel
     ])
   }
-}
-
-function getRotation (a) {
-  const deg = a * 180 / Math.PI
-  return `rotate(${deg})`
 }
 
 function getTextAttrs (anchor, offset, rotate) {

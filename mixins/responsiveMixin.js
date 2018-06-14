@@ -7,12 +7,12 @@ export default {
       height: null
     }
   },
-  methods: {
-    _resize: frameRateLimited(function () {
+  created () {
+    this._resize = frameRateLimited(function () {
       const {width, height} = this.$el.getBoundingClientRect()
       this.width = width
       this.height = height
-    })
+    }).bind(this)
   },
   mounted () {
     this._resize()
