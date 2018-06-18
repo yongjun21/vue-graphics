@@ -43,7 +43,7 @@ export default {
     },
     paddingBottom_ () {
       if (typeof this.paddingBottom === 'function') return this.paddingBottom()
-      return this.paddingBottom != null ? this.paddingBottom : this.padding_[2] 
+      return this.paddingBottom != null ? this.paddingBottom : this.padding_[2]
     },
     paddingLeft_ () {
       if (typeof this.paddingLeft === 'function') return this.paddingLeft()

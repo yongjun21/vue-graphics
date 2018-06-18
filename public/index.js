@@ -5,8 +5,8 @@ import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
 
 // testBarChart()
-// testWaterfallLine()
-testChordDiagram()
+testWaterfallLine()
+// testChordDiagram()
 // testStackedBar()
 
 function testBarChart () {
@@ -21,12 +21,7 @@ function testWaterfallLine () {
     .then(data => {
       data = data.filter(d => Object.keys(d).length > 1)
       data.forEach(d => {
-        d.class = 'base'
-        d.highlight = {class: 'highlight'}
-        if (d.id === '__OVERALL__') {
-          d.class = 'overall'
-          d.highlight = {class: 'overall'}
-        }
+        if (d.id === '__OVERALL__') d.class = 'overall'
       })
       window.vm = createVM(WaterfallLine, {data, domain: ['1', '2A', '2B', '2C', '2CS']})
     })

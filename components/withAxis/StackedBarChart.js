@@ -6,6 +6,10 @@ import {getInstanceProperties} from '../../util'
 
 export default {
   extends: StackedBarChart,
+  components: {
+    'grid-lines': GridLines,
+    'axis-component': LinearAxis
+  },
   props: {
     xLabel: String,
     yLabel: String,
@@ -14,10 +18,6 @@ export default {
       default: 10
     },
     gridlines: null
-  },
-  components: {
-    'grid-lines': GridLines,
-    'axis-component': LinearAxis
   },
   render (h) {
     if (this.width == null || this.height == null) return h('svg')
@@ -48,7 +48,7 @@ export default {
           label: this.xLabel
         },
         scopedSlots: {
-          tickLabel: data => h('text', data, this.data[data.id].label || data.key)
+          tickLabel: data => h('text', data, this.data[data.id].label || data.id)
         }
       }),
       h('axis-component', {
@@ -63,8 +63,15 @@ export default {
       })
     ]
 
-    const $children = this.$scopedSlots.default &&
-                      this.$scopedSlots.default(getInstanceProperties(this))
+    const instanceProperties = getInstanceProperties(this)
+
+    const $children = []
+    Object.keys(this.$slots).forEach(key => {
+      $children.push(this.$slots[key])
+    })
+    Object.keys(this.$scopedSlots).forEach(key => {
+      $children.push(this.$scopedSlots[key](instanceProperties))
+    })
 
     return h('svg', {class: 'vg-chart vg-stacked-bar-chart'}, [
       $gridlines,

@@ -1,73 +1,67 @@
 import {scalePoint, scaleLinear} from 'd3-scale'
-import {line, curveStep} from 'd3-shape'
+import {line, curveStepBefore} from 'd3-shape'
 
 import Line from '../elements/Line'
 import AnimatedLine from '../elements/AnimatedLine'
 import EnlargeTarget from '../directives/v-enlarge-target'
 
+import {mergeClass} from '../util'
+
+const lineGenerator = line().curve(curveStepBefore)
+
 export default {
+  name: 'WaterfallLine',
   directives: {EnlargeTarget},
-  props: ['data', 'domain', 'width', 'height'],
+  props: ['data', 'domain', 'highlighted', 'hoverEnabled', 'width', 'height'],
   data () {
     return {
-      highlighted: {}
+      hoveredOn: null
     }
   },
   computed: {
     xScale () {
       const scale = scalePoint()
       scale.domain(this.domain)
-      scale.rangeRound(this.width && [0, this.width])
-      scale.padding(0.5)
+      scale.rangeRound([0, this.width])
+      scale.padding(0.51)
       return scale
     },
     yScale () {
       const scale = scaleLinear()
-      scale.domain([-0.01, 1.01])
-      scale.rangeRound(this.height && [this.height, 0])
+      scale.domain([-0.02, 1.02])
+      scale.rangeRound([this.height, 0])
       return scale
     },
     pathString () {
-      if (this.width == null || this.height == null) return {}
-      const {domain, width, xScale, yScale} = this
+      const {domain, xScale, yScale} = this
       const padding = xScale.step() / 2
-      const lineGenerator = line().curve(curveStep)
       return this.data.reduce((obj, d) => {
         let cumulative = 0
         const points = []
-        points.push([-padding, yScale(cumulative)])
+        points.push([xScale(domain[0]) - padding, yScale(cumulative)])
         domain.forEach(key => {
           points.push([
-            xScale(key),
+            xScale(key) + padding,
             yScale(cumulative += d[key])
           ])
         })
-        points.push([width + padding, yScale(cumulative)])
         return Object.assign(obj, {[d.id]: lineGenerator(points)})
       }, {})
     }
   },
-  methods: {
-    getHighlighter (d, highlight) {
-      return () => {
-        if (highlight == null) {
-          highlight = this.highlighted[d.id]
-        }
-        this.$set(this.highlighted, d.id, highlight)
-      }
-    }
-  },
   render (h) {
-    const {pathString, highlighted} = this
+    if (this.width == null || this.height == null) return h('svg')
+
+    const {pathString, highlighted, hoveredOn, hoverEnabled} = this
     const $overlay = []
-    const $content = this.data.filter(d => d.id in pathString).map(d => {
-      if (highlighted[d.id]) {
+    const $lines = this.data.map(d => {
+      if ((highlighted && highlighted.indexOf(d.id) > -1) || (hoverEnabled && hoveredOn === d.id)) {
         $overlay.push(h(AnimatedLine, {
+          class: mergeClass(d.class, 'highlighted'),
           attrs: {
-            d: pathString[d.id]
-          },
-          class: d.highlight && d.highlight.class,
-          style: d.highlight && d.highlight.style
+            d: pathString[d.id],
+            'fill': 'none'
+          }
         }))
       }
       return h(Line, {
@@ -80,14 +74,15 @@ export default {
         class: d.class,
         style: d.style,
         on: {
-          // click: this.getHighlighter(d),
-          mouseover: this.getHighlighter(d, true),
-          mouseout: this.getHighlighter(d, false)
+          mouseover: () => { this.hoveredOn = d.id },
+          mouseout: () => { this.hoveredOn = null }
         },
         directives: [{name: 'enlarge-target'}]
       })
     })
-    $content.push(h('g', $overlay))
-    return h('svg', $content)
+    return h('svg', {class: 'waterfall-line'}, [
+      h('g', $lines),
+      h('g', $overlay)
+    ])
   }
 }
