@@ -11,11 +11,12 @@ const lineGenerator = line().curve(curveStepBefore)
 
 export default {
   name: 'WaterfallLine',
+  components: {'highlighted-line': AnimatedLine},
   directives: {EnlargeTarget},
-  props: ['data', 'domain', 'highlighted', 'hoverEnabled', 'width', 'height'],
+  props: ['data', 'domain', 'highlighted', 'interactives', 'width', 'height'],
   data () {
     return {
-      hoveredOn: null
+      selected: {}
     }
   },
   computed: {
@@ -32,34 +33,47 @@ export default {
       scale.rangeRound([this.height, 0])
       return scale
     },
-    pathString () {
+    paths () {
       const {domain, xScale, yScale} = this
-      const padding = xScale.step() / 2
-      return this.data.reduce((obj, d) => {
+      const halfStep = xScale.step() / 2
+      return this.data.map(d => {
         let cumulative = 0
         const points = []
-        points.push([xScale(domain[0]) - padding, yScale(cumulative)])
+        points.push([xScale(domain[0]) - halfStep, yScale(cumulative)])
         domain.forEach(key => {
           points.push([
-            xScale(key) + padding,
-            yScale(cumulative += d[key])
+            xScale(key) + halfStep,
+            yScale(Math.min(cumulative += d[key], 1))
           ])
         })
-        return Object.assign(obj, {[d.id]: lineGenerator(points)})
-      }, {})
+        return points
+      })
+    },
+    pathStrings () {
+      return this.paths.map(lineGenerator)
+    }
+  },
+  methods: {
+    handlerGenerator (id, bool) {
+      return () => {
+        if (bool == null) bool = !this.selected[id]
+        this.$set(this.selected, id, bool)
+        if (bool) this.$emit('select', id)
+      }
     }
   },
   render (h) {
     if (this.width == null || this.height == null) return h('svg')
 
-    const {pathString, highlighted, hoveredOn, hoverEnabled} = this
+    const {pathStrings, highlighted, selected, interactives} = this
     const $overlay = []
-    const $lines = this.data.map(d => {
-      if ((highlighted && highlighted.indexOf(d.id) > -1) || (hoverEnabled && hoveredOn === d.id)) {
-        $overlay.push(h(AnimatedLine, {
+    const $lines = this.data.map((d, i) => {
+      if ((highlighted && highlighted.indexOf(d.id) > -1) || selected[d.id]) {
+        $overlay.push(h('highlighted-line', {
+          key: d.id,
           class: mergeClass(d.class, 'highlighted'),
           attrs: {
-            d: pathString[d.id],
+            d: pathStrings[i],
             'fill': 'none'
           }
         }))
@@ -67,17 +81,14 @@ export default {
       return h(Line, {
         key: d.id,
         attrs: {
-          d: pathString[d.id],
+          d: pathStrings[i],
           'stroke': '#888',
           'fill': 'none'
         },
         class: d.class,
         style: d.style,
-        on: {
-          mouseover: () => { this.hoveredOn = d.id },
-          mouseout: () => { this.hoveredOn = null }
-        },
-        directives: [{name: 'enlarge-target'}]
+        on: interactives && interactives(this.handlerGenerator, d.id),
+        directives: interactives && [{name: 'enlarge-target'}]
       })
     })
     return h('svg', {class: 'waterfall-line'}, [

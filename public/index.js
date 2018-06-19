@@ -23,7 +23,16 @@ function testWaterfallLine () {
       data.forEach(d => {
         if (d.id === '__OVERALL__') d.class = 'overall'
       })
-      window.vm = createVM(WaterfallLine, {data, domain: ['1', '2A', '2B', '2C', '2CS']})
+      window.vm = createVM(WaterfallLine, {
+        data,
+        domain: ['1', '2A', '2B', '2C', '2CS'],
+        interactives: (f, id) => {
+          return {
+            mouseover: f(id, true),
+            mouseout: f(id, false)
+          }
+        }
+      })
     })
 }
 
