@@ -17,8 +17,10 @@ export default {
   mounted () {
     this._resize()
     window.addEventListener('resize', this._resize)
+    window.addEventListener('orientationchange', this._resize)
   },
   beforeDestroy () {
     window.removeEventListener('resize', this._resize)
+    window.removeEventListener('orientationchange', this._resize)
   }
 }

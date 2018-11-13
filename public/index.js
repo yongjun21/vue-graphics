@@ -1,11 +1,15 @@
+/* globals Vue */
+
 import {BarChart, ResponsiveWrapper, AnimatedBar} from '../index.js'
 
 import StackedBarChart from '../components/withAxis/StackedBarChart'
 import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
 
-// testBarChart()
-testWaterfallLine()
+// TouchEmulator()
+
+testBarChart()
+// testWaterfallLine()
 // testChordDiagram()
 // testStackedBar()
 

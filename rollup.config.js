@@ -1,4 +1,5 @@
 import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
 
 export default {
   input: 'public/index.js',
@@ -15,6 +16,7 @@ export default {
     }
   },
   plugins: [
-    resolve()
+    resolve(),
+    commonjs({include: ['node_modules/hammerjs/**']})
   ]
 }
