@@ -12,11 +12,20 @@
     }
 
     body > svg {
+      display: block;
+      margin: 0 auto;
       width: 70vw;
       max-width: 100vh;
       height: 70vw;
       max-height: 100vh;
       cursor: auto;
+    }
+
+    @media (max-width: 640px) {
+      body > svg {
+        width: 100vw;
+        height: 100vw;
+      }
     }
 
     path,

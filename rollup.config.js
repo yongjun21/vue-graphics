@@ -3,11 +3,12 @@ import commonjs from 'rollup-plugin-commonjs'
 
 export default {
   input: 'public/index.js',
-  external: ['d3-scale', 'd3-shape', 'd3-path', 'gsap/TweenLite', 'gsap/TimelineLite'],
+  external: ['vue', 'd3-scale', 'd3-shape', 'd3-path', 'gsap/TweenLite', 'gsap/TimelineLite'],
   output: {
     file: 'public/bundle.js',
     format: 'iife',
     globals: {
+      'vue': 'Vue',
       'd3-scale': 'd3',
       'd3-shape': 'd3',
       'd3-path': 'd3',

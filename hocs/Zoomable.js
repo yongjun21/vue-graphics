@@ -1,6 +1,7 @@
+import Vue from 'vue'
 import Hammer from 'hammerjs'
 
-export default {
+const Zoomable = {
   name: 'Zoomable',
   props: {
     width: {
@@ -11,22 +12,19 @@ export default {
       type: Number,
       required: true
     },
-    lockX: null,
-    lockY: null,
-    minScale: {
-      type: Number,
-      default: 1
-    },
     maxScale: {
       type: Number,
       default: 2
-    }
+    },
+    lockX: null,
+    lockY: null
   },
   data () {
     return {
-      scale: this.minScale,
-      offsetX: 0,
-      offsetY: 0,
+      scaleX_: 1,
+      scaleY_: 1,
+      offsetX_: 0,
+      offsetY_: 0,
       lastDelta: {
         scale: 1,
         offsetX: 0,
@@ -35,30 +33,71 @@ export default {
     }
   },
   computed: {
+    scaleX: {
+      get () {
+        return this.$options.synced ? this.$options.synced.scaleX_ : this.scaleX_
+      },
+      set (value) {
+        if (this.lockX != null) return
+        value = clamp(value, 1, this.maxScale)
+        if (this.$options.synced) this.$options.synced.scaleX_ = value
+        else this.scaleX_ = value
+      }
+    },
+    scaleY: {
+      get () {
+        return this.$options.synced ? this.$options.synced.scaleY_ : this.scaleY_
+      },
+      set (value) {
+        if (this.lockY != null) return
+        value = clamp(value, 1, this.maxScale)
+        if (this.$options.synced) this.$options.synced.scaleY_ = value
+        else this.scaleY_ = value
+      }
+    },
+    offsetX: {
+      get () {
+        return this.$options.synced ? this.$options.synced.offsetX_ : this.offsetX_
+      },
+      set (value) {
+        if (this.lockX != null) return
+        value = clamp(value, this.minOffsetX, 0)
+        if (this.$options.synced) this.$options.synced.offsetX_ = value
+        else this.offsetX_ = value
+      }
+    },
+    offsetY: {
+      get () {
+        return this.$options.synced ? this.$options.synced.offsetY_ : this.offsetY_
+      },
+      set (value) {
+        if (this.lockY != null) return
+        value = clamp(value, this.minOffsetY, 0)
+        if (this.$options.synced) this.$options.synced.offsetY_ = value
+        else this.offsetY_ = value
+      }
+    },
     viewBox () {
-      const scale = this.scale
       return [
-        -this.offsetX / scale,
-        -this.offsetY / scale,
-        this.width / scale,
-        this.height / scale
+        -this.offsetX / this.scaleX,
+        -this.offsetY / this.scaleY,
+        this.width / this.scaleX,
+        this.height / this.scaleY
       ].join(' ')
     },
     minOffsetX () {
-      if (this.lockX != null) return 0
-      return -this.width * (this.scale - 1)
+      return -this.width * (this.scaleX - 1)
     },
     minOffsetY () {
-      if (this.lockY != null) return 0
-      return -this.height * (this.scale - 1)
+      return -this.height * (this.scaleY - 1)
     }
   },
   methods: {
     handlePan (e) {
       const deltaX = e.deltaX - this.lastDelta.offsetX
       const deltaY = e.deltaY - this.lastDelta.offsetY
-      this.offsetX = clamp(this.offsetX + deltaX, this.minOffsetX, 0)
-      this.offsetY = clamp(this.offsetY + deltaY, this.minOffsetY, 0)
+      this.offsetX = this.offsetX + deltaX
+      this.offsetY = this.offsetY + deltaY
       this.lastDelta.offsetX = e.deltaX
       this.lastDelta.offsetY = e.deltaY
     },
@@ -70,12 +109,15 @@ export default {
       const centerX = e.center.x - thisX
       const centerY = e.center.y - thisY
 
-      const relativeCenterX = (centerX - this.offsetX) / this.scale
-      const relativeCenterY = (centerY - this.offsetY) / this.scale
+      const relativeCenterX = (centerX - this.offsetX) / this.scaleX
+      const relativeCenterY = (centerY - this.offsetY) / this.scaleY
 
-      this.scale = clamp(this.scale * deltaS, this.minScale, this.maxScale)
-      this.offsetX = clamp(centerX - relativeCenterX * this.scale, this.minOffsetX, 0)
-      this.offsetY = clamp(centerY - relativeCenterY * this.scale, this.minOffsetY, 0)
+      console.log('old', this.scaleX, this.scaleY)
+      this.scaleX = this.scaleX * deltaS
+      this.scaleY = this.scaleY * deltaS
+      console.log('new', this.scaleX, this.scaleY)
+      this.offsetX = centerX - relativeCenterX * this.scaleX
+      this.offsetY = centerY - relativeCenterY * this.scaleY
 
       this.lastDelta.scale = e.scale
     }
@@ -102,19 +144,13 @@ export default {
     })
   },
   render (h) {
-    const {scale, offsetX, offsetY} = this
-    let $slot
-    if (this.$scopedSlots.default) {
-      $slot = this.$scopedSlots.default({scale, offsetX, offsetY})
-    } else if (this.$slots.default) {
-      $slot = this.$slots.default
-    }
     return h('svg', {
       class: 'vg-zoomable',
       attrs: {
         width: this.width,
         height: this.height,
-        viewBox: this.viewBox
+        viewBox: this.viewBox,
+        preserveAspectRatio: 'none'
       }
     }, [
       h('rect', {
@@ -125,9 +161,23 @@ export default {
         },
         style: {'pointer-events': 'all'}
       }),
-      $slot
+      this.$slots.default
     ])
   }
+}
+
+export default Zoomable
+
+export function getSyncedZoomable () {
+  const synced = new Vue({
+    data: {
+      scaleX_: 1,
+      scaleY_: 1,
+      offsetX_: 0,
+      offsetY_: 0
+    }
+  })
+  return Object.assign({synced}, Zoomable)
 }
 
 function clamp (value, min, max) {
