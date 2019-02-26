@@ -30,21 +30,22 @@
 
     path,
     line {
+      fill: none;
       pointer-events: none;
     }
 
-    .waterfall-line .vg-line {
+    .waterfall-line path:not(.vg-enlarged) {
       stroke: #CCC;
       shape-rendering: crispEdges;
     }
 
-    .waterfall-line .vg-line.highlighted {
+    .waterfall-line path.highlighted {
       stroke: red;
       stroke-width: 2px;
     }
 
-    .waterfall-line .vg-line.overall,
-    .waterfall-line .vg-line.overall.highlighted {
+    .waterfall-line path.overall,
+    .waterfall-line path.overall.highlighted {
       stroke: blue;
       stroke-width: 2px;
     }
@@ -156,11 +157,10 @@
 </head>
 <body>
   <main></main>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.7/dist/vue.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.3.7/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TweenLite.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.4/TimelineLite.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.1/TweenMax.min.js"></script>
   <!-- <script src="https://cdn.jsdelivr.net/npm/hammer-touchemulator@0.0.2/touch-emulator.min.js"></script> -->
   <script src="bundle.js"></script>
 </body>

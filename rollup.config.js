@@ -3,7 +3,7 @@ import commonjs from 'rollup-plugin-commonjs'
 
 export default {
   input: 'public/index.js',
-  external: ['vue', 'd3-scale', 'd3-shape', 'd3-path', 'gsap/TweenLite', 'gsap/TimelineLite'],
+  external: ['vue', 'd3-scale', 'd3-shape', 'd3-path', 'gsap/TweenLite', 'gsap/TimelineLite', 'gsap/AttrPlugin'],
   output: {
     file: 'public/bundle.js',
     format: 'iife',

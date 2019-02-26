@@ -4,13 +4,15 @@ import TimelineLite from 'gsap/TimelineLite'
 import {mapRadialToCartesian} from '../util'
 
 import RadialAxis from '../components/RadialAxis'
-import AnimatedLine from '../elements/AnimatedLine'
 
 import MeasureText from '../directives/v-measure-text'
 
+import Draw from '../animation/directives/v-draw'
+import {queueAnimations, flushAnimations} from '../animation'
+
 export default {
   name: 'ChordDiagram',
-  directives: {MeasureText},
+  directives: {MeasureText, Draw},
   props: ['data', 'domain', 'groups', 'exclude', 'width', 'height'],
   data () {
     return {
@@ -71,11 +73,15 @@ export default {
           paths.push({
             key,
             ref: key,
-            attrs: {'data-value': d[key]},
-            props: {
+            attrs: {
               d: p.toString(),
-              auto: false
-            }
+              'data-value': d[key]
+            },
+            directives: [{
+              name: 'draw',
+              value: {duration: 0.5},
+              arg: this._uid
+            }]
           })
         })
         return Object.assign(obj, {[d.id]: paths})
@@ -155,10 +161,16 @@ export default {
       })
     },
     animate () {
+      if (this.animation) this.animation.kill()
+      queueAnimations(this._uid)
       this.$nextTick(function () {
-        const tweens = this.connections[this.selected]
-          .map(line => this.$refs[line.key].animate())
-        return new TimelineLite({tweens, stagger: 0.01})
+        const tweens = flushAnimations(this._uid)
+        if (tweens.length === 0) return
+        this.animation = new TimelineLite({
+          tweens,
+          stagger: 0.0166667,
+          onComplete: () => { this.animation = null }
+        })
       })
     }
   },
@@ -173,7 +185,7 @@ export default {
     if (this.width == null || this.height == null) return h('svg')
 
     const $axes = this.getAxes(h)
-    const $lines = this.connections[this.selected].map(line => h(AnimatedLine, line))
+    const $lines = this.connections[this.selected].map(line => h('path', line))
 
     return h('svg', [
       h('g', {

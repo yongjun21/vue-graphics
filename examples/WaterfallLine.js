@@ -1,9 +1,9 @@
 import {scalePoint, scaleLinear} from 'd3-scale'
 import {line, curveStepBefore} from 'd3-shape'
 
-import Line from '../elements/Line'
-import AnimatedLine from '../elements/AnimatedLine'
 import EnlargeTarget from '../directives/v-enlarge-target'
+
+import Draw from '../animation/directives/v-draw'
 
 import {mergeClass} from '../util'
 
@@ -11,8 +11,7 @@ const lineGenerator = line().curve(curveStepBefore)
 
 export default {
   name: 'WaterfallLine',
-  components: {'highlighted-line': AnimatedLine},
-  directives: {EnlargeTarget},
+  directives: {EnlargeTarget, Draw},
   props: ['data', 'domain', 'highlighted', 'interactives', 'width', 'height'],
   data () {
     return {
@@ -69,16 +68,19 @@ export default {
     const $overlay = []
     const $lines = this.data.map((d, i) => {
       if ((highlighted && highlighted.indexOf(d.id) > -1) || selected[d.id]) {
-        $overlay.push(h('highlighted-line', {
+        $overlay.push(h('path', {
           key: d.id,
           class: mergeClass(d.class, 'highlighted'),
           attrs: {
-            d: pathStrings[i],
-            'fill': 'none'
-          }
+            d: pathStrings[i]
+          },
+          directives: [{
+            name: 'draw',
+            value: {duration: 0.5}
+          }]
         }))
       }
-      return h(Line, {
+      return h('path', {
         key: d.id,
         attrs: {
           d: pathStrings[i],

@@ -1,15 +1,10 @@
 import {scaleBand, scaleLinear} from 'd3-scale'
 import {stack} from 'd3-shape'
 
-import Bar from '../elements/Bar'
-
 import {mergeClass} from '../util'
 
 export default {
   name: 'StackedBarChart',
-  components: {
-    'bar-element': Bar
-  },
   props: {
     width: Number,
     height: Number,
@@ -100,7 +95,7 @@ export default {
   render (h) {
     if (this.width == null || this.height == null) return h('svg')
     const transform = this.horizontal != null && 'matrix(0, 1, 1, 0, 0, 0)'
-    const $bars = this.bars.map(bar => h('bar-element', bar))
+    const $bars = this.bars.map(bar => h('rect', bar))
     return h('svg', {class: 'vg-chart vg-stacked-bar-chart'}, [
       h('g', {attrs: {transform}}, $bars)
     ])
