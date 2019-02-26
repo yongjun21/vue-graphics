@@ -1,7 +1,8 @@
 /* globals Vue */
 
-import {BarChart, ResponsiveWrapper, AnimatedBar} from '../index.js'
+import {ResponsiveWrapper, SvgWithPadding} from '../index.js'
 
+import BarChart from '../components/BarChart.vue'
 import StackedBarChart from '../components/withAxis/StackedBarChart'
 import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
@@ -14,8 +15,11 @@ testBarChart()
 // testStackedBar()
 
 function testBarChart () {
-  BarChart.components = {'bar-element': AnimatedBar}
-  window.vm = createVM(BarChart, {data: [10, 20, 50, 40], range: [0, 60]})
+  window.vm = createVM(BarChart, {
+    data: [10, 20, 50, 40],
+    x: (d, i) => i,
+    y: (d, i) => d
+  }, null, SvgWithPadding)
 }
 
 function testWaterfallLine () {
@@ -111,12 +115,12 @@ function testStackedBar () {
     })
 }
 
-function createVM (Component, data, options) {
+function createVM (Component, data, options, Wrapper = ResponsiveWrapper) {
   return new Vue({
     el: 'main',
     data,
     render (h) {
-      return h(ResponsiveWrapper, Object.assign({
+      return h(Wrapper, Object.assign({
         scopedSlots: {
           default: sizing => h(Component, {
             props: Object.assign(sizing, this.$data)
