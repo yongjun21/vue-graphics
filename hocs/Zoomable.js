@@ -112,10 +112,8 @@ const Zoomable = {
       const relativeCenterX = (centerX - this.offsetX) / this.scaleX
       const relativeCenterY = (centerY - this.offsetY) / this.scaleY
 
-      console.log('old', this.scaleX, this.scaleY)
       this.scaleX = this.scaleX * deltaS
       this.scaleY = this.scaleY * deltaS
-      console.log('new', this.scaleX, this.scaleY)
       this.offsetX = centerX - relativeCenterX * this.scaleX
       this.offsetY = centerY - relativeCenterY * this.scaleY
 
@@ -169,13 +167,11 @@ const Zoomable = {
 export default Zoomable
 
 export function getSyncedZoomable () {
-  const synced = new Vue({
-    data: {
-      scaleX_: 1,
-      scaleY_: 1,
-      offsetX_: 0,
-      offsetY_: 0
-    }
+  const synced = Vue.observable({
+    scaleX_: 1,
+    scaleY_: 1,
+    offsetX_: 0,
+    offsetY_: 0
   })
   return Object.assign({synced}, Zoomable)
 }

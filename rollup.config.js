@@ -1,5 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
+import VuePlugin from 'rollup-plugin-vue'
 
 export default {
   input: 'public/index.js',
@@ -18,6 +19,8 @@ export default {
   },
   plugins: [
     resolve(),
-    commonjs({include: ['node_modules/hammerjs/**']})
-  ]
+    commonjs(),
+    VuePlugin()
+  ],
+  preferConst: true
 }
