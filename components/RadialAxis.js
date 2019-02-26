@@ -1,5 +1,5 @@
 import {path} from 'd3-path'
-import {orientateText, uniqueHash, mergeClass} from '../util'
+import {orientateText, getUid, mergeClass} from '../util'
 
 export default {
   functional: true,
@@ -114,7 +114,7 @@ export default {
     })
 
     const rLabel = props.radius + props.labelPadding
-    const guideId = uniqueHash()
+    const guideId = getUid()
     const guide = path()
     guide.moveTo(-rLabel, 0)
     guide.arc(0, 0, rLabel, -Math.PI, 0, onTop)

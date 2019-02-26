@@ -3,6 +3,11 @@ export function createSVGElement (tag) {
   return document.createElementNS('http://www.w3.org/2000/svg', tag)
 }
 
+let dummy = 0
+export function getUid () {
+  return (dummy++).toString(36)
+}
+
 export function mapRadialToCartesian (a, radius, center) {
   center = center || [0, 0]
   const rad = a * Math.PI / 180
@@ -39,26 +44,15 @@ export function getInstanceProperties (vm) {
   return props
 }
 
-const hashCollection = {}
-
-export function uniqueHash () {
-  let hash
-  do {
-    hash = Math.random().toString(36).slice(2, 7)
-  } while (hash in hashCollection)
-  hashCollection[hash] = true
-  return hash
-}
-
 export function injectStyle (cssText) {
   const $style = document.createElement('style')
   $style.textContent = cssText
   document.head.appendChild($style)
 }
 
-export function frameRateLimited (cb) {
+export function frameRateLimited (cb, context = null) {
   let ready = true
-  return function () {
+  function wrapped () {
     if (!ready) return
     ready = false
     window.requestAnimationFrame(() => {
@@ -66,6 +60,7 @@ export function frameRateLimited (cb) {
       ready = true
     })
   }
+  return context ? wrapped.bind(context) : wrapped
 }
 
 export function orientateText (anchor, offset, rotate) {
