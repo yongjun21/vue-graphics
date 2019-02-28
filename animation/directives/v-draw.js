@@ -27,9 +27,14 @@ function animate (el, binding) {
   if (typeof options.duration === 'function') {
     options.duration = options.duration(el.getTotalLength())
   }
+  const vars = {
+    ease: Linear.easeNone,
+    onStart: () => el.classList.add('vg-animating'),
+    onComplete: () => el.classList.remove('vg-animating')
+  }
   const tween = TweenLite.fromTo(el, options.duration,
     {attr: {'stroke-dashoffset': 100}},
-    {attr: {'stroke-dashoffset': 0}, ease: Linear.easeNone}
+    Object.assign({attr: {'stroke-dashoffset': 0}}, vars)
   )
   if (name in currentAnimations) currentAnimations[name].push([options.order, tween])
 }
