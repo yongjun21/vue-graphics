@@ -6,40 +6,56 @@ export default {
       type: Array,
       required: true
     },
-    x: Function,
-    y: Function,
-    k: Function,
-    c: Function,
+    x: [Function, String],
+    y: [Function, String],
+    g: [Function, String],
+    k: [Function, String],
+    c: [Function, String],
     xDomain: {
       type: [Array, Function],
-      default: () => DomainHelper.MIN_MAX
+      default: () => DomainHelper.MINMAX('x')
     },
     yDomain: {
       type: [Array, Function],
-      default: () => DomainHelper.MIN_MAX
+      default: () => DomainHelper.MINMAX('y')
+    },
+    gDomain: {
+      type: [Array, Function],
+      default: () => DomainHelper.UNIQUE('g')
     }
   },
   computed: {
     dataProps () {
-      const {x, y, k, c} = this
+      const {x, y, g, k, c} = this
+      const toApply = []
+      if (k) toApply.push(['key', get(k)])
+      if (c) toApply.push(['class', get(c)])
+      if (x) toApply.push(['x', get(x)])
+      if (y) toApply.push(['y', get(y)])
+      if (g) toApply.push(['g', get(g)])
       return this.data.map((d, i) => {
-        return {
-          key: k && k(d, i),
-          class: c && c(d, i),
-          x: x && x(d, i),
-          y: y && y(d, i)
-        }
+        const props = {}
+        toApply.forEach(([key, accessor]) => {
+          props[key] = accessor(d, i)
+        })
+        return props
       })
     },
-    xDomain_ () {
-      if (typeof this.xDomain !== 'function') return this.xDomain
-      const values = this.data.map(this.x)
-      return this.xDomain(values)
-    },
-    yDomain_ () {
-      if (typeof this.yDomain !== 'function') return this.yDomain
-      const values = this.data.map(this.y)
-      return this.yDomain(values)
+    domain () {
+      const domain = {}
+      const propKeys = ['x', 'y', 'g']
+      propKeys.forEach(key => {
+        if (key in this) {
+          const propDomain = this[key + 'Domain']
+          if (typeof propDomain !== 'function') domain[key] = propDomain
+          else domain[key] = propDomain(this.dataProps)
+        }
+      })
+      return domain
     }
   }
+}
+
+function get (key) {
+  return typeof key === 'function' ? key : d => d[key]
 }

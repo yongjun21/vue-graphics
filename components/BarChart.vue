@@ -1,45 +1,40 @@
 <template>
-  <g class="bar-chart" :transform="transform.toString()">
-    <g class="bars" v-on="wrapListeners($listeners)">
+  <g class="vg-chart vg-bar-chart" :transform="transform.toString()">
+    <g class="vg-bars" v-on="wrapListeners($listeners)">
       <rect v-for="(bar, i) in dataProps" :key="bar.key"
-        class="bar"
+        class="vg-bar"
         :class="bar.class"
-        :data-bar-id="i"
+        v-associate="bar"
         v-animated:[_uid]="getBarAttrs(bar, i)">
       </rect>
     </g>
-    <slot v-bind="{transform}"></slot>
+    <slot v-bind="{transform, domain}"></slot>
   </g>
 </template>
 
 <script>
-import TimelineLite from 'gsap/TimelineLite'
-
-import {dataPropsMixin, userSpaceMixin} from '../mixins'
+import {dataPropsMixin, userSpaceMixin, animationMixin, associateDataMixin} from '../mixins'
 import {DomainHelper, TransformHelper} from '../helpers'
 
-import Animated from '../animation/directives/v-animated'
-import {queueAnimations, flushAnimations} from '../animation'
-
 export default {
-  directives: {Animated},
-  mixins: [dataPropsMixin, userSpaceMixin],
+  name: 'BarChart',
+  mixins: [dataPropsMixin, userSpaceMixin, animationMixin, associateDataMixin],
   props: {
     x: {
-      type: Function,
+      type: [Function, String],
       required: true
     },
     y: {
-      type: Function,
+      type: [Function, String],
       required: true
     },
     xDomain: {
       type: [Array, Function],
-      default: () => DomainHelper.UNIQUE_VALUES
+      default: () => DomainHelper.UNIQUE('x')
     },
     yDomain: {
       type: [Array, Function],
-      default: () => DomainHelper.CLAMPED_MIN_MAX(0)
+      default: () => DomainHelper.CLAMPED_MINMAX('y', 0)
     },
     horizontal: {
       type: Boolean,
@@ -56,49 +51,24 @@ export default {
       return this.horizontal ? t.invert() : t.flipY()
     },
     xRange () {
-      return [0, this.xDomain_.length]
+      return [0, this.domain.x.length]
     },
     yRange () {
-      return this.yDomain_
+      return this.domain.y
     }
   },
   methods: {
     getBarAttrs (d, i) {
-      const {xDomain_, bandWidth} = this
+      const {bandWidth, domain} = this
       const xOffset = (1 - bandWidth) / 2
       return {
-        x: xDomain_.indexOf(d.x) + xOffset,
+        x: domain.x.indexOf(d.x) + xOffset,
         y: 0,
         width: bandWidth,
         height: d.y,
         duration: 0.66667,
         order: i
       }
-    },
-    wrapListeners ($listeners) {
-      const wrapped = {}
-      Object.keys($listeners).forEach(key => {
-        wrapped[key] = e => {
-          const bar = this.dataProps[e.target.getAttribute('data-bar-id')]
-          this.$listeners[key](bar, e)
-        }
-      })
-      return wrapped
-    }
-  },
-  watch: {
-    data () {
-      if (this.animation) this.animation.kill()
-      queueAnimations(this._uid)
-      this.$nextTick(function () {
-        const tweens = flushAnimations(this._uid)
-        if (tweens.length === 0) return
-        this.animation = new TimelineLite({
-          tweens,
-          stagger: 0.0166667,
-          onComplete: () => { this.animation = null }
-        })
-      })
     }
   }
 }

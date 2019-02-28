@@ -1,5 +1,4 @@
 export * from './elements'
 export * from './components'
 export * from './hocs'
-export * from './mixins'
 export * from './directives'
