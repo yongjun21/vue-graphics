@@ -3,23 +3,28 @@
 import {ResponsiveWrapper, SvgWithPadding} from '../index.js'
 
 import BarChart from '../components/BarChart.vue'
-import StackedBarChart from '../components/withAxis/StackedBarChart'
+import StackedBarChart from '../components/StackedBarChart.vue'
 import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
 
 // TouchEmulator()
 
-testBarChart()
+// testBarChart()
 // testWaterfallLine()
 // testChordDiagram()
-// testStackedBar()
+testStackedBar()
 
 function testBarChart () {
-  window.vm = createVM(BarChart, {
+  window.vm = createVM2(BarChart, {
     data: [10, 20, 50, 40],
     x: (d, i) => i,
     y: (d, i) => d
-  }, null, SvgWithPadding)
+  }, {
+    inheritAttr: false,
+    on: {
+      mouseover: console.log
+    }
+  })
 }
 
 function testWaterfallLine () {
@@ -91,42 +96,52 @@ function testStackedBar () {
     .then(res => res.json())
     .then(json => {
       const data = json.historical
+      const tallData = []
       data.forEach(row => {
-        row.label = row.year
-        row.vacancyRemaining = row.places - row.filled - row.vacancy
+        tallData.push({year: row.year, category: 'filled', count: row['filled']})
+        tallData.push({year: row.year, category: 'vacancy', count: row['vacancies']})
+        tallData.push({year: row.year, category: 'remaining', count: row['places'] - row['filled'] - row['vacancies']})
       })
-      window.vm = createVM(StackedBarChart, {
-        data,
-        domain: ['filled', 'vacancy', 'vacancyRemaining'],
-        height: 60 * data.length + 18,
-        paddingInner: 0.3,
-        paddingOuter: 0.3,
-        horizontal: '',
-        gridlines: '',
-        tickCount: 4,
-        xLabel: 'Places',
-        yLabel: 'Year'
-      }, {
-        class: 'stacked-bar',
-        props: {
-          padding: '20 20 20 100'
-        }
+      window.vm = createVM2(StackedBarChart, {
+        data: tallData,
+        x: d => d.year,
+        y: d => d.count,
+        g: d => d.category,
+        c: d => d.category,
+        horizontal: true,
+        bandWidth: 0.5
       })
     })
 }
 
-function createVM (Component, data, options, Wrapper = ResponsiveWrapper) {
+function createVM (Component, data, options) {
   return new Vue({
     el: 'main',
     data,
     render (h) {
-      return h(Wrapper, Object.assign({
+      return h(ResponsiveWrapper, Object.assign({
         scopedSlots: {
           default: sizing => h(Component, {
             props: Object.assign(sizing, this.$data)
           })
         }
       }, options))
+    }
+  })
+}
+
+function createVM2 (Component, data, options) {
+  return new Vue({
+    el: 'main',
+    data,
+    render (h) {
+      return h(SvgWithPadding, {
+        scopedSlots: {
+          default: sizing => h(Component, Object.assign({
+            props: Object.assign(sizing, this.$data)
+          }, options))
+        }
+      })
     }
   })
 }
