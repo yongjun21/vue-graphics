@@ -6,11 +6,11 @@ export default {
       type: Array,
       required: true
     },
-    x: [Function, String],
-    y: [Function, String],
-    g: [Function, String],
-    k: [Function, String],
-    c: [Function, String],
+    x: [Function, String, Number],
+    y: [Function, String, Number],
+    g: [Function, String, Number],
+    k: [Function, String, Number],
+    c: [Function, String, Number],
     xDomain: {
       type: [Array, Function],
       default: () => DomainHelper.MINMAX('x')

@@ -21,15 +21,15 @@ export default {
   mixins: [dataPropsMixin, userSpaceMixin, animationMixin, associateDataMixin],
   props: {
     x: {
-      type: [Function, String],
+      type: [Function, String, Number],
       required: true
     },
     y: {
-      type: [Function, String],
+      type: [Function, String, Number],
       required: true
     },
     g: {
-      type: [Function, String],
+      type: [Function, String, Number],
       required: true
     },
     xDomain: {
