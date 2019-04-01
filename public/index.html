@@ -142,16 +142,26 @@
       fill: #000000;
     }
 
-    rect.filled {
+    .vg-bar.filled {
       fill: #000;
     }
 
-    rect.vacancy {
+    .vg-bar.vacancy {
       fill: #888;
     }
 
-    rect.remaining {
+    .vg-bar.remaining {
       fill: #CCC;
+    }
+
+    .vg-gridline,
+    .vg-baseline,
+    .vg-text-label > line {
+      stroke: #ccc;
+    }
+
+    .vg-stacked-bar-chart .vg-y-axis > .vg-baseline {
+      stroke: none;
     }
   </style>
 </head>

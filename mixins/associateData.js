@@ -8,7 +8,7 @@ export default {
       Object.keys($listeners).forEach(key => {
         wrapped[key] = e => {
           const data = getAssociated(e.target)
-          this.$listeners[key](data, e)
+          $listeners[key](data, e)
         }
       })
       return wrapped

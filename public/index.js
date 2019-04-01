@@ -2,8 +2,8 @@
 
 import {ResponsiveWrapper, SvgWithPadding} from '../index.js'
 
-import BarChart from '../components/BarChart.vue'
-import StackedBarChart from '../components/StackedBarChart.vue'
+import BarChart from '../examples/BarChart.vue'
+import StackedBarChart from '../examples/StackedBarChart.vue'
 import WaterfallLine from '../examples/WaterfallLine'
 import ChordDiagram from '../examples/ChordDiagram'
 
@@ -20,7 +20,6 @@ function testBarChart () {
     x: (d, i) => i,
     y: (d, i) => d
   }, {
-    inheritAttr: false,
     on: {
       mouseover: console.log
     }
@@ -138,7 +137,7 @@ function createVM2 (Component, data, options) {
       return h(SvgWithPadding, {
         scopedSlots: {
           default: sizing => h(Component, Object.assign({
-            props: Object.assign(sizing, this.$data)
+            attrs: Object.assign(sizing, this.$data)
           }, options))
         }
       })

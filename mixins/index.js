@@ -1,4 +1,4 @@
-export {default as dataPropsMixin} from './dataProps'
+export {default as dataViewMixin} from './dataView'
 export {default as userSpaceMixin} from './userSpace'
 export {default as animationMixin} from './animation'
 export {default as associateDataMixin} from './associateData'

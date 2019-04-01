@@ -9,6 +9,8 @@ export default class TransformHelper {
       e: 0,
       f: 0
     }
+    this.apply = this.apply.bind(this)
+    this.unapply = this.unapply.bind(this)
   }
 
   setOrigin (origin) {
@@ -219,28 +221,36 @@ export default class TransformHelper {
     }
   }
 
-  get apply () {
-    return ([x, y]) => {
-      const {a, b, c, d, e, f} = this.params
-      return [
-        a * x + c * y + e,
-        b * x + d * y + f
-      ]
-    }
+  apply ([x, y]) {
+    const {a, b, c, d, e, f} = this.params
+    return [
+      a * x + c * y + e,
+      b * x + d * y + f
+    ]
   }
 
-  get unapply () {
-    return ([x, y]) => {
-      const {a, b, c, d, e, f} = this.complement
-      return [
-        a * x + c * y + e,
-        b * x + d * y + f
-      ]
-    }
+  unapply ([x, y]) {
+    const {a, b, c, d, e, f} = this.complement
+    return [
+      a * x + c * y + e,
+      b * x + d * y + f
+    ]
   }
 
   toString (dp = 5) {
     const {a, b, c, d, e, f} = this.params
-    return `matrix(${[a, b, c, d, e, f].map(v => v.toFixed(dp)).join(' ')})`
+    return `matrix(${[a, b, c, d, e, f].map(round(5)).join(' ')})`
+  }
+}
+
+function round (dp) {
+  return v => {
+    if (dp === 0) return v.toFixed(0)
+    let rounded = v.toFixed(dp).split('')
+    while (rounded[rounded.length - 1] === '0' && dp-- > 0) {
+      rounded.pop()
+    }
+    if (dp === 0) rounded.pop()
+    return rounded.join('')
   }
 }

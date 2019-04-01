@@ -13,7 +13,7 @@ export default {
     c: [Function, String, Number],
     xDomain: {
       type: [Array, Function],
-      default: () => DomainHelper.MINMAX('x')
+      default: () => DomainHelper.UNIQUE('x')
     },
     yDomain: {
       type: [Array, Function],
@@ -25,7 +25,7 @@ export default {
     }
   },
   computed: {
-    dataProps () {
+    dataView () {
       const {x, y, g, k, c} = this
       const toApply = []
       if (k) toApply.push(['key', get(k)])
@@ -38,6 +38,8 @@ export default {
         toApply.forEach(([key, accessor]) => {
           props[key] = accessor(d, i)
         })
+        props.datum = d
+        props.index = i
         return props
       })
     },
@@ -48,7 +50,7 @@ export default {
         if (key in this) {
           const propDomain = this[key + 'Domain']
           if (typeof propDomain !== 'function') domain[key] = propDomain
-          else domain[key] = propDomain(this.dataProps)
+          else domain[key] = propDomain(this.dataView)
         }
       })
       return domain

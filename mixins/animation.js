@@ -6,7 +6,7 @@ import Animated from '../animation/directives/v-animated'
 export default {
   directives: {Animated},
   watch: {
-    data () {
+    dataView () {
       if (this.animation) this.animation.kill()
       queueAnimations(this._uid)
       this.$nextTick(function () {
