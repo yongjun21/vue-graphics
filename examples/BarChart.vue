@@ -30,13 +30,9 @@ export default {
       type: [Function, String, Number],
       required: true
     },
-    xDomain: {
-      type: [Array, Function],
-      default: () => DomainHelper.UNIQUE('x')
-    },
     yDomain: {
-      type: [Array, Function],
-      default: () => DomainHelper.CLAMPED_MINMAX('y', 0)
+      type: [Function, Array],
+      default: DomainHelper.CLAMPED_MINMAX('y', 0)
     },
     horizontal: {
       type: Boolean,

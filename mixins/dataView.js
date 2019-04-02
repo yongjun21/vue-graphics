@@ -12,16 +12,16 @@ export default {
     k: [Function, String, Number],
     c: [Function, String, Number],
     xDomain: {
-      type: [Array, Function],
-      default: () => DomainHelper.UNIQUE('x')
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('x')
     },
     yDomain: {
-      type: [Array, Function],
-      default: () => DomainHelper.MINMAX('y')
+      type: [Function, Array],
+      default: DomainHelper.MINMAX('y')
     },
     gDomain: {
-      type: [Array, Function],
-      default: () => DomainHelper.UNIQUE('g')
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('g')
     }
   },
   computed: {

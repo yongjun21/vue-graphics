@@ -16,8 +16,8 @@
     </x-axis>
     <y-axis
       :y-interval="yInterval"
-      :x-anchor="xRange[1]"
       :y-range="yRange"
+      :x-anchor="xRange[1]"
       :x-scale="xScale"
       :y-scale="yScale"
       :post-transform="transform"
@@ -61,31 +61,29 @@ export default {
       required: true
     },
     yDomain: {
-      type: [Array, Function],
-      default: () => {
-        return data => {
-          const stacked = SplitApplyCombine(data)
-            .split('x')
-            .split('g')
-            .apply((members, group) => {
-              const values = members.map(d => d.y)
-              group.minY = values.reduce((min, v) => v < min ? v : min, 0)
-              group.maxY = values.reduce((max, v) => v > max ? v : max, 0)
-            })
-            .combine()
-            .split('x')
-            .apply((members, group) => {
-              const plus = members.map(d => d.maxY)
-              const minus = members.map(d => d.minY)
-              group.stackedYPlus = plus.reduce((sum, v) => sum + v)
-              group.stackedYMinus = minus.reduce((sum, v) => sum + v)
-            })
-            .combine()
-          return [
-            stacked.reduce((min, v) => v.stackedYMinus < min ? v.stackedYMinus : min, 0),
-            stacked.reduce((max, v) => v.stackedYPlus > max ? v.stackedYPlus : max, 0)
-          ]
-        }
+      type: [Function, Array],
+      default: data => {
+        const stacked = SplitApplyCombine(data)
+          .split('x')
+          .split('g')
+          .apply((members, group) => {
+            const values = members.map(d => d.y)
+            group.minY = values.reduce((min, v) => v < min ? v : min, 0)
+            group.maxY = values.reduce((max, v) => v > max ? v : max, 0)
+          })
+          .combine()
+          .split('x')
+          .apply((members, group) => {
+            const plus = members.map(d => d.maxY)
+            const minus = members.map(d => d.minY)
+            group.stackedYPlus = plus.reduce((sum, v) => sum + v)
+            group.stackedYMinus = minus.reduce((sum, v) => sum + v)
+          })
+          .combine()
+        return [
+          stacked.reduce((min, v) => v.stackedYMinus < min ? v.stackedYMinus : min, 0),
+          stacked.reduce((max, v) => v.stackedYPlus > max ? v.stackedYPlus : max, 0)
+        ]
       }
     },
     horizontal: {
