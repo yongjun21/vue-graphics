@@ -40,7 +40,7 @@ export default {
     }
   },
   computed: {
-    transform () {
+    layout () {
       const t = new TransformHelper()
       return this.horizontal ? t.invert() : t.flipY()
     },

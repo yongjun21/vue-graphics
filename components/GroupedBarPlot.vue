@@ -4,8 +4,8 @@
       class="vg-sub-plot vg-bar-plot"
       :left="xScale(i + xOffset)"
       :top="yScale(yRange[0])"
-      :width="xScale(groupBandWidth, 0)"
-      :height="yScale(yRange[1], yRange[0])"
+      :width="xScale(groupBandWidth)"
+      :height="yScale(yRange[1] - yRange[0])"
       :x-range="gRange"
       :y-range="yRange">
       <template v-slot="{xScale, yScale}">
@@ -41,11 +41,11 @@ export default {
     },
     xScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     },
     yScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     },
     bandWidth: {
       type: Number,
@@ -82,8 +82,8 @@ export default {
       return {
         x: xScale(domain.g.indexOf(d.g) + gOffset),
         y: yScale(0),
-        width: xScale(bandWidth, 0),
-        height: yScale(d.y, 0),
+        width: xScale(bandWidth),
+        height: yScale(d.y),
         duration: 0.66667,
         order: i
       }

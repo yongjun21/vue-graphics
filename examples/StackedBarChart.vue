@@ -21,7 +21,7 @@
       :x-scale="xScale"
       :y-scale="yScale"
       :post-transform="transform"
-      :dy="20">
+      anchor="top">
     </y-axis>
     <stacked-bar-plot
       :data-view="dataView"
@@ -92,7 +92,7 @@ export default {
     }
   },
   computed: {
-    transform () {
+    layout () {
       const t = new TransformHelper()
       return this.horizontal ? t.invert() : t.flipY()
     },

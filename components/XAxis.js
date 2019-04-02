@@ -15,25 +15,26 @@ export default {
     },
     xScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     },
     yScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     }
   },
   render (h, {props, data}) {
-    const {yAnchor, xScale, yScale} = props
+    const {xScale} = props
     const xInterval = props.xInterval.map(x => typeof x !== 'object' ? {label: x, value: x} : x)
     const xRange = props.xRange || [xInterval[0].value, xInterval[xInterval.length - 1].value]
+    const y = props.yScale(props.yAnchor)
 
     const $baseline = h('line', {
       class: 'vg-baseline',
       attrs: {
         x1: xScale(xRange[0]),
         x2: xScale(xRange[1]),
-        y1: yScale(yAnchor),
-        y2: yScale(yAnchor)
+        y1: y,
+        y2: y
       }
     })
 
@@ -41,7 +42,7 @@ export default {
       return h(TextLabel, {
         attrs: Object.assign({
           x: xScale(x.value),
-          y: yScale(yAnchor)
+          y: y
         }, data.attrs)
       }, x.label)
     })

@@ -12,11 +12,11 @@ export default {
     },
     xScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     },
     yScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     }
   },
   render (h, {props}) {

@@ -27,11 +27,11 @@ export default {
     },
     xScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     },
     yScale: {
       type: Function,
-      default: (v, v0 = 0) => v - v0
+      default: v => v
     },
     bandWidth: {
       type: Number,
@@ -72,8 +72,8 @@ export default {
       return {
         x: xScale(domain.x.indexOf(d.x) + xOffset),
         y: yScale(y),
-        width: xScale(bandWidth, 0),
-        height: yScale(d.y, 0),
+        width: xScale(bandWidth),
+        height: yScale(d.y),
         duration: 0.66667,
         order: i
       }

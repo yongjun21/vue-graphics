@@ -1,27 +1,20 @@
+const IDENTITY = {
+  a: 1,
+  b: 0,
+  c: 0,
+  d: 1,
+  e: 0,
+  f: 0
+}
+
 export default class TransformHelper {
-  constructor (origin = [0, 0]) {
-    this.origin = origin
-    this.params = {
-      a: 1,
-      b: 0,
-      c: 0,
-      d: 1,
-      e: 0,
-      f: 0
-    }
+  constructor () {
+    this.params = Object.assign({}, IDENTITY)
     this.apply = this.apply.bind(this)
     this.unapply = this.unapply.bind(this)
   }
 
-  setOrigin (origin) {
-    if (!origin) return this
-    this.origin = origin
-    return this
-  }
-
   applyOrigin (fn, x0, y0) {
-    if (x0 == null) x0 = this.origin[0]
-    if (y0 == null) y0 = this.origin[1]
     this.params.e -= x0
     this.params.f -= y0
     fn.call(this)
@@ -46,10 +39,9 @@ export default class TransformHelper {
     return this
   }
 
-  scale (sx, sy, origin = []) {
+  scale (sx, sy = [0, 0], origin = [0, 0]) {
     if (sx == null) return this
-    if (sy == null) sy = sx
-    else if (typeof sy !== 'number') {
+    if (typeof sy !== 'number') {
       origin = sy
       sy = sx
     }
@@ -58,39 +50,39 @@ export default class TransformHelper {
     return this
   }
 
-  scaleX (sx, x0) {
+  scaleX (sx, x0 = 0) {
     if (sx == null) return this
     return this.applyOrigin(function () {
       this.params.a *= sx
       this.params.c *= sx
       this.params.e *= sx
-    }, x0, null)
+    }, x0, 0)
   }
 
-  scaleY (sy, y0) {
+  scaleY (sy, y0 = 0) {
     if (sy == null) return this
     return this.applyOrigin(function () {
       this.params.b *= sy
       this.params.d *= sy
       this.params.f *= sy
-    }, null, y0)
+    }, 0, y0)
   }
 
-  flipX (x0) {
+  flipX (x0 = 0) {
     return this.scaleX(-1, x0)
   }
 
-  flipY (y0) {
+  flipY (y0 = 0) {
     return this.scaleY(-1, y0)
   }
 
-  rotate180 (origin = []) {
+  rotate180 (origin = [0, 0]) {
     this.flipX(origin[0])
     this.flipY(origin[1])
     return this
   }
 
-  rotateRight (origin = []) {
+  rotateRight (origin = [0, 0]) {
     return this.applyOrigin(function () {
       const {a, b, c, d, e, f} = this.params
       this.params.a = -b
@@ -102,7 +94,7 @@ export default class TransformHelper {
     }, origin[0], origin[1])
   }
 
-  rotateLeft (origin = []) {
+  rotateLeft (origin = [0, 0]) {
     return this.applyOrigin(function () {
       const {a, b, c, d, e, f} = this.params
       this.params.a = b
@@ -114,7 +106,7 @@ export default class TransformHelper {
     }, origin[0], origin[1])
   }
 
-  invert (origin = []) {
+  invert (origin = [0, 0]) {
     return this.applyOrigin(function () {
       const {a, b, c, d, e, f} = this.params
       this.params.a = b
@@ -126,7 +118,7 @@ export default class TransformHelper {
     }, origin[0], origin[1])
   }
 
-  rotate (A, origin = []) {
+  rotate (A, origin = [0, 0]) {
     if (A == null) return this
     const rad = A * Math.PI / 180
     const sinA = Math.sin(rad)
@@ -142,7 +134,7 @@ export default class TransformHelper {
     }, origin[0], origin[1])
   }
 
-  skewX (A, x0) {
+  skewX (A, x0 = 0) {
     if (A == null) return this
     const tanA = Math.tan(A * Math.PI / 180)
     return this.applyOrigin(function () {
@@ -150,10 +142,10 @@ export default class TransformHelper {
       this.params.a = a + tanA * b
       this.params.c = c + tanA * d
       this.params.e = e + tanA * f
-    }, x0, null)
+    }, x0, 0)
   }
 
-  skewY (A, y0) {
+  skewY (A, y0 = 0) {
     if (A == null) return this
     const tanA = Math.tan(A * Math.PI / 180)
     return this.applyOrigin(function () {
@@ -161,7 +153,7 @@ export default class TransformHelper {
       this.params.b = tanA * a + b
       this.params.d = tanA * c + d
       this.params.f = tanA * e + f
-    }, null, y0)
+    }, 0, y0)
   }
 
   matrix (A, B, C, D, E, F) {
@@ -176,14 +168,14 @@ export default class TransformHelper {
   }
 
   clone () {
-    const t = new TransformHelper(this.origin)
+    const t = new TransformHelper()
     Object.assign(t.params, this.params)
     return t
   }
 
   inverse () {
-    const t = new TransformHelper(this.origin)
-    t.params = this.complement
+    const t = new TransformHelper()
+    Object.assign(t.params, this.inverseParams)
     return t
   }
 
@@ -208,7 +200,7 @@ export default class TransformHelper {
       .translate(origin[0], origin[1])
   }
 
-  get complement () {
+  get inverseParams () {
     const {a, b, c, d, e, f} = this.params
     const disc = a * d - b * c
     return {
@@ -230,11 +222,26 @@ export default class TransformHelper {
   }
 
   unapply ([x, y]) {
-    const {a, b, c, d, e, f} = this.complement
+    const {a, b, c, d, e, f} = this.inverseParams
     return [
       a * x + c * y + e,
       b * x + d * y + f
     ]
+  }
+
+  isIdentity () {
+    const params = this.params
+    return Object.keys(params).every(key => params[key] === IDENTITY[key])
+  }
+
+  isCloneOf (t) {
+    const params = this.params
+    return Object.keys(params).every(key => params[key] === t.params[key])
+  }
+
+  isInverseOf (t) {
+    const params = this.inverseParams
+    return Object.keys(params).every(key => params[key] === t.params[key])
   }
 
   toString (dp = 5) {

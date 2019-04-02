@@ -12,13 +12,13 @@ export default {
       type: Array,
       required: true
     },
-    transform: TransformHelper
+    layout: TransformHelper
   },
   render (h) {
     const {transform, xScale, yScale} = this
     const slots = this.$scopedSlots.default
     return h('g', {
-      attrs: {transform: transform && transform.toString()}
+      attrs: {transform: transform.isIdentity() ? null : transform.toString()}
     }, slots && slots({xScale, yScale}))
   }
 }

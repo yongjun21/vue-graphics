@@ -6,6 +6,15 @@
       :x-scale="xScale"
       :y-scale="yScale">
     </x-gridlines>
+    <x-axis
+      :x-interval="xLabel"
+      :x-scale="xScale"
+      :y-scale="yScale"
+      :post-transform="transform"
+      :dx="-20"
+      :rotate="90"
+      anchor="top">
+    </x-axis>
     <grouped-bar-plot
       :data-view="dataView"
       :domain="domain"
@@ -20,12 +29,13 @@
 <script>
 import GroupedBarPlot from '../components/GroupedBarPlot.vue'
 import XGridlines from '../components/XGridlines.js'
+import XAxis from '../components/XAxis.js'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
 import {DomainHelper, RangeHelper, IntervalHelper, TransformHelper} from '../helpers'
 
 export default {
   name: 'GroupedBarChart',
-  components: {GroupedBarPlot, XGridlines},
+  components: {GroupedBarPlot, XGridlines, XAxis},
   mixins: [dataViewMixin, userSpaceMixin],
   inheritAttrs: false,
   props: {
@@ -51,13 +61,14 @@ export default {
     }
   },
   computed: {
-    transform () {
+    layout () {
       const t = new TransformHelper()
       return this.horizontal ? t.invert() : t.flipY()
     },
     xRange: RangeHelper.DISCRETE('x'),
     yRange: RangeHelper.CONTINUOUS('y'),
-    xInterval: IntervalHelper.DIVIDER('x')
+    xInterval: IntervalHelper.DIVIDER('x'),
+    xLabel: IntervalHelper.MIDDLE('x')
   }
 }
 </script>
