@@ -244,13 +244,14 @@ export default class TransformHelper {
 }
 
 function round (dp) {
+  if (dp === 0) return v => v.toFixed(0)
   return v => {
-    if (dp === 0) return v.toFixed(0)
+    let n = 0
     let rounded = v.toFixed(dp).split('')
-    while (rounded[rounded.length - 1] === '0' && dp-- > 0) {
+    while (rounded[rounded.length - 1] === '0' && n++ < dp) {
       rounded.pop()
     }
-    if (dp === 0) rounded.pop()
+    if (n === dp) rounded.pop()
     return rounded.join('')
   }
 }

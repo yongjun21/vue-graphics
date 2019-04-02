@@ -28,7 +28,7 @@ export default {
     tickLength: Number
   },
   render (h, {props, children}) {
-    const offset = new TransformHelper().rotate(props.rotate).apply([props.dx, props.dy])
+    const offset = new TransformHelper().rotate(props.rotate).unapply([props.dx, props.dy])
     return h('g', {
       class: 'vg-text-label',
       attrs: {transform: getTransform(props)}
