@@ -1,4 +1,5 @@
 export default {
+  name: 'XGridlines',
   functional: true,
   props: {
     xInterval: {

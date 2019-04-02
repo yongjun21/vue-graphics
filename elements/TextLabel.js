@@ -1,6 +1,7 @@
 import {TransformHelper} from '../helpers'
 
 export default {
+  name: 'TextLabel',
   functional: true,
   props: {
     x: {

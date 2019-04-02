@@ -1,6 +1,6 @@
 export default {
-  functional: true,
   name: 'SvgWithPadding',
+  functional: true,
   props: {
     width: {
       type: Number,

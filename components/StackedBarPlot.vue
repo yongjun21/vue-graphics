@@ -13,6 +13,7 @@
 import {animationMixin, associateDataMixin} from '../mixins'
 
 export default {
+  name: 'StackedBarPlot',
   mixins: [animationMixin, associateDataMixin],
   inheritAttrs: false,
   props: {

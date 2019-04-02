@@ -26,6 +26,7 @@ import {animationMixin, associateDataMixin} from '../mixins'
 import {RangeHelper} from '../helpers'
 
 export default {
+  name: 'GroupBarPlot',
   components: {UserSpace},
   mixins: [animationMixin, associateDataMixin],
   inheritAttrs: false,

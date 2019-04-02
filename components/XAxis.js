@@ -1,6 +1,7 @@
 import {TextLabel} from '../elements'
 
 export default {
+  name: 'XAxis',
   functional: true,
   props: {
     xInterval: {

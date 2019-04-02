@@ -1,6 +1,7 @@
 import {TransformHelper} from '../helpers'
 
 export default {
+  name: 'UserSpace',
   props: {
     left: {
       type: Number,
