@@ -11,8 +11,6 @@ export default {
       return
     }
     el.classList.add('vg-animated')
-    el.setAttribute('pathLength', '100')
-    el.setAttribute('stroke-dasharray', '100')
     animate(el, binding)
   },
   update: animate
@@ -24,17 +22,20 @@ function animate (el, binding) {
     duration: 0.0166667,
     order: 0
   }, binding.value)
+  const totalLength = el.getTotalLength()
   if (typeof options.duration === 'function') {
-    options.duration = options.duration(el.getTotalLength())
+    options.duration = options.duration(totalLength)
+  }
+  const attr = {
+    'stroke-dasharray': totalLength,
+    'stroke-dashoffset': totalLength
   }
   const vars = {
+    attr: {'stroke-dashoffset': 0},
     ease: Linear.easeNone,
     onStart: () => el.classList.add('vg-animating'),
     onComplete: () => el.classList.remove('vg-animating')
   }
-  const tween = TweenLite.fromTo(el, options.duration,
-    {attr: {'stroke-dashoffset': 100}},
-    Object.assign({attr: {'stroke-dashoffset': 0}}, vars)
-  )
+  const tween = TweenLite.fromTo(el, options.duration, {attr}, vars)
   if (name in currentAnimations) currentAnimations[name].push([options.order, tween])
 }
