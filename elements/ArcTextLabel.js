@@ -35,14 +35,16 @@ export default {
   render (h, {props, data, children}) {
     const guideId = getUid('guide-')
 
-    const $guide = h(Arc, {
-      attrs: {id: guideId},
-      props: {
-        a1: -90,
-        a2: 90,
-        r: props.r
-      }
-    })
+    const $guide = h('defs', [
+      h(Arc, {
+        attrs: {id: guideId},
+        props: {
+          a1: -90,
+          a2: 90,
+          r: props.r
+        }
+      })
+    ])
 
     const $label = h('text', mergeData(data, {
       class: 'vg-text-label',
