@@ -1,38 +1,38 @@
+import Arc from '../elements/Arc'
 import {mergeData} from '../util'
 
 export default {
-  name: 'XGridlines',
+  name: 'RGridlines',
   functional: true,
   props: {
     interval: {
       type: Function,
       required: true
     },
-    xScale: {
+    aScale: {
       type: Function,
       required: true
     },
-    yScale: {
+    rScale: {
       type: Function,
       required: true
     }
   },
   render (h, {props, data}) {
-    const {interval, xScale, yScale} = props
-    const yRange = yScale.range()
-    const $lines = interval(xScale).map(x => {
-      return h('line', {
+    const {interval, aScale, rScale} = props
+    const aRange = aScale.range()
+    const $lines = interval(rScale).map(r => {
+      return h(Arc, {
         class: 'vg-gridline',
         attrs: {
-          x1: x.value,
-          x2: x.value,
-          y1: yRange[0],
-          y2: yRange[yRange.length - 1]
+          a1: aRange[0],
+          a2: aRange[aRange.length - 1],
+          r: r.value
         }
       })
     })
     return h('g', mergeData(data, {
-      class: 'vg-gridlines vg-x-gridlines'
+      class: 'vg-gridlines vg-r-gridlines'
     }), $lines)
   }
 }

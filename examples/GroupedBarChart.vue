@@ -1,25 +1,26 @@
 <template>
-  <g class="vg-chart vg-grouped-bar-chart" :transform="transform.toString()">
+  <g class="vg-chart vg-grouped-bar-chart"
+    v-animated-transform="{transform, duration: 0.66667}">
     <x-gridlines
-      :x-interval="xInterval"
-      :y-range="yRange"
+      :interval="xDivider"
       :x-scale="xScale"
       :y-scale="yScale">
     </x-gridlines>
     <x-axis
-      :x-interval="xLabel"
+      :interval="xLabel"
       :x-scale="xScale"
       :y-scale="yScale"
       :post-transform="transform"
-      :dx="-20"
-      :rotate="90"
+      :tick-size="0"
+      :tick-padding="20"
+      :rotate="horizontal ? 90 : 0"
       anchor="top">
     </x-axis>
     <grouped-bar-plot
       :data-view="dataView"
-      :domain="domain"
       :x-scale="xScale"
       :y-scale="yScale"
+      :g-scale="gScale"
       v-bind="$attrs"
       v-on="$listeners">
     </grouped-bar-plot>
@@ -30,12 +31,15 @@
 import GroupedBarPlot from '../components/GroupedBarPlot.vue'
 import XGridlines from '../components/XGridlines.js'
 import XAxis from '../components/XAxis.js'
+import AnimatedTransform from '../animation/directives/v-animated-transform.js'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
-import {DomainHelper, RangeHelper, IntervalHelper, TransformHelper} from '../helpers'
+import {DomainHelper, IntervalHelper, TransformHelper} from '../helpers'
+import {scaleBand, scaleLinear} from 'd3-scale'
 
 export default {
   name: 'GroupedBarChart',
   components: {GroupedBarPlot, XGridlines, XAxis},
+  directives: {AnimatedTransform},
   mixins: [dataViewMixin, userSpaceMixin],
   inheritAttrs: false,
   props: {
@@ -58,6 +62,14 @@ export default {
     horizontal: {
       type: Boolean,
       default: false
+    },
+    padding: {
+      type: Number,
+      default: 0.1
+    },
+    groupPadding: {
+      type: Number,
+      default: 0.1
     }
   },
   computed: {
@@ -65,9 +77,28 @@ export default {
       const t = new TransformHelper()
       return this.horizontal ? t.invert() : t.flipY()
     },
-    xRange: RangeHelper.DISCRETE('x'),
-    yRange: RangeHelper.CONTINUOUS('y'),
-    xInterval: IntervalHelper.DIVIDER('x'),
+    xScale () {
+      return scaleBand()
+        .domain(this.domain.x)
+        .rangeRound(this.xRange)
+        .paddingInner(this.groupPadding)
+        .paddingOuter(this.groupPadding / 2)
+    },
+    yScale () {
+      return scaleLinear()
+        .domain(this.domain.y)
+        .rangeRound(this.yRange)
+    },
+    gScale () {
+      return scaleBand()
+        .domain(this.domain.g)
+        .paddingInner(this.padding)
+        .paddingOuter(this.padding / 2)
+        .round(true)
+    }
+  },
+  methods: {
+    xDivider: IntervalHelper.DIVIDER('x'),
     xLabel: IntervalHelper.MIDDLE('x')
   }
 }

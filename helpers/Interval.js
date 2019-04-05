@@ -1,36 +1,36 @@
-export function FIXED_SPACING (of, space) {
-  return function () {
-    const domain = this.domain[of]
+export function MULTIPLES_OF (unit) {
+  return scale => {
+    const domain = scale.domain()
     const interval = []
-    let index = Math.ceil(domain[0] / space)
-    const lastIndex = Math.floor(domain[1] / space)
-    while (index <= lastIndex) interval.push(index++ * space)
-    return interval
+    let index = Math.ceil(domain[0] / unit)
+    const lastIndex = Math.floor(domain[domain.length - 1] / unit)
+    while (index <= lastIndex) interval.push(index++ * unit)
+    return interval.map(v => ({label: v, value: scale(v)}))
   }
 }
 
-export function NICE (of, target = 4) {
-  return function () {
-    const domain = this.domain[of]
-    const order = Math.log10((domain[1] - domain[0]) / (target - 1))
-    const space = Math.pow(10, Math.floor(order))
-    return [
-      FIXED_SPACING(of, space * 5).call(this),
-      FIXED_SPACING(of, space).call(this)
-    ].find(interval => interval.length >= target)
+export function TICKS (target = 6) {
+  return scale => {
+    return scale.ticks(target).map(v => ({label: v, value: scale(v)}))
   }
 }
 
-export function MIDDLE (of) {
-  return function () {
-    const domain = this.domain[of]
-    return domain.map((v, i) => ({label: v, value: i + 0.5}))
+export function MIDDLE () {
+  return scale => {
+    const offset = scale.bandwidth ? scale.bandwidth() / 2 : 0
+    return scale.domain().map(v => ({label: v, value: scale(v) + offset}))
   }
 }
 
-export function DIVIDER (of) {
-  return function () {
-    const domain = this.domain[of]
-    return domain.map((v, i) => i).concat(domain.length)
+export function DIVIDER () {
+  return scale => {
+    const domain = scale.domain()
+    const range = scale.range()
+    const step = scale.step()
+    return domain.map((v, i) => {
+      const label = i === 0 ? [null, v] : [domain[i - 1], v]
+      const value = range[0] + i * step
+      return {label, value}
+    }).concat({label: [domain[domain.length - 1], null], value: range[range.length - 1]})
   }
 }

@@ -4,21 +4,27 @@ import {TransformHelper} from '../helpers'
 export default {
   extends: userSpaceMixin,
   props: {
-    xRange: {
-      type: Array,
-      required: true
-    },
-    yRange: {
-      type: Array,
-      required: true
-    },
-    layout: TransformHelper
+    layout: TransformHelper,
+    originAt: {
+      validator: prop => [
+        'xMinYMin',
+        'xMinYMid',
+        'xMinYMax',
+        'xMidYMin',
+        'xMidYMid',
+        'xMidYMax',
+        'xMaxYMin',
+        'xMaxYMid',
+        'xMaxYMax'
+      ].includes(prop),
+      default: 'xMinYMin'
+    }
   },
   render (h) {
-    const {transform, xScale, yScale} = this
+    const {transform, xRange, yRange} = this
     const slots = this.$scopedSlots.default
     return h('g', {
       attrs: {transform: transform.isIdentity() ? null : transform.toString()}
-    }, slots && slots({xScale, yScale}))
+    }, slots && slots({xRange, yRange}))
   }
 }

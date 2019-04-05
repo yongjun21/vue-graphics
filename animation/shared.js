@@ -1,3 +1,6 @@
+export const _ANIMATION_ = Symbol('animation')
+export const _TRANSFORMATION_ = Symbol('transformation')
+
 export const currentAnimations = {}
 export const config = {}
 

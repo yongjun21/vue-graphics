@@ -2,22 +2,22 @@ import TextLabel from '../elements/TextLabel'
 import {wrapListeners} from '../util'
 
 export default {
-  name: 'YAxis',
+  name: 'RAxis',
   functional: true,
   props: {
     interval: {
       type: Function,
       required: true
     },
-    xTranslate: {
+    a: {
       type: Number,
       default: 0
     },
-    xScale: {
+    aScale: {
       type: Function,
       default: v => v
     },
-    yScale: {
+    rScale: {
       type: Function,
       required: true
     },
@@ -31,36 +31,37 @@ export default {
     }
   },
   render (h, {props, data}) {
-    const {interval, xTranslate, xScale, yScale, tickSize, tickPadding} = props
-    const x = xScale(xTranslate)
-    const yRange = yScale.range()
+    const {interval, aScale, rScale, tickSize, tickPadding} = props
+    const a = aScale(props.a)
+    const rRange = rScale.range()
 
     const $baseline = h('line', {
       class: 'vg-baseline',
       attrs: {
-        x1: x,
-        x2: x,
-        y1: yRange[0],
-        y2: yRange[yRange.length - 1]
+        x1: 0,
+        x2: 0,
+        y1: -rRange[0],
+        y2: -rRange[rRange.length - 1]
       }
     })
 
-    const $ticks = interval(yScale).map(y => {
+    const $ticks = interval(rScale).map(r => {
       const $label = h(TextLabel, {
-        key: y.label,
+        key: r.label,
         attrs: Object.assign({}, data.attrs, {
-          x: x - tickSize - tickPadding,
-          y: y.value,
-          for: y.label
+          x: tickSize + tickPadding,
+          y: -r.value,
+          anchor: tickSize < 0 ? 'right' : 'left',
+          for: r.label
         })
-      }, y.formatted || y.label.toString())
+      }, r.formatted || r.label.toString())
 
       const $mark = h('line', {
         attrs: {
-          x1: x,
-          x2: x - tickSize,
-          y1: y.value,
-          y2: y.value
+          x1: 0,
+          x2: tickSize,
+          y1: -r.value,
+          y2: -r.value
         }
       })
 
@@ -71,7 +72,10 @@ export default {
       wrapListeners(data.on, el => el.getAttribute('for'), 'text')
 
     return h('g', {
-      class: 'vg-axis vg-y-axis'
+      class: 'vg-axis vg-ar-axis',
+      attrs: {
+        transform: `rotate(${a})`
+      }
     }, [
       $baseline,
       h('g', {on: $listeners}, $ticks)

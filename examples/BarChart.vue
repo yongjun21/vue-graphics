@@ -14,7 +14,8 @@
 <script>
 import BarPlot from '../components/BarPlot.vue'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
-import {DomainHelper, RangeHelper, TransformHelper} from '../helpers'
+import {DomainHelper, TransformHelper} from '../helpers'
+import {scaleBand, scaleLinear} from 'd3-scale'
 
 export default {
   name: 'BarChart',
@@ -37,6 +38,10 @@ export default {
     horizontal: {
       type: Boolean,
       default: false
+    },
+    padding: {
+      type: Number,
+      default: 0.1
     }
   },
   computed: {
@@ -44,8 +49,18 @@ export default {
       const t = new TransformHelper()
       return this.horizontal ? t.invert() : t.flipY()
     },
-    xRange: RangeHelper.DISCRETE('x'),
-    yRange: RangeHelper.CONTINUOUS('y')
+    xScale () {
+      return scaleBand()
+        .domain(this.domain.x)
+        .rangeRound(this.xRange)
+        .paddingInner(this.padding)
+        .paddingOuter(this.padding / 2)
+    },
+    yScale () {
+      return scaleLinear()
+        .domain(this.domain.y)
+        .rangeRound(this.yRange)
+    }
   }
 }
 </script>

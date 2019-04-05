@@ -1,53 +1,49 @@
+import './polyfills/Element.prototype.matches'
+
 // for testing
 export function createSVGElement (tag) {
   return document.createElementNS('http://www.w3.org/2000/svg', tag)
 }
 
 let dummy = 0
-export function getUid () {
-  return (dummy++).toString(36)
+export function getUid (prefix) {
+  return prefix + (dummy++).toString(36)
 }
 
-export function mapRadialToCartesian (a, radius, center) {
-  center = center || [0, 0]
-  const rad = a * Math.PI / 180
+export function polar2xy ([angle, radius]) {
+  const rad = angle * Math.PI / 180
   return [
-    Math.round(Math.cos(rad) * radius + center[0]),
-    Math.round(Math.sin(rad) * radius + center[1])
+    Math.round(Math.sin(rad) * radius),
+    -Math.round(Math.cos(rad) * radius)
   ]
 }
 
-export function mergeClass () {
-  const merged = {}
-  for (let i = 0; i < arguments.length; i++) {
-    const arg = arguments[i]
-    if (Array.isArray(arg)) {
-      arg.forEach(v => {
-        Object.assign(merged, mergeClass(v))
-      })
-    } else if (typeof arg === 'object') {
-      Object.assign(merged, arg)
-    } else if (typeof arg === 'string') {
-      arg.split(' ').forEach(s => {
-        if (s.length > 0) merged[s] = true
-      })
+export function wrapListeners ($listeners, getData, selector) {
+  const wrapped = {}
+  Object.keys($listeners).forEach(key => {
+    wrapped[key] = e => {
+      if (selector && !e.target.matches(selector)) return
+      $listeners[key](getData(e.target), e)
     }
+  })
+  return wrapped
+}
+
+export function mergeData (original, data) {
+  const merged = Object.assign({}, original)
+  if ('class' in data) {
+    merged.class = original.class ? [original.class, data.class] : data.class
+  }
+  if ('attrs' in data) {
+    merged.attrs = original.attrs ? Object.assign({}, original.attrs, data.attrs) : data.attrs
+  }
+  if ('props' in data) {
+    merged.props = original.props ? Object.assign({}, original.props, data.props) : data.props
+  }
+  if ('on' in data) {
+    merged.on = original.on ? Object.assign({}, original.on, data.on) : data.on
   }
   return merged
-}
-
-export function getInstanceProperties (vm) {
-  const props = Object.assign({}, vm.$data)
-  Object.keys(vm.$options.computed).forEach(key => {
-    props[key] = vm[key]
-  })
-  return props
-}
-
-export function injectStyle (cssText) {
-  const $style = document.createElement('style')
-  $style.textContent = cssText
-  document.head.appendChild($style)
 }
 
 export function frameRateLimited (cb, context = null) {
@@ -61,51 +57,4 @@ export function frameRateLimited (cb, context = null) {
     })
   }
   return context ? wrapped.bind(context) : wrapped
-}
-
-export function orientateText (anchor, offset, rotate) {
-  offset = offset || [0, 0]
-
-  function getOffsetAngle (offset) {
-    if (offset[0] === 0 && offset[1] === 0) return null
-    return Math.atan2(offset[1], offset[0]) * 180 / Math.PI - 90
-  }
-
-  const attrs = {
-    'dy': ['topleft', 'top', 'topright'].indexOf(anchor) > -1 ? '0.7em'
-        : ['bottomleft', 'bottom', 'bottomright'].indexOf(anchor) > -1 ? '0'
-        : '0.35em',
-    'text-anchor': ['topleft', 'left', 'bottomleft'].indexOf(anchor) > -1 ? 'start'
-                 : ['topright', 'right', 'bottomright'].indexOf(anchor) > -1 ? 'end'
-                 : 'middle'
-  }
-
-  const anchorAngles = {
-    'top': 0,
-    'topright': 0,
-    'right': -90,
-    'bottomright': -180,
-    'bottom': -180,
-    'bottomleft': -180,
-    'left': -270,
-    'topleft': 0
-  }
-  const offsetAngle = getOffsetAngle(offset)
-
-  const transformations = []
-  if (offsetAngle != null) {
-    transformations.push(`translate(${offset[0]} ${offset[1]})`)
-  }
-  if (rotate != null) {
-    let deg = rotate
-    if (anchor in anchorAngles && offsetAngle != null) {
-      deg += anchorAngles[anchor] + offsetAngle
-    }
-    transformations.push(`rotate(${deg})`)
-  }
-  if (transformations.length > 0) {
-    attrs.transform = transformations.join(' ')
-  }
-
-  return attrs
 }

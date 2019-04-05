@@ -187,16 +187,21 @@ export default class TransformHelper {
 
   decompose () {
     const {a, b, c, d, e, f} = this.params
-    const decomposed = [new TransformHelper(), new TransformHelper()]
-    Object.assign(decomposed[0].params, {a, b, c, d})
-    Object.assign(decomposed[1].params, {e, f})
+    const A = Math.atan2(b, a) * 180 / Math.PI
+    const decomposed = [
+      new TransformHelper().matrix(a, b, c, d, 0, 0).rotate(A),
+      new TransformHelper().rotate(-A),
+      new TransformHelper().translate(e, f)
+    ]
     return decomposed
   }
 
   textCorrection (origin = [0, 0]) {
+    const decomposed = this.inverse().decompose()
     return new TransformHelper()
       .translate(-origin[0], -origin[1])
-      .chain(this.inverse().decompose()[0])
+      .chain(decomposed[0])
+      .chain(decomposed[1])
       .translate(origin[0], origin[1])
   }
 

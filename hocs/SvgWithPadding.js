@@ -1,3 +1,5 @@
+import {mergeData} from '../util'
+
 export default {
   name: 'SvgWithPadding',
   functional: true,
@@ -38,12 +40,9 @@ export default {
       props.height
     ].join(' ')
 
-    data.attrs = data.attrs || {}
-    data.attrs.viewBox = viewBox
+    const $slot = scopedSlots.default
 
-    return h('svg', data, [
-      scopedSlots.default(contentBox)
-    ])
+    return h('svg', mergeData(data, {attrs: {viewBox}}), $slot && $slot(contentBox))
   }
 }
 

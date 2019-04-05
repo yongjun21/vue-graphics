@@ -34,6 +34,12 @@
       pointer-events: none;
     }
 
+    .vg-gridline,
+    .vg-baseline,
+    .vg-tick > line {
+      stroke: #ccc;
+    }
+
     .waterfall-line path:not(.vg-enlarged) {
       stroke: #CCC;
       shape-rendering: crispEdges;
@@ -50,12 +56,7 @@
       stroke-width: 2px;
     }
 
-    .chord-diagram .axis path,
-    .chord-diagram .axis line {
-      display: none;
-    }
-
-    .chord-diagram .tick-label text {
+    .chord-diagram .vg-axis text {
       font-size: 0.4em;
       fill: #929292;
       cursor: pointer;
@@ -65,18 +66,13 @@
       user-select: none;
     }
 
-    .chord-diagram .tick-label circle {
+    .chord-diagram .vg-scatter-plot .vg-dot {
       transition: fill 500ms;
     }
 
-    .chord-diagram .tick-label.source text {
+    .chord-diagram .vg-text-label.source text {
       font-size: 0.6em;
       font-weight: 700;
-    }
-
-    .chord-diagram .tick-label.source circle {
-      fill: #FFFFFF;
-      stroke: #000000;
     }
 
     .chord-diagram .axis-label text {
@@ -88,76 +84,74 @@
       user-select: none;
     }
 
-    .chord-diagram .axis-label path {
-      display: inline;
+    .chord-diagram .vg-a-axis .vg-baseline {
       stroke: #929292;
       stroke-width: 8;
     }
 
-    .chord-diagram path {
+    .chord-diagram .vg-chord {
       mix-blend-mode: multiply;
     }
 
-    path[data-value="2"] {
+    .chord-diagram .vg-chord.type-2 {
       stroke: #FFD400;
       stroke-width: 1px;
     }
 
-    path[data-value="3"] {
+    .chord-diagram .vg-chord.type-3 {
       stroke: #FFD400;
       stroke-width: 1px;
     }
 
-    path[data-value="4"] {
+    .chord-diagram .vg-chord.type-4 {
       stroke: #EF4123;
       stroke-width: 1px;
     }
 
-    path[data-value="5"] {
+    .chord-diagram .vg-chord.type-5 {
       stroke: #000000;
       stroke-width: 1px;
     }
 
-    circle[data-value="0"] {
+    .chord-diagram .vg-dot.type-0 {
       fill: #71C062;
     }
 
-    circle[data-value="1"] {
+    .chord-diagram .vg-dot.type-1 {
       fill: #36B4BB;
     }
 
-    circle[data-value="2"] {
+    .chord-diagram .vg-dot.type-2 {
       fill: #FFD400;
     }
 
-    circle[data-value="3"] {
+    .chord-diagram .vg-dot.type-3 {
       fill: #FFD400;
     }
 
-    circle[data-value="4"] {
+    .chord-diagram .vg-dot.type-4 {
       fill: #EF4123;
     }
 
-    circle[data-value="5"] {
+    .chord-diagram .vg-dot.type-5 {
       fill: #000000;
     }
 
-    .vg-bar.filled {
+    .chord-diagram .vg-dot.source {
+      fill: #FFFFFF;
+      stroke: #000000;
+    }
+
+    .vg-stacked-bar-chart .vg-bar.filled {
       fill: #000;
     }
 
-    .vg-bar.vacancy {
+    .vg-stacked-bar-chart .vg-bar.vacancy {
       fill: #888;
     }
 
-    .vg-bar.remaining {
+    .vg-stacked-bar-chart .vg-bar.remaining {
       fill: #CCC;
-    }
-
-    .vg-gridline,
-    .vg-baseline,
-    .vg-text-label > line {
-      stroke: #ccc;
     }
 
     .vg-stacked-bar-chart .vg-y-axis > .vg-baseline {

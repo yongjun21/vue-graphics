@@ -1,23 +1,24 @@
-import TextLabel from '../elements/TextLabel'
+import Arc from '../elements/Arc'
+import RadialTextLabel from '../elements/RadialTextLabel'
 import {wrapListeners} from '../util'
 
 export default {
-  name: 'XAxis',
+  name: 'AAxis',
   functional: true,
   props: {
     interval: {
       type: Function,
       required: true
     },
-    yTranslate: {
+    r: {
       type: Number,
       default: 0
     },
-    xScale: {
+    aScale: {
       type: Function,
       required: true
     },
-    yScale: {
+    rScale: {
       type: Function,
       default: v => v
     },
@@ -31,36 +32,38 @@ export default {
     }
   },
   render (h, {props, data}) {
-    const {interval, yTranslate, xScale, yScale, tickSize, tickPadding} = props
-    const y = yScale(yTranslate)
-    const xRange = xScale.range()
+    const {interval, aScale, rScale, tickSize, tickPadding} = props
+    const r = rScale(props.r)
+    const aRange = aScale.range()
+    const ccw = aRange[0] > aRange[1]
 
-    const $baseline = h('line', {
+    const $baseline = h(Arc, {
       class: 'vg-baseline',
-      attrs: {
-        x1: xRange[0],
-        x2: xRange[xRange.length - 1],
-        y1: y,
-        y2: y
+      props: {
+        a1: aRange[0],
+        a2: aRange[1],
+        r
       }
     })
 
-    const $ticks = interval(xScale).map(x => {
-      const $label = h(TextLabel, {
-        key: x.label,
+    const $ticks = interval(aScale).map(a => {
+      const $label = h(RadialTextLabel, {
         attrs: Object.assign({}, data.attrs, {
-          x: x.value,
-          y: y - tickSize - tickPadding,
-          for: x.label
+          a: a.value,
+          r: r + tickSize + tickPadding,
+          anchor: ccw ? 'right' : 'left',
+          rotate: ccw ? 90 : -90,
+          for: a.label
         })
-      }, x.formatted || x.label.toString())
+      }, a.formatted || a.label.toString())
 
       const $mark = h('line', {
         attrs: {
-          x1: x.value,
-          x2: x.value,
-          y1: y,
-          y2: y - tickSize
+          x1: 0,
+          x2: 0,
+          y1: -r,
+          y2: -(r + tickSize),
+          transform: `rotate(${a.value})`
         }
       })
 
@@ -71,7 +74,7 @@ export default {
       wrapListeners(data.on, el => el.getAttribute('for'), 'text')
 
     return h('g', {
-      class: 'vg-axis vg-x-axis'
+      class: 'vg-axis vg-a-axis'
     }, [
       $baseline,
       h('g', {on: $listeners}, $ticks)

@@ -1,33 +1,33 @@
 <template>
   <g class="vg-chart vg-stacked-bar-chart" :transform="transform.toString()">
     <y-gridlines
-      :y-interval="yInterval"
-      :x-range="xRange"
+      :interval="yInterval"
       :x-scale="xScale"
       :y-scale="yScale">
     </y-gridlines>
     <x-axis
-      :x-interval="xInterval"
+      :interval="xInterval"
       :x-scale="xScale"
       :y-scale="yScale"
       :post-transform="transform"
-      :dx="-20"
-      :tick-length="10">
+      :tick-size="10"
+      :tick-padding="10"
+      anchor="right">
     </x-axis>
     <y-axis
-      :y-interval="yInterval"
-      :y-range="yRange"
-      :x-anchor="xRange[1]"
-      :x-scale="xScale"
+      :interval="yInterval"
+      :x-translate="xRange[1]"
       :y-scale="yScale"
       :post-transform="transform"
+      :tick-size="0"
+      :tick-padding="-3"
       anchor="top">
     </y-axis>
     <stacked-bar-plot
       :data-view="dataView"
-      :domain="domain"
       :x-scale="xScale"
       :y-scale="yScale"
+      :g-domain="domain.g"
       v-bind="$attrs"
       v-on="$listeners">
     </stacked-bar-plot>
@@ -40,7 +40,8 @@ import YGridlines from '../components/YGridlines.js'
 import XAxis from '../components/XAxis.js'
 import YAxis from '../components/YAxis.js'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
-import {RangeHelper, IntervalHelper, TransformHelper, SplitApplyCombine} from '../helpers'
+import {IntervalHelper, TransformHelper, SplitApplyCombine} from '../helpers'
+import {scaleBand, scaleLinear} from 'd3-scale'
 
 export default {
   name: 'StackedBarChart',
@@ -89,6 +90,10 @@ export default {
     horizontal: {
       type: Boolean,
       default: false
+    },
+    padding: {
+      type: Number,
+      default: 0.1
     }
   },
   computed: {
@@ -96,10 +101,22 @@ export default {
       const t = new TransformHelper()
       return this.horizontal ? t.invert() : t.flipY()
     },
-    xRange: RangeHelper.DISCRETE('x'),
-    yRange: RangeHelper.CONTINUOUS('y'),
-    xInterval: IntervalHelper.MIDDLE('x'),
-    yInterval: IntervalHelper.NICE('y')
+    xScale () {
+      return scaleBand()
+        .domain(this.domain.x)
+        .rangeRound(this.xRange)
+        .paddingInner(this.padding)
+        .paddingOuter(this.padding / 2)
+    },
+    yScale () {
+      return scaleLinear()
+        .domain(this.domain.y)
+        .rangeRound(this.yRange)
+    }
+  },
+  methods: {
+    xInterval: IntervalHelper.MIDDLE(),
+    yInterval: IntervalHelper.TICKS()
   }
 }
 </script>

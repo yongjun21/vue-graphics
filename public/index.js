@@ -1,18 +1,18 @@
 /* globals Vue */
 
-import {ResponsiveWrapper, SvgWithPadding} from '../index.js'
+import {ResponsiveWrapper, SvgWithPadding} from '../hocs'
 
 import BarChart from '../examples/BarChart.vue'
 import StackedBarChart from '../examples/StackedBarChart.vue'
+import ChordDiagram from '../examples/ChordDiagram.vue'
 import WaterfallLine from '../examples/WaterfallLine'
-import ChordDiagram from '../examples/ChordDiagram'
 
 // TouchEmulator()
 
 // testBarChart()
 // testWaterfallLine()
-// testChordDiagram()
-testStackedBar()
+testChordDiagram()
+// testStackedBar()
 
 function testBarChart () {
   window.vm = createVM2(BarChart, {
@@ -54,38 +54,14 @@ function testChordDiagram () {
     dynamicTyping: true,
     download: true,
     complete (parsed) {
-      const groups = ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania']
-      const groupedData = {}
-
-      parsed.data.forEach(row => {
-        row.id = row.code
-        row.label = row.country
-        row.group = row.region
-
-        groupedData[row.group] = groupedData[row.group] || []
-        groupedData[row.group].push(row.id)
-      });
-
-      ['Americas', 'Africa', 'Oceania'].forEach(region => {
-        groupedData[region].reverse()
-      })
-
-      const domain = Object.keys(groupedData).reduce((arr, g) => {
-        return arr.concat(groupedData[g])
-      }, [])
-
       const data = {
         data: parsed.data,
-        domain,
-        groups,
-        exclude: v => v <= 1
+        k: d => d.code,
+        a: d => d.country,
+        g: d => d.region,
+        gDomain: ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania']
       }
-      window.vm = createVM(ChordDiagram, data, {
-        class: 'chord-diagram',
-        props: {
-          padding: '20%'
-        }
-      })
+      window.vm = createVM2(ChordDiagram, data, null, {props: {height: 800}})
     }
   })
 }
@@ -108,7 +84,7 @@ function testStackedBar () {
         g: d => d.category,
         c: d => d.category,
         horizontal: true,
-        bandWidth: 0.5
+        padding: 0.5
       })
     })
 }
@@ -129,18 +105,18 @@ function createVM (Component, data, options) {
   })
 }
 
-function createVM2 (Component, data, options) {
+function createVM2 (Component, data, options, svgOptions) {
   return new Vue({
     el: 'main',
     data,
     render (h) {
-      return h(SvgWithPadding, {
+      return h(SvgWithPadding, Object.assign({
         scopedSlots: {
           default: sizing => h(Component, Object.assign({
             attrs: Object.assign(sizing, this.$data)
           }, options))
         }
-      })
+      }, svgOptions))
     }
   })
 }

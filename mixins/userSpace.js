@@ -21,7 +21,7 @@ export default {
     }
   },
   computed: {
-    bbox () {
+    $_bbox () {
       const {left, top, width, height} = this
       const t = this.layout || new TransformHelper()
       const corners = [
@@ -37,21 +37,41 @@ export default {
         Math.max(...corners.map(c => c[1]))
       ]
     },
-    xScale () {
-      const {bbox, xRange} = this
-      const scale = (bbox[2] - bbox[0]) / (xRange[1] - xRange[0])
-      return x => Math.round(scale * x)
+    $_translate () {
+      const bbox = this.$_bbox
+      const originAt = this.originAt || 'xMinYMin'
+      if (Array.isArray(originAt)) {
+        return [
+          (1 - originAt[0]) * bbox[0] + originAt[0] * bbox[2],
+          (1 - originAt[1]) * bbox[1] + originAt[1] * bbox[3]
+        ]
+      }
+      const pattern = /x(Min|Mid|Max)Y(Min|Mid|Max)/
+      const [, xAlign, yAlign] = originAt.match(pattern)
+      const xTranslate = xAlign === 'Min' ? bbox[0]
+                       : xAlign === 'Max' ? bbox[2]
+                       : (bbox[0] + bbox[2]) / 2
+      const yTranslate = yAlign === 'Min' ? bbox[1]
+                       : yAlign === 'Max' ? bbox[3]
+                       : (bbox[1] + bbox[3]) / 2
+      return [xTranslate, yTranslate]
     },
-    yScale () {
-      const {bbox, yRange} = this
-      const scale = (bbox[3] - bbox[1]) / (yRange[1] - yRange[0])
-      return y => Math.round(scale * y)
+    xRange () {
+      return [
+        this.$_bbox[0] - this.$_translate[0],
+        this.$_bbox[2] - this.$_translate[0]
+      ]
+    },
+    yRange () {
+      return [
+        this.$_bbox[1] - this.$_translate[1],
+        this.$_bbox[3] - this.$_translate[1]
+      ]
     },
     transform () {
-      const {layout, bbox, xScale, yScale, xRange, yRange} = this
-      const [left, top] = [xScale(xRange[0]), yScale(yRange[0])]
-      const t = new TransformHelper().translate(bbox[0] - left, bbox[1] - top)
-      return layout ? t.chain(layout) : t
+      const t = new TransformHelper()
+      t.translate(this.$_translate[0], this.$_translate[1])
+      return this.layout ? t.chain(this.layout) : t
     }
   }
 }

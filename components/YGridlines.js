@@ -1,40 +1,38 @@
+import {mergeData} from '../util'
+
 export default {
   name: 'YGridlines',
   functional: true,
   props: {
-    yInterval: {
-      type: Array,
-      required: true
-    },
-    xRange: {
-      type: Array,
+    interval: {
+      type: Function,
       required: true
     },
     xScale: {
       type: Function,
-      default: v => v
+      required: true
     },
     yScale: {
       type: Function,
-      default: v => v
+      required: true
     }
   },
-  render (h, {props}) {
-    const {yInterval, xRange, xScale, yScale} = props
-    const $lines = yInterval.map(y => {
-      if (typeof y !== 'object') y = {label: y, value: y}
+  render (h, {props, data}) {
+    const {interval, xScale, yScale} = props
+    const xRange = xScale.range()
+    const $lines = interval(yScale).map(y => {
       return h('line', {
         class: 'vg-gridline',
         attrs: {
-          x1: xScale(xRange[0]),
-          x2: xScale(xRange[1]),
-          y1: yScale(y.value),
-          y2: yScale(y.value)
+          x1: xRange[0],
+          x2: xRange[xRange.length - 1],
+          y1: y.value,
+          y2: y.value
         }
       })
     })
-    return h('g', {
+    return h('g', mergeData(data, {
       class: 'vg-gridlines vg-y-gridlines'
-    }, $lines)
+    }), $lines)
   }
 }

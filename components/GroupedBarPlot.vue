@@ -1,33 +1,20 @@
 <template>
-  <g class="vg-plot" v-on="wrapListeners($listeners)">
-    <user-space v-for="(group, i) in grouped" :key="i"
-      class="vg-sub-plot vg-bar-plot"
-      :left="xScale(i + xOffset)"
-      :top="yScale(yRange[0])"
-      :width="xScale(groupBandWidth)"
-      :height="yScale(yRange[1] - yRange[0])"
-      :x-range="gRange"
-      :y-range="yRange">
-      <template v-slot="{xScale, yScale}">
-        <rect v-for="(d, i) in group" :key="d.key"
-          class="vg-bar"
-          :class="d.class"
-          v-associate="d"
-          v-animated:[_uid]="getGeom(d, i, xScale, yScale)">
-        </rect>
-      </template>
-    </user-space>
+  <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
+    <rect v-for="(d, i) in dataView" :key="d.key" v-if="hasGeom(d)"
+      class="vg-bar"
+      :class="d.class"
+      v-associate="d"
+      v-animated:[_uid]="getGeom(d, i)">
+    </rect>
   </g>
 </template>
 
 <script>
-import {UserSpace} from '../hocs'
 import {animationMixin, associateDataMixin} from '../mixins'
-import {RangeHelper} from '../helpers'
+import {scaleBand} from 'd3-scale'
 
 export default {
   name: 'GroupBarPlot',
-  components: {UserSpace},
   mixins: [animationMixin, associateDataMixin],
   inheritAttrs: false,
   props: {
@@ -35,58 +22,46 @@ export default {
       type: Array,
       required: true
     },
-    domain: {
-      type: Object,
-      required: true
-    },
     xScale: {
       type: Function,
-      default: v => v
+      required: true
     },
     yScale: {
       type: Function,
       default: v => v
     },
-    bandWidth: {
-      type: Number,
-      default: 0.9
-    },
-    groupBandWidth: {
-      type: Number,
-      default: 0.9
+    gScale: {
+      type: Function,
+      default: scaleBand().domain([undefined])
     }
   },
   computed: {
-    grouped () {
-      const grouped = new Map()
-      this.domain.x.forEach(group => {
-        grouped.set(group, [])
+    subScales () {
+      const {xScale, gScale} = this
+      const scales = {}
+      xScale.domain().forEach(x => {
+        const start = xScale(x)
+        const stop = start + xScale.bandwidth()
+        scales[x] = gScale.copy().range([start, stop])
       })
-      this.dataView.forEach(d => {
-        if (grouped.has(d.x)) grouped.get(d.x).push(d)
-      })
-      return this.domain.x.map(group => grouped.get(group))
-    },
-    xOffset () {
-      return (1 - this.groupBandWidth) / 2
-    },
-    gOffset () {
-      return (1 - this.bandWidth) / 2
-    },
-    gRange: RangeHelper.DISCRETE('g'),
-    yRange: RangeHelper.CONTINUOUS('y')
+      return scales
+    }
   },
   methods: {
-    getGeom (d, i, xScale, yScale) {
-      const {bandWidth, domain, gOffset} = this
+    getGeom (d, i) {
+      const {yScale} = this
+      const xScale = this.subScales[d.x]
       return {
-        x: xScale(domain.g.indexOf(d.g) + gOffset),
+        x: xScale(d.g),
         y: yScale(0),
-        width: xScale(bandWidth),
-        height: yScale(d.y),
+        width: xScale.bandwidth(),
+        height: yScale(d.y) - yScale(0),
         duration: 0.66667,
         order: i
       }
+    },
+    hasGeom (d) {
+      return this.xScale(d.x) != null && this.yScale(d.y) != null && this.gScale(d.g)
     }
   }
 }

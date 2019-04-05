@@ -1,17 +1,14 @@
-const associatedData = new WeakMap()
+export const _ASSOCIATED_ = Symbol('associated')
 
 export default {
   bind: associate,
-  update: associate,
-  unbind (el) {
-    associatedData.delete(el)
-  }
+  update: associate
 }
 
 export function getAssociated (el) {
-  return associatedData.get(el)
+  return el[_ASSOCIATED_]
 }
 
 function associate (el, binding) {
-  associatedData.set(el, binding.value)
+  el[_ASSOCIATED_] = binding.value
 }

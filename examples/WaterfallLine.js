@@ -5,7 +5,7 @@ import EnlargeTarget from '../directives/v-enlarge-target'
 
 import Draw from '../animation/directives/v-draw'
 
-import {mergeClass} from '../util'
+import {mergeData} from '../util'
 
 const lineGenerator = line().curve(curveStepBefore)
 
@@ -70,7 +70,7 @@ export default {
       if ((highlighted && highlighted.indexOf(d.id) > -1) || selected[d.id]) {
         $overlay.push(h('path', {
           key: d.id,
-          class: mergeClass(d.class, 'highlighted'),
+          class: mergeData(d.class, 'highlighted'),
           attrs: {
             d: pathStrings[i]
           },

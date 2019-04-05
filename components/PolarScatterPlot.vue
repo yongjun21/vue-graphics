@@ -1,11 +1,11 @@
 <template>
-  <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
-    <rect v-for="(d, i) in dataView" :key="d.key" v-if="hasGeom(d)"
-      class="vg-bar"
+  <g class="vg-plot vg-scatter-plot" v-on="wrappedListeners">
+    <circle v-for="(d, i) in dataView" :key="d.key" v-if="hasGeom(d)"
+      class="vg-dot"
       :class="d.class"
       v-associate="d"
       v-animated:[_uid]="getGeom(d, i)">
-    </rect>
+    </circle>
   </g>
 </template>
 
@@ -13,7 +13,7 @@
 import {animationMixin, associateDataMixin} from '../mixins'
 
 export default {
-  name: 'BarPlot',
+  name: 'PolarScatterPlot',
   mixins: [animationMixin, associateDataMixin],
   inheritAttrs: false,
   props: {
@@ -21,29 +21,33 @@ export default {
       type: Array,
       required: true
     },
-    xScale: {
-      type: Function,
-      required: true
-    },
-    yScale: {
+    aScale: {
       type: Function,
       default: v => v
+    },
+    rScale: {
+      type: Function,
+      default: v => v
+    },
+    dotSize: {
+      type: Number,
+      default: 8
     }
   },
   methods: {
     getGeom (d, i) {
-      const {xScale, yScale} = this
+      const {aScale, rScale, dotSize} = this
       return {
-        x: xScale(d.x),
-        y: yScale(0),
-        width: xScale.bandwidth(),
-        height: yScale(d.y) - yScale(0),
+        cx: 0,
+        cy: -rScale(d.r),
+        transform: `rotate(${aScale(d.a)})`,
+        r: d.s || dotSize,
         duration: 0.66667,
         order: i
       }
     },
     hasGeom (d) {
-      return this.xScale(d.x) != null && this.yScale(d.x) != null
+      return this.aScale(d.a) != null && this.rScale(d.r) != null
     }
   }
 }

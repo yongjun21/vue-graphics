@@ -1,8 +1,6 @@
 import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
-import {currentAnimations} from '../shared'
-
-const animationTargets = new WeakMap()
+import {_ANIMATION_, currentAnimations} from '../shared'
 
 export default {
   bind (el, binding) {
@@ -11,7 +9,7 @@ export default {
     delete vars.duration
     delete vars.order
     const target = {}
-    animationTargets.set(el, target)
+    el[_ANIMATION_] = target
     Object.keys(vars).forEach(prop => {
       addProperty(target, vars, prop)
       el.setAttribute(prop, target[prop])
@@ -24,7 +22,7 @@ export default {
     const order = vars.order || 0
     delete vars.duration
     delete vars.order
-    const target = animationTargets.get(el)
+    const target = el[_ANIMATION_]
     if (typeof duration === 'function') duration = duration(vars, target)
     Object.keys(vars).forEach(prop => {
       if (typeof vars[prop] === 'function' || !(prop in target)) {
@@ -58,9 +56,6 @@ export default {
     })
     const tween = TweenLite.to(target, duration, vars)
     if (name in currentAnimations) currentAnimations[name].push([order, tween])
-  },
-  unbind (el) {
-    animationTargets.delete(el)
   }
 }
 
