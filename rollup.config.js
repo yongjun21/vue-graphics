@@ -4,7 +4,16 @@ import VuePlugin from 'rollup-plugin-vue'
 
 export default {
   input: 'public/index.js',
-  external: ['vue', 'd3-scale', 'd3-shape', 'd3-path', 'gsap/TweenLite', 'gsap/TimelineLite', 'gsap/AttrPlugin'],
+  external: [
+    'vue',
+    'd3-scale',
+    'd3-shape',
+    'd3-path',
+    'd3-interpolate-path',
+    'gsap/TweenLite',
+    'gsap/TimelineLite',
+    'gsap/AttrPlugin'
+  ],
   output: {
     file: 'public/bundle.js',
     format: 'iife',
@@ -13,6 +22,7 @@ export default {
       'd3-scale': 'd3',
       'd3-shape': 'd3',
       'd3-path': 'd3',
+      'd3-interpolate-path': 'd3',
       'gsap/TweenLite': 'TweenLite',
       'gsap/TimelineLite': 'TimelineLite'
     }

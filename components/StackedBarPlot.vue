@@ -1,17 +1,16 @@
 <template>
   <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
-    <rect v-for="(d, i) in dataView" :key="d.key" v-if="hasGeom(d)"
+    <rect v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
       class="vg-bar"
       :class="d.class"
       v-associate="d"
-      v-animated:[_uid]="getGeom(d, i)">
+      v-animated:[_uid]="getGeom(d)">
     </rect>
   </g>
 </template>
 
 <script>
 import {animationMixin, associateDataMixin} from '../mixins'
-import {SplitApplyCombine} from '../helpers'
 
 export default {
   name: 'StackedBarPlot',
@@ -36,41 +35,34 @@ export default {
     }
   },
   computed: {
+    xDomain () {
+      return this.xScale.domain()
+    },
     yOffset () {
-      const {gDomain, hasGeom} = this
-      const offset = new Map()
+      const {gDomain, xDomain, hasGeom} = this
+      const offset = new WeakMap()
+      const minY = xDomain.map(() => 0)
+      const maxY = xDomain.map(() => 0)
 
-      SplitApplyCombine(this.dataView.filter(hasGeom))
-        .split('x')
-        .apply((members, group) => {
-          const offsetByG = new Map()
-          const ordered = gDomain.map(g => [0, 0])
-          members.forEach(d => {
-            const pair = ordered[gDomain.indexOf(d.g)]
-            if (d.y > pair[0]) pair[0] = d.y
-            if (d.y < pair[1]) pair[1] = d.y
-          })
-          ordered.unshift([0, 0])
-          ordered.pop()
-
-          let positiveOffset = 0
-          let negativeOffset = 0
-          ordered.forEach((pair, i) => {
-            positiveOffset += pair[0]
-            negativeOffset += pair[1]
-            offsetByG.set(gDomain[i], [positiveOffset, negativeOffset])
-          })
-          offset.set(group.x, offsetByG)
+      this.dataView
+        .filter(hasGeom)
+        .sort((a, b) => gDomain.indexOf(a.g) - gDomain.indexOf(b.g))
+        .forEach(d => {
+          const xIndex = xDomain.indexOf(d.x)
+          if (d.y < 0) {
+            offset.set(d, minY[xIndex])
+            minY[xIndex] += d.y
+          } else {
+            offset.set(d, maxY[xIndex])
+            maxY[xIndex] += d.y
+          }
         })
-        .combine()
 
-      return d => {
-        return offset.get(d.x).get(d.g)[d.y >= 0 ? 0 : 1]
-      }
+      return d => offset.get(d)
     }
   },
   methods: {
-    getGeom (d, i) {
+    getGeom (d) {
       const {xScale, yScale, yOffset} = this
       const y0 = yOffset(d)
       return {
@@ -79,7 +71,7 @@ export default {
         width: xScale.bandwidth(),
         height: yScale(y0 + d.y) - yScale(y0),
         duration: 0.66667,
-        order: i
+        order: d.index
       }
     },
     hasGeom (d) {

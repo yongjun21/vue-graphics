@@ -1,42 +1,25 @@
-import {createSVGElement} from '../util'
-
-const mouseEvents = [
-  'click',
-  'dblclick',
-  'mousedown',
-  'mouseup',
-  'mousemove',
-  'mouseover',
-  'mouseout',
-  'mouseenter',
-  'mouseleave',
-  'contextmenu'
-]
+const _CLONE_ = Symbol('clone')
 
 export default {
-  bind ($el, binding) {
-    const $enlarged = createSVGElement('path')
-    $enlarged.setAttribute('stroke-width', binding.value || 9)
-    $enlarged.setAttribute('stroke', 'none')
-    $enlarged.setAttribute('fill', 'none')
-    $enlarged.style.pointerEvents = 'stroke'
-    $enlarged.classList.add('vg-enlarged')
-    mouseEvents.forEach(type => {
-      $enlarged.addEventListener(type, event => {
-        const e = new window.Event(type, event)
-        $el.dispatchEvent(e)
-      })
-    })
-    $el.$enlarged = $enlarged
-  },
-  inserted ($el) {
-    $el.$enlarged.setAttribute('d', $el.getAttribute('d'))
-    $el.parentNode.appendChild($el.$enlarged)
+  inserted ($el, binding) {
+    const $clone = $el.cloneNode()
+    $el.setAttribute('stroke-width', binding.value || 9)
+    $el.setAttribute('class', 'vg-enlarged')
+    $el.setAttribute('stroke', 'none')
+    $el.setAttribute('fill', 'none')
+    $el.style.pointerEvents = 'stroke'
+    $clone.style.pointerEvents = 'none'
+    $el.parentNode.appendChild($clone)
+    $el[_CLONE_] = $clone
   },
   update ($el) {
-    $el.$enlarged.setAttribute('d', $el.getAttribute('d'))
+    const $clone = $el[_CLONE_]
+    $clone.setAttribute('d', $el.getAttribute('d'))
+    $clone.setAttribute('stroke-dasharray', $el.getAttribute('stroke-dasharray'))
+    $clone.setAttribute('stroke-dashoffset', $el.getAttribute('stroke-dashoffset'))
   },
   unbind ($el) {
-    $el.$enlarged.parentNode.removeChild($el.$enlarged)
+    const $clone = $el[_CLONE_]
+    $clone.parentNode.removeChild($clone)
   }
 }

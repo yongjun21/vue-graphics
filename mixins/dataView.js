@@ -1,43 +1,11 @@
-import {DomainHelper} from '../helpers'
-
 export default {
   props: {
     data: {
       type: Array,
       required: true
     },
-    x: [Function, String, Number],
-    y: [Function, String, Number],
-    g: [Function, String, Number],
-    a: [Function, String, Number],
-    r: [Function, String, Number],
-    s: [Function, String, Number],
     k: [Function, String, Number],
-    c: [Function, String, Number],
-    xDomain: {
-      type: [Function, Array],
-      default: DomainHelper.UNIQUE('x')
-    },
-    yDomain: {
-      type: [Function, Array],
-      default: DomainHelper.MINMAX('y')
-    },
-    gDomain: {
-      type: [Function, Array],
-      default: DomainHelper.UNIQUE('g')
-    },
-    aDomain: {
-      type: [Function, Array],
-      default: DomainHelper.MINMAX('a')
-    },
-    rDomain: {
-      type: [Function, Array],
-      default: DomainHelper.MINMAX('r')
-    },
-    sDomain: {
-      type: [Function, Array],
-      default: DomainHelper.MINMAX('s')
-    }
+    c: [Function, String, Number]
   },
   computed: {
     dataView () {

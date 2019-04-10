@@ -1,5 +1,5 @@
 <template>
-  <g class="chord-diagram" :transform="transform.toString()">
+  <g class="chord-diagram" :transform="transform">
     <chord-plot
       :data-view="links"
       :a-scale="aScale"
@@ -11,22 +11,21 @@
       :dot-size="3">
     </polar-scatter-plot>
     <g class="axes" v-measure-text="measure">
-      <a-axis v-for="(aScale, i) in aSubScales" :key="i"
+      <a-axis v-for="(aScale, i) in aSubScales" :key="'axis-' + domain.g[i]"
         :interval="aInterval"
         :a-scale="aScale"
-        :r="radius"
+        :r-offset="radius"
         :tick-size="0"
         :tick-padding="-0.3 * radius"
+        :classed="v => ({source: v === origin.a})"
         @click="changeSelected">
+        <arc-text-label :key="'axis-label-' + domain.g[i]"
+          class="axis-label"
+          :r="radius + 20"
+          :a="getMidpoint(aScale)">
+          {{domain.g[i]}}
+        </arc-text-label>
       </a-axis>
-    </g>
-    <g class="axis-labels">
-      <arc-text-label v-for="(midpoint, i) in aSubScaleMidpoints" :key="i"
-        class="axis-label"
-        :r="radius + 20"
-        :a="midpoint">
-        {{domain.g[i]}}
-      </arc-text-label>
     </g>
   </g>
 </template>
@@ -34,7 +33,7 @@
 <script>
 import ChordPlot from '../components/ChordPlot.vue'
 import PolarScatterPlot from '../components/PolarScatterPlot.vue'
-import AAxis from '../components/AAxis.js'
+import AAxis from '../components/AAxis.vue'
 import ArcTextLabel from '../elements/ArcTextLabel.js'
 import MeasureText from '../directives/v-measure-text.js'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
@@ -52,9 +51,17 @@ export default {
       type: [Function, String, Number],
       required: true
     },
+    g: {
+      type: [Function, String, Number],
+      required: true
+    },
     aDomain: {
       type: [Function, Array],
       default: DomainHelper.UNIQUE('a')
+    },
+    gDomain: {
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('g')
     }
   },
   data () {
@@ -96,17 +103,18 @@ export default {
       })
     },
     links () {
-      const datum = this.origin.datum
-      const gIndex = this.domain.g.indexOf(this.origin.g)
+      const {origin, radius} = this
+      const gIndex = this.domain.g.indexOf(origin.g)
       const startIndex = this.groupedADomain.slice(0, gIndex)
         .reduce((sum, arr) => sum + arr.length, 0)
       const destinations = this.sortedDataView
         .map((d, i, arr) => arr[(i + startIndex) % arr.length])
-        .filter(d => datum[d.key] > 1)
+        .filter(d => origin.datum[d.key] > 1)
       return destinations.map(destination => ({
         key: origin.key + '>' + destination.key,
-        o: this.origin,
-        d: destination,
+        a1: origin.a,
+        a2: destination.a,
+        r: 0.7 * radius - 6,
         class: destination.class
       }))
     },
@@ -125,21 +133,19 @@ export default {
         return ScaleHelper.SUBSET(this.aScale, start, stop)
       })
     },
-    aSubScaleMidpoints () {
-      return this.aSubScales.map(scale => {
-        const range = scale.range()
-        return (range[0] + range[range.length - 1]) / 2
-      })
-    },
     measure () {
       return {
-        target: '.vg-tick-labels text',
+        target: '.vg-tick text',
         callback: console.log
       }
     }
   },
   methods: {
     aInterval: IntervalHelper.MIDDLE(),
+    getMidpoint (scale) {
+      const range = scale.range()
+      return 0.5 * range[0] + 0.5 * range[range.length - 1]
+    },
     changeSelected (label) {
       const selected = this.dataView.find(d => d.a === label).key
       this.selected = selected

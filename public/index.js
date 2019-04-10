@@ -1,50 +1,51 @@
 /* globals Vue */
 
-import {ResponsiveWrapper, SvgWithPadding} from '../hocs'
+import {SvgWithPadding} from '../hocs'
 
 import BarChart from '../examples/BarChart.vue'
 import StackedBarChart from '../examples/StackedBarChart.vue'
 import ChordDiagram from '../examples/ChordDiagram.vue'
-import WaterfallLine from '../examples/WaterfallLine'
+import WaterfallChart from '../examples/WaterfallChart.vue'
 
 // TouchEmulator()
 
 // testBarChart()
-// testWaterfallLine()
-testChordDiagram()
+testWaterfallChart()
+// testChordDiagram()
 // testStackedBar()
 
 function testBarChart () {
-  window.vm = createVM2(BarChart, {
+  window.vm = createVM(BarChart, {
     data: [10, 20, 50, 40],
     x: (d, i) => i,
     y: (d, i) => d
   }, {
     on: {
-      mouseover: console.log
+      mouseover: console.log,
+      mouseout: console.log
     }
   })
 }
 
-function testWaterfallLine () {
+function testWaterfallChart () {
   window.fetch('waterfall.json')
     .then(res => res.json())
     .then(json => json['2017'])
     .then(data => {
-      data = data.filter(d => Object.keys(d).length > 1)
+      const groups = ['1', '2A', '2B', '2C', '2CS']
+      const tallData = []
       data.forEach(d => {
-        if (d.id === '__OVERALL__') d.class = 'overall'
+        if (Object.keys(d).length <= 1) return
+        let y = 0
+        tallData.push({x: '0', y, g: d.id})
+        groups.forEach(x => {
+          y += d[x]
+          tallData.push({x, y, g: d.id})
+        })
       })
-      window.vm = createVM(WaterfallLine, {
-        data,
-        domain: ['1', '2A', '2B', '2C', '2CS'],
-        interactives: (f, id) => {
-          return {
-            mouseover: f(id, true),
-            mouseout: f(id, false)
-          }
-        }
-      })
+      window.vm = createVM(WaterfallChart, {
+        data: tallData
+      }, null, {props: {height: 800}})
     })
 }
 
@@ -56,12 +57,12 @@ function testChordDiagram () {
     complete (parsed) {
       const data = {
         data: parsed.data,
-        k: d => d.code,
-        a: d => d.country,
-        g: d => d.region,
+        k: 'code',
+        a: 'country',
+        g: 'region',
         gDomain: ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania']
       }
-      window.vm = createVM2(ChordDiagram, data, null, {props: {height: 800}})
+      window.vm = createVM(ChordDiagram, data, null, {props: {height: 800}})
     }
   })
 }
@@ -77,35 +78,19 @@ function testStackedBar () {
         tallData.push({year: row.year, category: 'vacancy', count: row['vacancies']})
         tallData.push({year: row.year, category: 'remaining', count: row['places'] - row['filled'] - row['vacancies']})
       })
-      window.vm = createVM2(StackedBarChart, {
+      window.vm = createVM(StackedBarChart, {
         data: tallData,
-        x: d => d.year,
-        y: d => d.count,
-        g: d => d.category,
-        c: d => d.category,
+        x: 'year',
+        y: 'count',
+        g: 'category',
+        c: 'category',
         horizontal: true,
         padding: 0.5
       })
     })
 }
 
-function createVM (Component, data, options) {
-  return new Vue({
-    el: 'main',
-    data,
-    render (h) {
-      return h(ResponsiveWrapper, Object.assign({
-        scopedSlots: {
-          default: sizing => h(Component, {
-            props: Object.assign(sizing, this.$data)
-          })
-        }
-      }, options))
-    }
-  })
-}
-
-function createVM2 (Component, data, options, svgOptions) {
+function createVM (Component, data, options, svgOptions) {
   return new Vue({
     el: 'main',
     data,

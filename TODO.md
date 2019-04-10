@@ -1,5 +1,2 @@
-- LinePlot
-- Migrate WaterfallChart example
 - Launch v2
-- Figure out what to do with range helper
 - Subset domain & range ScaleHelpers

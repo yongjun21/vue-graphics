@@ -1,3 +1,5 @@
+import SplitApplyCombine from './SplitApplyCombine'
+
 export function UNIQUE (of) {
   return data => {
     const values = new Set(data.map(d => d[of]))
@@ -49,6 +51,22 @@ export function CLAMPED_MINMAX (of, minValue, maxValue = minValue) {
   }
 }
 
+export function STACKED_MINMAX (of, by) {
+  return data => {
+    const values = SplitApplyCombine(data)
+      .split(by)
+      .apply((members, group) => {
+        group.min = members.reduce((sum, d) => sum + Math.min(0, d[of]), 0)
+        group.max = members.reduce((sum, d) => sum + Math.max(0, d[of]), 0)
+      })
+      .combine()
+    return [
+      values.reduce((min, d) => d.min < min ? d.min : min, 0),
+      values.reduce((max, d) => d.max > max ? d.max : max, 0)
+    ]
+  }
+}
+
 export function CLAMPED_ROUNDED_MINMAX (of, round, minValue, maxValue = minValue) {
   return data => {
     const values = data.map(d => d[of])
@@ -57,6 +75,24 @@ export function CLAMPED_ROUNDED_MINMAX (of, round, minValue, maxValue = minValue
     return [
       Math.floor(clampedMin / round) * round,
       Math.ceil(clampedMax / round) * round
+    ]
+  }
+}
+
+export function STACKED_ROUNDED_MINMAX (of, by, round) {
+  return data => {
+    const values = SplitApplyCombine(data)
+      .split(by)
+      .apply((members, group) => {
+        group.max = members.reduce((sum, d) => sum + Math.min(0, d[of]), 0)
+        group.min = members.reduce((sum, d) => sum + Math.max(0, d[of]), 0)
+      })
+      .combine()
+    const stackedMin = values.reduce((min, d) => d.min < min ? d.min : min, 0)
+    const stackedMax = values.reduce((max, d) => d.max > max ? d.max : max, 0)
+    return [
+      Math.floor(stackedMin / round) * round,
+      Math.ceil(stackedMax / round) * round
     ]
   }
 }

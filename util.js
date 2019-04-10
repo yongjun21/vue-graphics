@@ -52,9 +52,38 @@ export function frameRateLimited (cb, context = null) {
     if (!ready) return
     ready = false
     window.requestAnimationFrame(() => {
-      cb.call(this)
+      cb.apply(this, arguments)
       ready = true
     })
   }
   return context ? wrapped.bind(context) : wrapped
+}
+
+export function findCenter (domainA, domainR) {
+  const minA = Math.min(...domainA)
+  const maxA = Math.max(...domainA)
+  const minR = Math.min(...domainR)
+  const maxR = Math.max(...domainR)
+
+  const corners = []
+  corners.push([minA, minR], [minA, maxR])
+  let a = Math.floor(minA / 90) * 90 + 90
+  while (a < maxA && corners.length <= 10) {
+    corners.push([a, minR], [a, maxR])
+    a += 90
+  }
+  corners.push([maxA, minR], [maxA, maxR])
+
+  const xyCorners = corners.map(polar2xy)
+  const bbox = [
+    Math.min(...xyCorners.map(c => c[0])),
+    Math.min(...xyCorners.map(c => c[1])),
+    Math.max(...xyCorners.map(c => c[0])),
+    Math.max(...xyCorners.map(c => c[1]))
+  ]
+
+  return [
+    -bbox[0] / (bbox[2] - bbox[0]),
+    -bbox[1] / (bbox[3] - bbox[1])
+  ]
 }

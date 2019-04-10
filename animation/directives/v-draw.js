@@ -16,10 +16,14 @@ export default {
   update: animate
 }
 
-function animate (el, binding) {
+function animate (el, binding, vnode, oldVnode) {
+  if (oldVnode &&
+      vnode.data.attrs.d === oldVnode.data.attrs.d &&
+      el.getAttribute('stroke-dashoffset') === '0'
+  ) return
   const name = binding.arg || 'default'
   const options = Object.assign({
-    duration: 0.0166667,
+    duration: 0.66667,
     order: 0
   }, binding.value)
   const totalLength = el.getTotalLength()

@@ -1,10 +1,10 @@
 <template>
   <g class="vg-plot vg-scatter-plot" v-on="wrappedListeners">
-    <circle v-for="(d, i) in dataView" :key="d.key" v-if="hasGeom(d)"
+    <circle v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
       class="vg-dot"
       :class="d.class"
       v-associate="d"
-      v-animated:[_uid]="getGeom(d, i)">
+      v-animated:[_uid]="getGeom(d)">
     </circle>
   </g>
 </template>
@@ -35,7 +35,7 @@ export default {
     }
   },
   methods: {
-    getGeom (d, i) {
+    getGeom (d) {
       const {aScale, rScale, dotSize} = this
       return {
         cx: 0,
@@ -43,7 +43,7 @@ export default {
         transform: `rotate(${aScale(d.a)})`,
         r: d.s || dotSize,
         duration: 0.66667,
-        order: i
+        order: d.index
       }
     },
     hasGeom (d) {

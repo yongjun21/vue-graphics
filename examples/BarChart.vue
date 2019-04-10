@@ -1,5 +1,5 @@
 <template>
-  <g class="vg-chart vg-bar-chart" :transform="transform.toString()">
+  <g class="vg-chart vg-bar-chart" :transform="transform">
     <bar-plot
       :data-view="dataView"
       :domain="domain"
@@ -30,6 +30,10 @@ export default {
     y: {
       type: [Function, String, Number],
       required: true
+    },
+    xDomain: {
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('x')
     },
     yDomain: {
       type: [Function, Array],

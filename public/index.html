@@ -40,23 +40,25 @@
       stroke: #ccc;
     }
 
-    .waterfall-line path:not(.vg-enlarged) {
+    .waterfall-chart .vg-line {
       stroke: #CCC;
       shape-rendering: crispEdges;
+      pointer-events: stroke;
     }
 
-    .waterfall-line path.highlighted {
-      stroke: red;
-      stroke-width: 2px;
-    }
-
-    .waterfall-line path.overall,
-    .waterfall-line path.overall.highlighted {
+    .waterfall-chart .vg-line.overall {
       stroke: blue;
       stroke-width: 2px;
+      pointer-events: none;
     }
 
-    .chord-diagram .vg-axis text {
+    .waterfall-chart .overlay .vg-line {
+      stroke: red;
+      stroke-width: 2px;
+      pointer-events: none;
+    }
+
+    .chord-diagram .vg-ticks text {
       font-size: 0.4em;
       fill: #929292;
       cursor: pointer;
@@ -70,12 +72,12 @@
       transition: fill 500ms;
     }
 
-    .chord-diagram .vg-text-label.source text {
+    .chord-diagram .vg-text-label.source {
       font-size: 0.6em;
       font-weight: 700;
     }
 
-    .chord-diagram .axis-label text {
+    .chord-diagram .axis-label {
       font-size: 0.8em;
       fill: #929292;
       -webkit-user-select: none;
@@ -142,15 +144,18 @@
       stroke: #000000;
     }
 
-    .vg-stacked-bar-chart .vg-bar.filled {
+    .vg-stacked-bar-chart .vg-bar.filled,
+    .vg-grouped-bar-chart .vg-bar.filled {
       fill: #000;
     }
 
-    .vg-stacked-bar-chart .vg-bar.vacancy {
+    .vg-stacked-bar-chart .vg-bar.vacancy,
+    .vg-grouped-bar-chart .vg-bar.vacancy {
       fill: #888;
     }
 
-    .vg-stacked-bar-chart .vg-bar.remaining {
+    .vg-stacked-bar-chart .vg-bar.remaining,
+    .vg-grouped-bar-chart .vg-bar.remaining {
       fill: #CCC;
     }
 
@@ -164,6 +169,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.7/dist/vue.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.3.7/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3-interpolate-path@2.0.1/build/d3-interpolate-path.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.1/TweenMax.min.js"></script>
   <!-- <script src="https://cdn.jsdelivr.net/npm/hammer-touchemulator@0.0.2/touch-emulator.min.js"></script> -->
   <script src="bundle.js"></script>

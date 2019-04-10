@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/yongjun21/vue-graphics#readme",
   "dependencies": {
+    "d3-interpolate-path": "^2.0.1",
     "d3-path": "^1.0.5",
     "d3-scale": "^2.0.0",
     "d3-shape": "^1.2.0",

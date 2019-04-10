@@ -1,6 +1,6 @@
 import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATION_, currentAnimations} from '../shared'
+import {_ANIMATED_STATE_, currentAnimations} from '../shared'
 
 export default {
   bind (el, binding) {
@@ -9,7 +9,7 @@ export default {
     delete vars.duration
     delete vars.order
     const target = {}
-    el[_ANIMATION_] = target
+    el[_ANIMATED_STATE_] = target
     Object.keys(vars).forEach(prop => {
       addProperty(target, vars, prop)
       el.setAttribute(prop, target[prop])
@@ -18,11 +18,11 @@ export default {
   update (el, binding) {
     const name = binding.arg || 'default'
     const vars = Object.assign({}, binding.value)
-    let duration = vars.duration || 0.0166667
+    let duration = vars.duration || 0.66667
     const order = vars.order || 0
     delete vars.duration
     delete vars.order
-    const target = el[_ANIMATION_]
+    const target = el[_ANIMATED_STATE_]
     if (typeof duration === 'function') duration = duration(vars, target)
     Object.keys(vars).forEach(prop => {
       if (typeof vars[prop] === 'function' || !(prop in target)) {

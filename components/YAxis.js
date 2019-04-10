@@ -48,6 +48,7 @@ export default {
     const $ticks = interval(yScale).map(y => {
       const $label = h(TextLabel, {
         key: y.label,
+        class: y.class,
         attrs: Object.assign({}, data.attrs, {
           x: x - tickSize - tickPadding,
           y: y.value,

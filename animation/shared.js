@@ -1,5 +1,7 @@
 export const _ANIMATION_ = Symbol('animation')
-export const _TRANSFORMATION_ = Symbol('transformation')
+export const _ANIMATED_STATE_ = Symbol('animated state')
+export const _TRANSFORM_STATE_ = Symbol('transform state')
+export const _MORPH_STATE_ = Symbol('morph state')
 
 export const currentAnimations = {}
 export const config = {}

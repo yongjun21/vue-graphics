@@ -1,5 +1,5 @@
 <template>
-  <g class="vg-chart vg-stacked-bar-chart" :transform="transform.toString()">
+  <g class="vg-chart vg-stacked-bar-chart" :transform="transform">
     <y-gridlines
       :interval="yInterval"
       :x-scale="xScale"
@@ -40,7 +40,7 @@ import YGridlines from '../components/YGridlines.js'
 import XAxis from '../components/XAxis.js'
 import YAxis from '../components/YAxis.js'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
-import {IntervalHelper, TransformHelper, SplitApplyCombine} from '../helpers'
+import {IntervalHelper, TransformHelper, DomainHelper} from '../helpers'
 import {scaleBand, scaleLinear} from 'd3-scale'
 
 export default {
@@ -61,31 +61,17 @@ export default {
       type: [Function, String, Number],
       required: true
     },
+    xDomain: {
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('x')
+    },
     yDomain: {
       type: [Function, Array],
-      default: data => {
-        const stacked = SplitApplyCombine(data)
-          .split('x')
-          .split('g')
-          .apply((members, group) => {
-            const values = members.map(d => d.y)
-            group.minY = values.reduce((min, v) => v < min ? v : min, 0)
-            group.maxY = values.reduce((max, v) => v > max ? v : max, 0)
-          })
-          .combine()
-          .split('x')
-          .apply((members, group) => {
-            const plus = members.map(d => d.maxY)
-            const minus = members.map(d => d.minY)
-            group.stackedYPlus = plus.reduce((sum, v) => sum + v)
-            group.stackedYMinus = minus.reduce((sum, v) => sum + v)
-          })
-          .combine()
-        return [
-          stacked.reduce((min, v) => v.stackedYMinus < min ? v.stackedYMinus : min, 0),
-          stacked.reduce((max, v) => v.stackedYPlus > max ? v.stackedYPlus : max, 0)
-        ]
-      }
+      default: DomainHelper.STACKED_MINMAX('y', 'x')
+    },
+    gDomain: {
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('g')
     },
     horizontal: {
       type: Boolean,

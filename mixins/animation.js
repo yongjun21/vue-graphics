@@ -3,9 +3,10 @@ import {_ANIMATION_, queueAnimations, flushAnimations} from '../animation'
 
 import Animated from '../animation/directives/v-animated'
 import Draw from '../animation/directives/v-draw'
+import Morph from '../animation/directives/v-morph'
 
 export default {
-  directives: {Animated, Draw},
+  directives: {Animated, Draw, Morph},
   watch: {
     dataView: {
       handler () {

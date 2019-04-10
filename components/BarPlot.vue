@@ -1,10 +1,10 @@
 <template>
   <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
-    <rect v-for="(d, i) in dataView" :key="d.key" v-if="hasGeom(d)"
+    <rect v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
       class="vg-bar"
       :class="d.class"
       v-associate="d"
-      v-animated:[_uid]="getGeom(d, i)">
+      v-animated:[_uid]="getGeom(d)">
     </rect>
   </g>
 </template>
@@ -39,7 +39,7 @@ export default {
         width: xScale.bandwidth(),
         height: yScale(d.y) - yScale(0),
         duration: 0.66667,
-        order: i
+        order: d.index
       }
     },
     hasGeom (d) {

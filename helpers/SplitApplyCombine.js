@@ -1,7 +1,7 @@
 export default function SplitApplyCombine (data) {
   const indexes = new Map()
   const applied = []
-  const wrapped = Object.assign(data, {
+  const wrapped = Object.assign([...data], {
     split (by, alias) {
       if (typeof by === 'string') {
         alias = by
@@ -22,7 +22,7 @@ export default function SplitApplyCombine (data) {
         })
         combined.push(group)
       })
-      return SplitApplyCombine(returnOriginal ? [...data] : combined)
+      return SplitApplyCombine(returnOriginal ? data : combined)
     }
   })
   Object.defineProperty(wrapped, 'groups', {
@@ -40,7 +40,7 @@ export default function SplitApplyCombine (data) {
           match = intersect(match, index)
         })
         const members = match != null ? match.map(i => data[i]) : data
-        groups.set(group, Object.freeze(members))
+        groups.set(group, members)
       })
       return groups
     }

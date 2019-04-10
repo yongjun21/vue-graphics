@@ -1,6 +1,5 @@
 <template>
-  <g class="vg-chart vg-grouped-bar-chart"
-    v-animated-transform="{transform, duration: 0.66667}">
+  <g class="vg-chart vg-grouped-bar-chart" v-animated-transform="transform">
     <x-gridlines
       :interval="xDivider"
       :x-scale="xScale"
@@ -52,12 +51,19 @@ export default {
       required: true
     },
     g: {
-      type: [Function, String, Number],
-      required: true
+      type: [Function, String, Number]
+    },
+    xDomain: {
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('x')
     },
     yDomain: {
       type: [Function, Array],
       default: DomainHelper.CLAMPED_MINMAX('y', 0)
+    },
+    gDomain: {
+      type: [Function, Array],
+      default: DomainHelper.UNIQUE('g')
     },
     horizontal: {
       type: Boolean,

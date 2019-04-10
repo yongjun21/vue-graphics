@@ -1,22 +1,32 @@
 import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
-import {_TRANSFORMATION_} from '../shared'
+import {_TRANSFORM_STATE_} from '../shared'
+import {TransformHelper} from '../../helpers'
 
 export default {
   bind (el, binding) {
     el.classList.add('vg-animated')
-    const target = binding.value.transform.clone()
-    el[_TRANSFORMATION_] = target
-    el.setAttribute('transform', target.toString())
+    const options = binding.value instanceof TransformHelper
+                  ? {transform: binding.value}
+                  : binding.value
+    const target = options.transform.clone()
+    el[_TRANSFORM_STATE_] = target
+    el.setAttribute('transform', target)
   },
   update (el, binding) {
-    const target = el[_TRANSFORMATION_]
-    const duration = binding.value.duration || 0.0166667
+    const target = el[_TRANSFORM_STATE_]
+    const options = binding.value instanceof TransformHelper
+                  ? {transform: binding.value}
+                  : binding.value
+    options.duration = options.duration || 0.66667
+    if (typeof options.duration === 'function') {
+      options.duration = options.duration(options.transform, target)
+    }
     const vars = Object.assign({
       onStart: () => el.classList.add('vg-animating'),
       onComplete: () => el.classList.remove('vg-animating'),
-      onUpdate: () => el.setAttribute('transform', target.toString())
-    }, binding.value.transform.params)
-    TweenLite.to(target.params, duration, vars)
+      onUpdate: () => el.setAttribute('transform', target)
+    }, options.transform.params)
+    TweenLite.to(target.params, options.duration, vars)
   }
 }
