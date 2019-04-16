@@ -29,7 +29,7 @@
 <script>
 import GroupedBarPlot from '../components/GroupedBarPlot.vue'
 import XGridlines from '../components/XGridlines.js'
-import XAxis from '../components/XAxis.js'
+import XAxis from '../components/XAxis.vue'
 import AnimatedTransform from '../animation/directives/v-animated-transform.js'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
 import {DomainHelper, IntervalHelper, TransformHelper} from '../helpers'

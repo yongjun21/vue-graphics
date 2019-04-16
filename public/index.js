@@ -9,8 +9,8 @@ import WaterfallChart from '../examples/WaterfallChart.vue'
 
 // TouchEmulator()
 
-// testBarChart()
-testWaterfallChart()
+testBarChart()
+// testWaterfallChart()
 // testChordDiagram()
 // testStackedBar()
 

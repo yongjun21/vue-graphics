@@ -22,6 +22,7 @@ export function wrapListeners ($listeners, getData, selector) {
   const wrapped = {}
   Object.keys($listeners).forEach(key => {
     wrapped[key] = e => {
+      e.stopPropagation()
       if (selector && !e.target.matches(selector)) return
       $listeners[key](getData(e.target), e)
     }

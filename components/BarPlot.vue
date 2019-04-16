@@ -6,11 +6,14 @@
       v-associate="d"
       v-animated:[_uid]="getGeom(d)">
     </rect>
+    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 
 <script>
 import {animationMixin, associateDataMixin} from '../mixins'
+
+const geoms = new WeakMap()
 
 export default {
   name: 'BarPlot',
@@ -31,7 +34,7 @@ export default {
     }
   },
   methods: {
-    getGeom (d, i) {
+    getGeom (d) {
       const {xScale, yScale} = this
       return {
         x: xScale(d.x),

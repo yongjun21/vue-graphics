@@ -17,7 +17,7 @@ export default {
           if (tweens.length === 0) return
           this[_ANIMATION_] = new TimelineLite({
             tweens,
-            stagger: 0.0166667,
+            stagger: 0,
             onComplete: () => { this[_ANIMATION_] = null }
           })
         })

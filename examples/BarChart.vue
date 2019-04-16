@@ -7,19 +7,33 @@
       :y-scale="yScale"
       v-bind="$attrs"
       v-on="$listeners">
+      <template v-slot="{getGeom, hasGeom}">
+        <animated-annotations
+          :data-view="dataView"
+          :get-geom="getGeom"
+          :has-geom="hasGeom"
+          :x="g => g.x + 0.5 * g.width"
+          :y="g => g.height + 10"
+          :v="d => d.y"
+          anchor="bottom"
+          :post-transform="transform"
+          v-on="$listeners">
+        </animated-annotations>
+      </template>
     </bar-plot>
   </g>
 </template>
 
 <script>
 import BarPlot from '../components/BarPlot.vue'
+import AnimatedAnnotations from '../components/AnimatedAnnotations.vue'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
 import {DomainHelper, TransformHelper} from '../helpers'
 import {scaleBand, scaleLinear} from 'd3-scale'
 
 export default {
   name: 'BarChart',
-  components: {BarPlot},
+  components: {BarPlot, AnimatedAnnotations},
   mixins: [dataViewMixin, userSpaceMixin],
   inheritAttrs: false,
   props: {

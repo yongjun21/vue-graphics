@@ -6,6 +6,7 @@
       v-associate="d"
       v-animated:[_uid]="getGeom(d)">
     </circle>
+    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 

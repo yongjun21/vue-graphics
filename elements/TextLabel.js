@@ -30,11 +30,12 @@ export default {
     rotate: Number,
     postTransform: TransformHelper
   },
-  render (h, {props, data, children}) {
+  render (h, {props, data, scopedSlots}) {
+    const $children = scopedSlots.default && scopedSlots.default()
     return h('text', mergeData(data, {
       class: 'vg-text-label',
       attrs: getTextAttrs(props)
-    }), children)
+    }), $children)
   }
 }
 

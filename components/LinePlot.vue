@@ -3,10 +3,11 @@
     <path v-for="(value, label) in grouped" :key="label" v-if="value.length > 0"
       class="vg-line"
       :class="classed && classed(label)"
-      :d="getGeom(value)"
+      v-bind="getGeom(value)"
       v-enlarge-target
       v-associate="{label, value}">
     </path>
+    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 
@@ -60,7 +61,7 @@ export default {
         .x(d => xScale(d.x))
         .y(d => yScale(d.y))
         .curve(curve)
-      return lineGenerator(data)
+      return {d: lineGenerator(data)}
     },
     hasGeom (d) {
       return this.xScale(d.x) != null && this.yScale(d.x) != null

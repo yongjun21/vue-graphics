@@ -37,8 +37,8 @@
 <script>
 import StackedBarPlot from '../components/StackedBarPlot.vue'
 import YGridlines from '../components/YGridlines.js'
-import XAxis from '../components/XAxis.js'
-import YAxis from '../components/YAxis.js'
+import XAxis from '../components/XAxis.vue'
+import YAxis from '../components/YAxis.vue'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
 import {IntervalHelper, TransformHelper, DomainHelper} from '../helpers'
 import {scaleBand, scaleLinear} from 'd3-scale'

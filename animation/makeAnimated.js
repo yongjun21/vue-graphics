@@ -1,10 +1,14 @@
 import TweenLite from 'gsap/TweenLite'
 import {currentAnimations} from './shared'
 
-export default function (Target, name = 'default') {
+export default function (Target) {
   return {
     inheritAttrs: false,
     props: {
+      name: {
+        type: [String, Number, Symbol],
+        default: 'default'
+      },
       animated: {
         type: Object,
         default () {
@@ -25,7 +29,7 @@ export default function (Target, name = 'default') {
     methods: {
       animate () {
         const vars = Object.assign({}, this.animated)
-        let duration = vars.duration || 0
+        let duration = vars.duration || 0.66667
         const order = vars.order || 0
         delete vars.duration
         delete vars.order
@@ -44,7 +48,7 @@ export default function (Target, name = 'default') {
           onComplete: () => { this.class['vg-animating'] = false }
         })
         const tween = TweenLite.to(target, duration, vars)
-        if (name in currentAnimations) currentAnimations[name].push([order, tween])
+        if (this.name in currentAnimations) currentAnimations[this.name].push([order, tween])
       }
     },
     watch: {
@@ -54,13 +58,13 @@ export default function (Target, name = 'default') {
       }
     },
     render (h) {
-      const {animating, $attrs} = this
+      const {animating, $attrs, $scopedSlots} = this
       const attrs = {}
       this.keys.forEach(prop => {
         attrs[prop] = animating[prop]
       })
       Object.assign(attrs, $attrs)
-      return h(Target, {class: this.class, attrs})
+      return h(Target, {class: this.class, attrs, scopedSlots: $scopedSlots})
     }
   }
 }

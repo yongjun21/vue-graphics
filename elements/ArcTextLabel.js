@@ -1,5 +1,5 @@
 import Arc from './Arc'
-import {getUid, polar2xy, mergeData} from '../util'
+import {getUid, mergeData} from '../util'
 
 export default {
   name: 'TextLabel',

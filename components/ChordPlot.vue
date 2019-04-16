@@ -3,10 +3,11 @@
     <path v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
       class="vg-chord"
       :class="d.class"
-      :d="getGeom(d)"
+      v-bind="getGeom(d)"
       v-associate="d"
       v-draw:[_uid]="{duration: 0.66667, order: d.index}">
     </path>
+    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 
@@ -41,7 +42,7 @@ export default {
       const p = path()
       p.moveTo(...oXY)
       p.quadraticCurveTo(0, 0, ...dXY)
-      return p
+      return {d: p.toString()}
     },
     hasGeom (d) {
       return this.aScale(d.a1) != null && this.aScale(d.a2) != null

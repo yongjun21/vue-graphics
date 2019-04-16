@@ -1,16 +1,16 @@
 <template>
-  <g class="vg-axis vg-r-axis" :transform="`rotate(${a})`">
-    <line class="vg-baseline" :y1="-rRange[0]" :y2="-rRange[rRange.length - 1]"></line>
+  <g class="vg-axis vg-y-axis">
+    <line class="vg-baseline" :x1="x" :x2="x" :y1="yRange[0]" :y2="yRange[yRange.length - 1]"></line>
     <g class="vg-ticks" v-on="wrappedListeners">
-      <g v-for="(r, i) in rInterval" :key="r.label" class="vg-tick">
-        <line :x2="tickSize" :y1="-r.value" :y2="-r.value"></line>
+      <g v-for="(y, i) in yInterval" :key="y.label" class="vg-tick">
+        <line :x1="x" :x2="x - tickSize" :y1="y.value" :y2="y.value"></line>
         <text-label
-          :class="classed && classed(r.label)"
-          :x="tickSize + tickPadding"
-          :y="-r.value"
-          :anchor="tickSize < 0 ? 'right' : 'left'"
-          v-associate="r.label">
-          {{formatted(r.label, i)}}
+          :class="classed && classed(y.label)"
+          :x="x - tickSize - tickPadding"
+          :y="y.value"
+          v-bind="$attrs"
+          v-associate="y.label">
+          {{formatted(y.label, i)}}
         </text-label>
       </g>
     </g>
@@ -23,7 +23,7 @@ import TextLabel from '../elements/TextLabel'
 import {associateDataMixin} from '../mixins'
 
 export default {
-  name: 'RAxis',
+  name: 'YAxis',
   components: {TextLabel},
   mixins: [associateDataMixin],
   inheritAttrs: false,
@@ -32,15 +32,15 @@ export default {
       type: Function,
       required: true
     },
-    aRotate: {
+    xTranslate: {
       type: Number,
       default: 0
     },
-    aScale: {
+    xScale: {
       type: Function,
       default: v => v
     },
-    rScale: {
+    yScale: {
       type: Function,
       required: true
     },
@@ -59,14 +59,14 @@ export default {
     }
   },
   computed: {
-    rInterval () {
-      return this.interval(this.rScale)
+    yInterval () {
+      return this.interval(this.yScale)
     },
-    rRange () {
-      return this.rScale.range()
+    yRange () {
+      return this.yScale.range()
     },
-    a () {
-      return this.aScale(this.aRotate)
+    x () {
+      return this.xScale(this.xTranslate)
     }
   }
 }
