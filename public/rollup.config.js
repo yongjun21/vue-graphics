@@ -2,7 +2,8 @@ import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import VuePlugin from 'rollup-plugin-vue'
 
-const config = {
+export default {
+  input: 'public/index.js',
   external: [
     'vue',
     'd3-scale',
@@ -14,18 +15,22 @@ const config = {
     'gsap/AttrPlugin'
   ],
   output: {
-    format: 'cjs',
-    sourcemap: true
+    file: 'public/bundle.js',
+    format: 'iife',
+    globals: {
+      'vue': 'Vue',
+      'd3-scale': 'd3',
+      'd3-shape': 'd3',
+      'd3-path': 'd3',
+      'd3-interpolate-path': 'd3',
+      'gsap/TweenLite': 'TweenLite',
+      'gsap/TimelineLite': 'TimelineLite'
+    }
   },
   plugins: [
     resolve(),
     commonjs(),
     VuePlugin()
-  ]
-}
-
-export default args => {
-  const filename = args.input.match(/\/?(\w+)\.\w+$/)[1]
-  config.output.file = `dist/${filename}.js`
-  return config
+  ],
+  preferConst: true
 }
