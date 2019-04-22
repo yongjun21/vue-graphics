@@ -3,7 +3,8 @@
     <chord-plot
       :data-view="links"
       :a-scale="aScale"
-      :r="0.7 * radius - 6">
+      :r="0.7 * radius - 6"
+      :animation-stagger="0.0166667">
     </chord-plot>
     <polar-scatter-plot
       :dataView="sortedDataView"
@@ -110,12 +111,13 @@ export default {
       const destinations = this.sortedDataView
         .map((d, i, arr) => arr[(i + startIndex) % arr.length])
         .filter(d => origin.datum[d.key] > 1)
-      return destinations.map(destination => ({
+      return destinations.map((destination, i) => ({
         key: origin.key + '>' + destination.key,
         a1: origin.a,
         a2: destination.a,
         r: 0.7 * radius - 6,
-        class: destination.class
+        class: destination.class,
+        index: i
       }))
     },
     aScale () {

@@ -9,9 +9,9 @@ import WaterfallChart from '../examples/WaterfallChart.vue'
 
 // TouchEmulator()
 
-testBarChart()
+// testBarChart()
 // testWaterfallChart()
-// testChordDiagram()
+testChordDiagram()
 // testStackedBar()
 
 function testBarChart () {
@@ -68,7 +68,7 @@ function testChordDiagram () {
 }
 
 function testStackedBar () {
-  window.fetch('https://eqrox04mbk.execute-api.ap-southeast-1.amazonaws.com/development?school=AI TONG SCHOOL&phase=2B&runs=0')
+  window.fetch('https://k57kq477w1.execute-api.ap-southeast-1.amazonaws.com/development?school=AI TONG SCHOOL&phase=2B&runs=0')
     .then(res => res.json())
     .then(json => {
       const data = json.historical

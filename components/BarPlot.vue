@@ -1,19 +1,19 @@
 <template>
   <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
-    <rect v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
-      class="vg-bar"
-      :class="d.class"
-      v-associate="d"
-      v-animated:[_uid]="getGeom(d)">
-    </rect>
+    <animated-group :enter="{height: 0}" :exit="{height: 0}">
+      <rect v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
+        class="vg-bar"
+        :class="d.class"
+        v-associate="d"
+        v-animated:[_uid]="getGeom(d, i)">
+      </rect>
+    </animated-group>
     <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 
 <script>
 import {animationMixin, associateDataMixin} from '../mixins'
-
-const geoms = new WeakMap()
 
 export default {
   name: 'BarPlot',
@@ -34,7 +34,7 @@ export default {
     }
   },
   methods: {
-    getGeom (d) {
+    getGeom (d, i) {
       const {xScale, yScale} = this
       return {
         x: xScale(d.x),
@@ -42,7 +42,7 @@ export default {
         width: xScale.bandwidth(),
         height: yScale(d.y) - yScale(0),
         duration: 0.66667,
-        order: d.index
+        order: i
       }
     },
     hasGeom (d) {

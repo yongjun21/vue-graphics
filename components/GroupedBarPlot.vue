@@ -1,11 +1,13 @@
 <template>
   <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
-    <rect v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
-      class="vg-bar"
-      :class="d.class"
-      v-associate="d"
-      v-animated:[_uid]="getGeom(d)">
-    </rect>
+    <animated-group :enter="{height: 0}" :exit="{height: 0}">
+      <rect v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
+        class="vg-bar"
+        :class="d.class"
+        v-associate="d"
+        v-animated:[_uid]="getGeom(d, i)">
+      </rect>
+    </animated-group>
     <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
@@ -49,7 +51,7 @@ export default {
     }
   },
   methods: {
-    getGeom (d) {
+    getGeom (d, i) {
       const {yScale} = this
       const xScale = this.subScales[d.x]
       return {

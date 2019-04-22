@@ -1,6 +1,6 @@
 export {default as makeAnimated} from './makeAnimated'
 export {
-  _ANIMATION_,
+  _ANIMATE_,
   queueAnimations,
   flushAnimations,
   config as ANIMATION_CONFIG

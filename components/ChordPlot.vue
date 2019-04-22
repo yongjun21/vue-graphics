@@ -7,7 +7,6 @@
       v-associate="d"
       v-draw:[_uid]="{duration: 0.66667, order: d.index}">
     </path>
-    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 
