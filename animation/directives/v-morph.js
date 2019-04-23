@@ -11,11 +11,11 @@ export default {
 
     el.classList.add('vg-animated')
 
-    el[_ANIMATE_] = function (el, binding) {
-      const options = Object.assign({
+    el[_ANIMATE_] = function (options) {
+      options = Object.assign({
         duration: 0.66667,
         order: 0
-      }, binding.value)
+      }, options)
 
       const updated = el.getAttribute('d')
       const interpolator = interpolatePath(target.d, updated)
@@ -38,6 +38,6 @@ export default {
     }
   },
   update (el, binding) {
-    el[_ANIMATE_](binding)
+    el[_ANIMATE_](binding.value)
   }
 }

@@ -1,33 +1,37 @@
 <template>
-  <g class="vg-annotations" v-on="wrappedListeners">
-    <text-label v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
+  <animated-group class="vg-annotations" v-on="wrappedListeners" :enter="enter">
+    <animated-text-label v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-annotation"
       :class="d.class"
-      :animated="getTextGeom(d)"
-      v-bind="$attrs">
-      <animated-number :animated="getNumberGeom(d)" v-associate="d"></animated-number>
-    </text-label>
-  </g>
+      :name="_uid"
+      v-bind="getTextGeom(d, i)">
+      <animated-number
+        :name="_uid"
+        v-bind="getNumberGeom(d, i)"
+        v-associate="d">
+      </animated-number>
+    </animated-text-label>
+  </animated-group>
 </template>
 
 <script>
 import TextLabel from '../elements/TextLabel'
-import {associateDataMixin} from '../mixins'
+import {animationMixin, associateDataMixin} from '../mixins'
 import {makeAnimated} from '../animation'
 
 export default {
   name: 'Annotations',
   components: {
-    TextLabel: makeAnimated(TextLabel),
+    AnimatedTextLabel: makeAnimated(TextLabel, ['x', 'y']),
     AnimatedNumber: makeAnimated({
       functional: true,
-      props: ['value'],
+      props: ['value', 'formatted'],
       render (h, {data, props}) {
-        return h('tspan', data, Math.round(props.value.toLocaleString()))
+        return h('tspan', data, props.formatted(props.value))
       }
-    })
+    }, ['value'])
   },
-  mixins: [associateDataMixin],
+  mixins: [animationMixin, associateDataMixin],
   inheritAttrs: false,
   props: {
     dataView: {
@@ -53,25 +57,31 @@ export default {
     v: {
       type: Function,
       required: true
-    }
+    },
+    formatted: {
+      type: Function,
+      default: v => Math.round(v).toLocaleString()
+    },
+    enter: Object
   },
   methods: {
-    getTextGeom (d) {
-      const geom = this.getGeom(d)
+    getTextGeom (d, i) {
+      const geom = this.getGeom(d, i)
       const {x, y} = this
       const getX = typeof x === 'function' ? x : geom => geom[x]
       const getY = typeof y === 'function' ? y : geom => geom[y]
-      return {
+      return Object.assign({
         x: getX(geom),
         y: getY(geom),
         duration: geom.duration,
         order: geom.order
-      }
+      }, this.$attrs)
     },
-    getNumberGeom (d) {
-      const geom = this.getGeom(d)
+    getNumberGeom (d, i) {
+      const geom = this.getGeom(d, i)
       return {
-        value: this.v(d),
+        value: this.v(d, i),
+        formatted: this.formatted,
         duration: geom.duration,
         order: geom.order
       }

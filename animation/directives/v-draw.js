@@ -15,15 +15,15 @@ export default {
 
     el.classList.add('vg-animated')
 
-    el[_ANIMATE_] = function (binding) {
+    el[_ANIMATE_] = function (options) {
       const totalLength = el.getTotalLength()
       el.setAttribute('stroke-dasharray', totalLength)
       el.setAttribute('stroke-dashoffset', totalLength)
 
-      const options = Object.assign({
+      options = Object.assign({
         duration: 0.66667,
         order: 0
-      }, binding.value)
+      }, options)
       if (typeof options.duration === 'function') {
         options.duration = options.duration(totalLength)
       }
@@ -39,13 +39,13 @@ export default {
       if (name in currentAnimations) currentAnimations[name].push([options.order, tween])
     }
 
-    el[_ANIMATE_](binding)
+    el[_ANIMATE_](binding.value)
   },
   update (el, binding, vnode, oldVnode) {
     if (
       vnode.data.attrs.d === oldVnode.data.attrs.d &&
       el.getAttribute('stroke-dashoffset') === '0'
     ) return
-    el[_ANIMATE_](binding)
+    el[_ANIMATE_](binding.value)
   }
 }

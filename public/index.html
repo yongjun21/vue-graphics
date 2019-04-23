@@ -162,6 +162,16 @@
     .vg-stacked-bar-chart .vg-y-axis > .vg-baseline {
       stroke: none;
     }
+
+    .vg-text-label.v-enter,
+    .vg-text-label.v-leave-to {
+      opacity: 0;
+    }
+
+    .vg-text-label.v-enter-active,
+    .vg-text-label.v-leave-active {
+      transition: opacity 0.66667s;
+    }
   </style>
 </head>
 <body>

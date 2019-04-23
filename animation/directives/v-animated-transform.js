@@ -6,16 +6,15 @@ import {TransformHelper} from '../../helpers'
 export default {
   bind (el, binding) {
     el.classList.add('vg-animated')
-    const options = binding.value instanceof TransformHelper
-                  ? {transform: binding.value}
-                  : binding.value
-    const target = options.transform.clone()
+    const target = binding.value instanceof TransformHelper
+                 ? binding.value.clone()
+                 : binding.value.transform.clone()
     el.setAttribute('transform', target)
 
-    el[_ANIMATE_] = function (binding) {
-      const options = binding.value instanceof TransformHelper
-                    ? {transform: binding.value}
-                    : binding.value
+    el[_ANIMATE_] = function (options) {
+      options = options instanceof TransformHelper
+              ? {transform: options}
+              : options
       options.duration = options.duration || 0.66667
       if (typeof options.duration === 'function') {
         options.duration = options.duration(options.transform, target)
@@ -29,6 +28,6 @@ export default {
     }
   },
   update (el, binding) {
-    el[_ANIMATE_](binding)
+    el[_ANIMATE_](binding.value)
   }
 }

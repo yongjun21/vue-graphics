@@ -17,8 +17,8 @@ export default {
 
     el.classList.add('vg-animated')
 
-    el[_ANIMATE_] = function (binding, done, reverse) {
-      const vars = Object.assign({}, binding.value)
+    el[_ANIMATE_] = function (vars, done, reverse) {
+      vars = Object.assign({}, vars)
       let duration = vars.duration || 0.66667
       const order = vars.order || 0
       delete vars.duration
@@ -64,7 +64,7 @@ export default {
     }
   },
   update (el, binding) {
-    el[_ANIMATE_](binding)
+    el[_ANIMATE_](binding.value)
   }
 }
 

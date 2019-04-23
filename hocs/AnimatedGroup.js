@@ -6,36 +6,39 @@ export default {
     enter: Object,
     exit: Object
   },
-  render (h, {props, data, children}) {
+  render (h, {props, data, scopedSlots}) {
+    const $children = scopedSlots.default && scopedSlots.default()
+    const on = {}
+    if (props.enter) {
+      on.enter = function (el, done) {
+        if (!el[_ANIMATE_]) return done()
+        const vars = Object.assign({
+          duration: 0.66667,
+          order: Infinity
+        }, props.enter)
+        el[_ANIMATE_](vars, done, true)
+      }
+    }
+
+    if (props.exit) {
+      on.exit = function (el, done) {
+        if (!props.exit || !el[_ANIMATE_]) return done()
+        const vars = Object.assign({
+          duration: 0.66667,
+          order: -Infinity,
+          leaving: true
+        }, props.exit)
+        el[_ANIMATE_](vars, done, false)
+      }
+    }
+
     return h('transition-group', {
       class: data.class,
       props: {
         tag: 'g',
-        appear: true,
-        css: false
+        appear: true
       },
-      on: {
-        enter (el, done) {
-          if (!el[_ANIMATE_]) return
-          const binding = {
-            value: Object.assign({
-              duration: 0.66667,
-              order: Infinity
-            }, props.enter)
-          }
-          el[_ANIMATE_](binding, done, true)
-        },
-        leave (el, done) {
-          if (!el[_ANIMATE_]) return
-          const binding = {
-            value: Object.assign({
-              duration: 0.66667,
-              order: -Infinity
-            }, props.exit)
-          }
-          el[_ANIMATE_](binding, done, false)
-        }
-      }
-    }, children)
+      on: Object.assign(on, data.on)
+    }, $children)
   }
 }

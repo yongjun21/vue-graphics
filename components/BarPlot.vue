@@ -46,7 +46,7 @@ export default {
       }
     },
     hasGeom (d) {
-      return this.xScale(d.x) != null && this.yScale(d.x) != null
+      return this.xScale(d.x) != null && this.yScale(d.y) != null
     }
   }
 }
