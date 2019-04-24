@@ -3,7 +3,7 @@
 import {SvgWithPadding} from '../hocs'
 
 import BarChart from '../examples/BarChart.vue'
-import StackedBarChart from '../examples/StackedBarChart.vue'
+import StackedBarChart from '../examples/GroupedBarChart.vue'
 import ChordDiagram from '../examples/ChordDiagram.vue'
 import WaterfallChart from '../examples/WaterfallChart.vue'
 

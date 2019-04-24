@@ -2,7 +2,7 @@ import SplitApplyCombine from './SplitApplyCombine'
 
 export function UNIQUE (of) {
   return data => {
-    const values = new Set(data.map(d => d[of]))
+    const values = new Set(getValues(data, of))
     return [...values]
   }
 }
@@ -12,7 +12,7 @@ export function SORTED_UNIQUE (of, by, descending = false) {
     const sorted = [...data]
     if (descending) sorted.sort((a, b) => b[by] - a[by])
     else sorted.sort((a, b) => a[by] - b[by])
-    const values = new Set(sorted.map(d => d[of]))
+    const values = new Set(getValues(sorted, of))
     return [...values]
   }
 }
@@ -20,7 +20,7 @@ export function SORTED_UNIQUE (of, by, descending = false) {
 export function MINMAX (of) {
   return data => {
     if (data.length === 0) return [0, 1]
-    const values = data.map(d => d[of])
+    const values = getValues(data, of)
     return [
       values.reduce((min, v) => v < min ? v : min),
       values.reduce((max, v) => v > max ? v : max)
@@ -31,7 +31,7 @@ export function MINMAX (of) {
 export function ROUNDED_MINMAX (of, round) {
   return data => {
     if (data.length === 0) return [0, round]
-    const values = data.map(d => d[of])
+    const values = getValues(data, of)
     const min = values.reduce((min, v) => v < min ? v : min)
     const max = values.reduce((max, v) => v > max ? v : max)
     return [
@@ -43,7 +43,7 @@ export function ROUNDED_MINMAX (of, round) {
 
 export function CLAMPED_MINMAX (of, minValue, maxValue = minValue) {
   return data => {
-    const values = data.map(d => d[of])
+    const values = getValues(data, of)
     return [
       values.reduce((min, v) => v < min ? v : min, minValue),
       values.reduce((max, v) => v > max ? v : max, maxValue)
@@ -69,7 +69,7 @@ export function STACKED_MINMAX (of, by) {
 
 export function CLAMPED_ROUNDED_MINMAX (of, round, minValue, maxValue = minValue) {
   return data => {
-    const values = data.map(d => d[of])
+    const values = getValues(data, of)
     const clampedMin = values.reduce((min, v) => v < min ? v : min, minValue)
     const clampedMax = values.reduce((max, v) => v > max ? v : max, maxValue)
     return [
@@ -95,4 +95,9 @@ export function STACKED_ROUNDED_MINMAX (of, by, round) {
       Math.ceil(stackedMax / round) * round
     ]
   }
+}
+
+function getValues (data, of) {
+  if (!Array.isArray(of)) return data.map(d => d[of])
+  return of.reduce((arr, key) => arr.concat(data.map(d => d[key])), [])
 }

@@ -11,7 +11,7 @@ export default {
     }
 
     const name = binding.arg || 'default'
-    const target = Object.create(null)
+    const target = {}
 
     el.classList.add('vg-animated')
 

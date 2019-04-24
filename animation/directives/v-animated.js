@@ -5,7 +5,7 @@ import {_ANIMATE_, currentAnimations} from '../shared'
 export default {
   bind (el, binding) {
     const name = binding.arg || 'default'
-    const target = Object.create(null)
+    const target = {}
 
     const vars = Object.assign({}, binding.value)
     delete vars.duration

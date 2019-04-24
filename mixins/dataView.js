@@ -9,16 +9,13 @@ export default {
   },
   computed: {
     dataView () {
-      const {x, y, g, a, r, s, k, c} = this
+      const keys = ['x', 'y', 'y1', 'y2', 'g', 'a', 'r', 's']
       const toApply = []
-      if (k) toApply.push(['key', get(k)])
-      if (c) toApply.push(['class', get(c)])
-      if (x) toApply.push(['x', get(x)])
-      if (y) toApply.push(['y', get(y)])
-      if (g) toApply.push(['g', get(g)])
-      if (a) toApply.push(['a', get(a)])
-      if (r) toApply.push(['r', get(r)])
-      if (s) toApply.push(['s', get(s)])
+      if (this.k) toApply.push(['key', get(this.k)])
+      if (this.c) toApply.push(['class', get(this.c)])
+      keys.forEach(key => {
+        if (this[key]) toApply.push([key, get(this[key])])
+      })
       return this.data.map((d, i) => {
         const props = {}
         toApply.forEach(([key, accessor]) => {
