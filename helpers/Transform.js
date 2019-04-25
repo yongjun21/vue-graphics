@@ -207,21 +207,34 @@ export default class TransformHelper {
 
   decompose () {
     const {a, b, c, d, e, f} = this.params
-    const A = Math.atan2(b, a) * 180 / Math.PI
-    const decomposed = [
-      new TransformHelper().matrix(a, b, c, d, 0, 0).rotate(A),
-      new TransformHelper().rotate(-A),
-      new TransformHelper().translate(e, f)
-    ]
-    return decomposed
+    const scaleX = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
+    const skewX = (a * c + b * d) / scaleX
+    const scaleY = (a * d - b * c) / scaleX
+    const rotate = Math.atan2(b, a) * 180 / Math.PI
+
+    return {
+      scaleX,
+      skewX,
+      scaleY,
+      rotate,
+      translateX: e,
+      translateY: f
+    }
+  }
+
+  static recompose (decomposed) {
+    const {scaleX, skewX, scaleY, rotate, translateX, translateY} = decomposed
+    return new TransformHelper()
+      .matrix(scaleX, 0, skewX, scaleY, 0, 0)
+      .rotate(rotate)
+      .translate(translateX, translateY)
   }
 
   textCorrection (origin = [0, 0]) {
-    const decomposed = this.inverse().decompose()
+    const {a, b, c, d} = this.inverseParams
     return new TransformHelper()
       .translate(-origin[0], -origin[1])
-      .chain(decomposed[0])
-      .chain(decomposed[1])
+      .matrix(a, b, c, d, 0, 0)
       .translate(origin[0], origin[1])
   }
 
@@ -284,6 +297,20 @@ export function interpolateTransform (from, to) {
       interpolated.params[key] = (1 - t) * fromParams[key] + t * toParams[key]
     })
     return interpolated
+  }
+}
+
+export function interpolateTransform2 (from, to) {
+  const fromDecomposed = from.decompose()
+  const toDecomposed = to.Decompose()
+  if (toDecomposed.rotate - fromDecomposed.rotate > 180) fromDecomposed.rotate += 360
+  else if (toDecomposed.rotate - fromDecomposed.rotate < -180) fromDecomposed.rotate -= 360
+  return t => {
+    const interpolatedDecomposed = {}
+    Object.keys(toDecomposed).forEach(key => {
+      interpolatedDecomposed[key] = (1 - t) * fromDecomposed[key] + t * toDecomposed[key]
+    })
+    return TransformHelper.recompose(interpolatedDecomposed)
   }
 }
 
