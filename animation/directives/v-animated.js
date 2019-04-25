@@ -12,7 +12,7 @@ export default {
     delete vars.order
     Object.keys(vars).forEach(prop => {
       addProperty(target, vars, prop)
-      el.setAttribute(prop, target[prop])
+      if (prop[0] !== '_') el.setAttribute(prop, target[prop])
     })
 
     el.classList.add('vg-animated')
@@ -27,7 +27,7 @@ export default {
       Object.keys(vars).forEach(prop => {
         if (typeof vars[prop] === 'function' || !(prop in target)) {
           addProperty(target, vars, prop)
-          el.setAttribute(prop, target[prop])
+          if (prop[0] !== '_') el.setAttribute(prop, target[prop])
         }
       })
 
@@ -55,7 +55,7 @@ export default {
         },
         onUpdate () {
           animating.forEach(prop => {
-            el.setAttribute(prop, target[prop])
+            if (prop[0] !== '_') el.setAttribute(prop, target[prop])
           })
         }
       })

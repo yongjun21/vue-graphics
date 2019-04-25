@@ -8,10 +8,11 @@ const IDENTITY = {
 }
 
 export default class TransformHelper {
-  constructor () {
+  constructor (transform) {
     this.params = Object.assign({}, IDENTITY)
     this.apply = this.apply.bind(this)
     this.unapply = this.unapply.bind(this)
+    if (typeof transform === 'string') this.parse(transform)
   }
 
   applyOrigin (fn, x0, y0) {
@@ -42,8 +43,7 @@ export default class TransformHelper {
   scale (sx, sy = [0, 0], origin = [0, 0]) {
     if (sx == null) return this
     if (typeof sy !== 'number') {
-      origin = sy
-      sy = sx
+      [sy, origin] = [sx, sy]
     }
     this.scaleX(sx, origin[0])
     this.scaleY(sy, origin[1])
@@ -118,8 +118,11 @@ export default class TransformHelper {
     }, origin[0], origin[1])
   }
 
-  rotate (A, origin = [0, 0]) {
+  rotate (A, x0 = 0, y0 = 0) {
     if (A == null) return this
+    if (Array.isArray(x0)) {
+      [x0, y0] = x0 // allows origin to be passed in in the form of an array
+    }
     const rad = A * Math.PI / 180
     const sinA = Math.sin(rad)
     const cosA = Math.cos(rad)
@@ -131,7 +134,7 @@ export default class TransformHelper {
       this.params.d = sinA * c + cosA * d
       this.params.e = cosA * e - sinA * f
       this.params.f = sinA * e + cosA * f
-    }, origin[0], origin[1])
+    }, x0, y0)
   }
 
   skewX (A, x0 = 0) {
@@ -164,6 +167,23 @@ export default class TransformHelper {
     this.params.d = B * c + D * d
     this.params.e = A * e + C * f + E
     this.params.f = B * e + D * f + F
+    return this
+  }
+
+  parse (str) {
+    if (!str) return this
+    const transformations = []
+    const pattern = /(translate|scale|rotate|skewX|skewY|matrix)\(([\s\S]+?)\)/g
+    let match
+    while ((match = pattern.exec(str)) != null) {
+      transformations.push({
+        type: match[1],
+        params: match[2].split(/[\s,]+/).map(Number)
+      })
+    }
+    transformations.reverse().forEach(f => {
+      this[f.type].apply(this, f.params)
+    })
     return this
   }
 
@@ -252,6 +272,18 @@ export default class TransformHelper {
   toString (dp = 5) {
     const {a, b, c, d, e, f} = this.params
     return `matrix(${[a, b, c, d, e, f].map(round(5)).join(' ')})`
+  }
+}
+
+export function interpolateTransform (from, to) {
+  const fromParams = Object.assign(from.params)
+  const toParams = Object.assign(to.params)
+  return t => {
+    const interpolated = new TransformHelper()
+    Object.keys(toParams).forEach(key => {
+      interpolated.params[key] = (1 - t) * fromParams[key] + t * toParams[key]
+    })
+    return interpolated
   }
 }
 

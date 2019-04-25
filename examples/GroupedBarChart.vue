@@ -30,14 +30,33 @@
 import GroupedBarPlot from '../components/GroupedBarPlot.vue'
 import XGridlines from '../components/XGridlines.js'
 import XAxis from '../components/XAxis.vue'
-import AnimatedTransform from '../animation/directives/v-animated-transform.js'
+import AnimatedTransform from '../animation/directives/v-animated-transform-2.js'
+import {makeAnimated} from '../animation'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
 import {DomainHelper, IntervalHelper, TransformHelper} from '../helpers'
 import {scaleBand, scaleLinear} from 'd3-scale'
 
+function interpolateScale (from, to) {
+  const fromRange = from.range()
+  const toRange = to.range()
+  return t => {
+    const iRange = toRange.map((v, i) => (1 - t) * fromRange[i] + t * v)
+    return to.copy().range(iRange)
+  }
+}
+
+const animatedScaleProps = [
+  {name: 'xScale', interpolate: interpolateScale},
+  {name: 'yScale', interpolate: interpolateScale}
+]
+
 export default {
   name: 'GroupedBarChart',
-  components: {GroupedBarPlot, XGridlines, XAxis},
+  components: {
+    GroupedBarPlot,
+    XGridlines: makeAnimated(XGridlines, animatedScaleProps),
+    XAxis: makeAnimated(XAxis, animatedScaleProps)
+  },
   directives: {AnimatedTransform},
   mixins: [dataViewMixin, userSpaceMixin],
   inheritAttrs: false,

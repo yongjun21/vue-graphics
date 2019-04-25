@@ -3,16 +3,18 @@
 import {SvgWithPadding} from '../hocs'
 
 import BarChart from '../examples/BarChart.vue'
-import StackedBarChart from '../examples/GroupedBarChart.vue'
+import StackedBarChart from '../examples/StackedBarChart.vue'
+import GroupedBarChart from '../examples/GroupedBarChart.vue'
 import ChordDiagram from '../examples/ChordDiagram.vue'
 import WaterfallChart from '../examples/WaterfallChart.vue'
 
 // TouchEmulator()
 
-testBarChart()
+// testBarChart()
 // testWaterfallChart()
 // testChordDiagram()
 // testStackedBar()
+testGroupedBar()
 
 function testBarChart () {
   window.vm = createVM(BarChart, {
@@ -86,6 +88,29 @@ function testStackedBar () {
         c: 'category',
         horizontal: true,
         padding: 0.5
+      })
+    })
+}
+
+function testGroupedBar () {
+  window.fetch('https://k57kq477w1.execute-api.ap-southeast-1.amazonaws.com/development?school=AI TONG SCHOOL&phase=2B&runs=0')
+    .then(res => res.json())
+    .then(json => {
+      const data = json.historical
+      const tallData = []
+      data.forEach(row => {
+        tallData.push({year: row.year, category: 'filled', count: row['filled']})
+        tallData.push({year: row.year, category: 'vacancy', count: row['vacancies']})
+        tallData.push({year: row.year, category: 'remaining', count: row['places'] - row['filled'] - row['vacancies']})
+      })
+      window.vm = createVM(GroupedBarChart, {
+        data: tallData,
+        x: 'year',
+        y: 'count',
+        g: 'category',
+        c: 'category',
+        horizontal: true,
+        padding: 0.4
       })
     })
 }

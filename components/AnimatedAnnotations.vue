@@ -3,7 +3,7 @@
     <animated-text-label v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-annotation"
       :class="d.class"
-      :name="_uid"
+      :animation-group="_uid"
       v-bind="getTextGeom(d, i)">
       <animated-number
         :name="_uid"
