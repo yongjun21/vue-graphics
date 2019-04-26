@@ -8,11 +8,10 @@ const IDENTITY = {
 }
 
 export default class TransformHelper {
-  constructor (transform) {
+  constructor () {
     this.params = Object.assign({}, IDENTITY)
     this.apply = this.apply.bind(this)
     this.unapply = this.unapply.bind(this)
-    if (typeof transform === 'string') this.parse(transform)
   }
 
   applyOrigin (fn, x0, y0) {
@@ -170,23 +169,6 @@ export default class TransformHelper {
     return this
   }
 
-  parse (str) {
-    if (!str) return this
-    const transformations = []
-    const pattern = /(translate|scale|rotate|skewX|skewY|matrix)\(([\s\S]+?)\)/g
-    let match
-    while ((match = pattern.exec(str)) != null) {
-      transformations.push({
-        type: match[1],
-        params: match[2].split(/[\s,]+/).map(Number)
-      })
-    }
-    transformations.reverse().forEach(f => {
-      this[f.type].apply(this, f.params)
-    })
-    return this
-  }
-
   clone () {
     const t = new TransformHelper()
     Object.assign(t.params, this.params)
@@ -205,18 +187,22 @@ export default class TransformHelper {
     return t.matrix(a, b, c, d, e, f)
   }
 
+  textCorrection (origin = [0, 0]) {
+    const {a, b, c, d} = this.inverseParams
+    return new TransformHelper()
+      .translate(-origin[0], -origin[1])
+      .matrix(a, b, c, d, 0, 0)
+      .translate(origin[0], origin[1])
+  }
+
   decompose () {
     const {a, b, c, d, e, f} = this.params
     const scaleX = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
-    const skewX = (a * c + b * d) / scaleX
-    const scaleY = (a * d - b * c) / scaleX
-    const rotate = Math.atan2(b, a) * 180 / Math.PI
-
     return {
       scaleX,
-      skewX,
-      scaleY,
-      rotate,
+      skewX: (a * c + b * d) / scaleX,
+      scaleY: (a * d - b * c) / scaleX,
+      rotate: Math.atan2(b, a) * 180 / Math.PI,
       translateX: e,
       translateY: f
     }
@@ -230,12 +216,22 @@ export default class TransformHelper {
       .translate(translateX, translateY)
   }
 
-  textCorrection (origin = [0, 0]) {
-    const {a, b, c, d} = this.inverseParams
-    return new TransformHelper()
-      .translate(-origin[0], -origin[1])
-      .matrix(a, b, c, d, 0, 0)
-      .translate(origin[0], origin[1])
+  static parse (str) {
+    const parsed = new TransformHelper()
+    if (!str) return parsed
+    const transformations = []
+    const pattern = /(translate|scale|rotate|skewX|skewY|matrix)\(([\s\S]+?)\)/g
+    let match
+    while ((match = pattern.exec(str)) != null) {
+      transformations.push({
+        type: match[1],
+        params: match[2].split(/[\s,]+/).map(Number)
+      })
+    }
+    transformations.reverse().forEach(f => {
+      parsed[f.type].apply(parsed, f.params)
+    })
+    return parsed
   }
 
   get inverseParams () {
@@ -301,16 +297,17 @@ export function interpolateTransform (from, to) {
 }
 
 export function interpolateTransform2 (from, to) {
-  const fromDecomposed = from.decompose()
-  const toDecomposed = to.Decompose()
-  if (toDecomposed.rotate - fromDecomposed.rotate > 180) fromDecomposed.rotate += 360
-  else if (toDecomposed.rotate - fromDecomposed.rotate < -180) fromDecomposed.rotate -= 360
+  const fromParams = from.decompose()
+  const toParams = to.Decompose()
+  // rotate using shortest path
+  if (toParams.rotate - fromParams.rotate > 180) fromParams.rotate += 360
+  else if (toParams.rotate - fromParams.rotate < -180) fromParams.rotate -= 360
   return t => {
-    const interpolatedDecomposed = {}
-    Object.keys(toDecomposed).forEach(key => {
-      interpolatedDecomposed[key] = (1 - t) * fromDecomposed[key] + t * toDecomposed[key]
+    const interpolatedParams = {}
+    Object.keys(toParams).forEach(key => {
+      interpolatedParams[key] = (1 - t) * fromParams[key] + t * toParams[key]
     })
-    return TransformHelper.recompose(interpolatedDecomposed)
+    return TransformHelper.recompose(interpolatedParams)
   }
 }
 
