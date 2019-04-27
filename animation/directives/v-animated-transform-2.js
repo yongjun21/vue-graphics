@@ -1,15 +1,15 @@
 import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
 import {_ANIMATE_} from '../shared'
-import {TransformHelper} from '../../helpers'
+import TransformHelper, {interpolateTransform2} from '../../helpers/Transform'
 
 export default {
   bind (el, binding) {
     el.classList.add('vg-animated')
-    const target = binding.value instanceof TransformHelper
-                 ? binding.value.decompose()
-                 : binding.value.transform.decompose()
-    el.setAttribute('transform', TransformHelper.recompose(target))
+    let transform = binding.value instanceof TransformHelper
+                  ? binding.value
+                  : binding.value.transform
+    el.setAttribute('transform', transform)
 
     el[_ANIMATE_] = function (options) {
       options = options instanceof TransformHelper
@@ -17,15 +17,19 @@ export default {
               : options
       options.duration = options.duration || 0.66667
       if (typeof options.duration === 'function') {
-        options.duration = options.duration(options.transform, TransformHelper.recompose(target))
+        options.duration = options.duration(options.transform, transform)
       }
-      const vars = Object.assign({
+      const target = {t: 0}
+      const interpolator = interpolateTransform2(transform, options.transform)
+      const vars = {
+        t: 1,
         onStart: () => el.classList.add('vg-animating'),
         onComplete: () => el.classList.remove('vg-animating'),
-        onUpdate: () => el.setAttribute('transform', TransformHelper.recompose(target))
-      }, options.transform.decompose())
-      if (vars.rotate - target.rotate > 180) target.rotate += 360
-      else if (vars.rotate - target.rotate < -180) target.rotate -= 360
+        onUpdate: () => {
+          transform = interpolator(target.t)
+          el.setAttribute('transform', transform)
+        }
+      }
       TweenLite.to(target, options.duration, vars)
     }
   },

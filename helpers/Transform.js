@@ -7,6 +7,8 @@ const IDENTITY = {
   f: 0
 }
 
+const epsilon = 0.00001
+
 export default class TransformHelper {
   constructor () {
     this.params = Object.assign({}, IDENTITY)
@@ -196,16 +198,30 @@ export default class TransformHelper {
   }
 
   decompose () {
-    const {a, b, c, d, e, f} = this.params
-    const scaleX = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
-    return {
-      scaleX,
-      skewX: (a * c + b * d) / scaleX,
-      scaleY: (a * d - b * c) / scaleX,
-      rotate: Math.atan2(b, a) * 180 / Math.PI,
-      translateX: e,
-      translateY: f
+    const {a, b, c, d, e: translateX, f: translateY} = this.params
+    let scaleX, skewX, scaleY, rotate
+    if (a === 0 && b === 0 && c === 0 && d === 0) {
+      scaleX = skewX = scaleY = rotate = 0
+    } else if (c === 0 && d === 0) {
+      rotate = Math.atan2(b, a) * 180 / Math.PI
+      scaleX = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
+      skewX = scaleY = 0
+    } else if (a === 0 && b === 0) {
+      rotate = -Math.atan2(c, d) * 180 / Math.PI
+      scaleY = Math.sqrt(Math.pow(c, 2) + Math.pow(d, 2))
+      scaleX = skewX = 0
+    } else {
+      scaleX = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
+      rotate = Math.atan2(b, a) * 180 / Math.PI
+      if (a < 0 && (a * d - b * c) < 0) {
+        scaleX = -scaleX
+        rotate = rotate >= 0 ? rotate - 180 : rotate + 180
+      }
+      skewX = a * c + b * d / scaleX
+      scaleY = a * d - b * c / scaleX
     }
+    if (rotate < -180 + epsilon) rotate = -rotate
+    return {scaleX, skewX, scaleY, rotate, translateX, translateY}
   }
 
   static recompose (decomposed) {
@@ -214,6 +230,10 @@ export default class TransformHelper {
       .matrix(scaleX, 0, skewX, scaleY, 0, 0)
       .rotate(rotate)
       .translate(translateX, translateY)
+  }
+
+  static solve (from, to) {
+    return from.inverse().chain(to)
   }
 
   static parse (str) {
@@ -297,17 +317,24 @@ export function interpolateTransform (from, to) {
 }
 
 export function interpolateTransform2 (from, to) {
-  const fromParams = from.decompose()
-  const toParams = to.Decompose()
-  // rotate using shortest path
-  if (toParams.rotate - fromParams.rotate > 180) fromParams.rotate += 360
-  else if (toParams.rotate - fromParams.rotate < -180) fromParams.rotate -= 360
+  const {e, f} = from.params
+  from = from.clone().translate(-e, -f)
+  to = to.clone().translate(-e, -f)
+  const fromParams = {
+    scaleX: 1,
+    skewX: 0,
+    scaleY: 1,
+    rotate: 0,
+    translateX: 0,
+    translateY: 0
+  }
+  const toParams = TransformHelper.solve(from, to).decompose()
   return t => {
     const interpolatedParams = {}
     Object.keys(toParams).forEach(key => {
       interpolatedParams[key] = (1 - t) * fromParams[key] + t * toParams[key]
     })
-    return TransformHelper.recompose(interpolatedParams)
+    return from.chain(TransformHelper.recompose(interpolatedParams)).translate(e, f)
   }
 }
 

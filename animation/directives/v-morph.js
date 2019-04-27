@@ -7,7 +7,7 @@ export default {
   bind (el, binding) {
     const name = binding.arg || 'default'
 
-    const target = {d: el.getAttribute('d')}
+    let d = el.getAttribute('d')
 
     el.classList.add('vg-animated')
 
@@ -18,22 +18,23 @@ export default {
       }, options)
 
       const updated = el.getAttribute('d')
-      const interpolator = interpolatePath(target.d, updated)
-      el.setAttribute('d', target.d)
+      el.setAttribute('d', d)
 
       if (typeof options.duration === 'function') {
-        options.duration = options.duration(updated, target.d)
+        options.duration = options.duration(updated, d)
       }
+      const target = {t: 0}
+      const interpolator = interpolatePath(d, updated)
       const vars = {
         t: 1,
         onStart: () => el.classList.add('vg-animating'),
         onComplete: () => el.classList.remove('vg-animating'),
         onUpdate: () => {
-          target.d = interpolator(target.t)
+          d = interpolator(target.t)
           el.setAttribute('d', target.d)
         }
       }
-      const tween = TweenLite.fromTo(target, options.duration, {t: 0}, vars)
+      const tween = TweenLite.to(target, options.duration, vars)
       if (name in currentAnimations) currentAnimations[name].push([options.order, tween])
     }
   },

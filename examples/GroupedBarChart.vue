@@ -102,6 +102,9 @@ export default {
       const t = new TransformHelper()
       return this.horizontal ? t.invert() : t.flipY()
     },
+    originAt () {
+      return 'xMidYMid'
+    },
     xScale () {
       return scaleBand()
         .domain(this.domain.x)
