@@ -66,7 +66,7 @@ export default function (Target, animatedProps = []) {
           if (!(prop in target)) delete vars[prop]
         })
 
-        target._t = 0
+        TweenLite.to(target, 0, {_t: 0}) // force reset t
         Object.assign(vars, {
           _t: 1,
           onStart: () => {

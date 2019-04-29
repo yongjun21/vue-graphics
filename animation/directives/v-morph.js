@@ -31,7 +31,7 @@ export default {
         onComplete: () => el.classList.remove('vg-animating'),
         onUpdate: () => {
           d = interpolator(target.t)
-          el.setAttribute('d', target.d)
+          el.setAttribute('d', d)
         }
       }
       const tween = TweenLite.to(target, options.duration, vars)
