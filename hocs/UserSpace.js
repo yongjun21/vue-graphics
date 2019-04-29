@@ -25,6 +25,6 @@ export default {
     const slots = this.$scopedSlots.default
     return h('g', {
       attrs: {transform: transform.isIdentity() ? null : transform}
-    }, slots && slots({xRange, yRange}))
+    }, slots && slots({xRange, yRange, transform}))
   }
 }

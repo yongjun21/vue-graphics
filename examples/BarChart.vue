@@ -2,7 +2,6 @@
   <g class="vg-chart vg-bar-chart" :transform="transform">
     <bar-plot
       :data-view="dataView"
-      :domain="domain"
       :x-scale="xScale"
       :y-scale="yScale"
       v-bind="$attrs"
