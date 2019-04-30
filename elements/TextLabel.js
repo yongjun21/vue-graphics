@@ -31,10 +31,11 @@ export default {
     postTransform: TransformHelper
   },
   render (h, {props, data, scopedSlots}) {
-    const $children = scopedSlots.default && scopedSlots.default()
+    const attrs = getTextAttrs(props)
+    const $children = scopedSlots.default && scopedSlots.default(attrs)
     return h('text', mergeData(data, {
       class: 'vg-text-label',
-      attrs: getTextAttrs(props)
+      attrs
     }), $children)
   }
 }

@@ -31,12 +31,14 @@ export default {
       default: -90
     }
   },
-  render (h, {props, data, children}) {
+  render (h, {props, data, scopedSlots}) {
     const origin = polar2xy([props.a, props.r])
+    const attrs = getTextAttrs(props, origin)
+    const $children = scopedSlots.default && scopedSlots.default(attrs)
     return h('text', mergeData(data, {
       class: 'vg-text-label',
-      attrs: getTextAttrs(props, origin)
-    }), children)
+      attrs
+    }), $children)
   }
 }
 

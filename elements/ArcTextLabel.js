@@ -32,7 +32,7 @@ export default {
       default: -90
     }
   },
-  render (h, {props, data, children}) {
+  render (h, {props, data, scopedSlots}) {
     const guideId = getUid('guide-')
 
     const $guide = h('defs', [
@@ -45,6 +45,8 @@ export default {
         }
       })
     ])
+
+    const $children = scopedSlots.default && scopedSlots.default()
 
     const $label = h('text', mergeData(data, {
       class: 'vg-text-label',
@@ -60,7 +62,7 @@ export default {
           href: '#' + guideId,
           startOffset: '50%'
         }
-      }, children)
+      }, $children)
     ])
 
     return h('g', [
