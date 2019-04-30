@@ -1,6 +1,6 @@
 <template>
   <g class="vg-plot vg-scatter-plot" v-on="wrappedListeners">
-    <animated-group :enter="{r: 0}" :exit="{r: 0}">
+    <animated-group :enter="{r: 0}" :exit="{r: 0}" :duration="animationDuration">
       <circle v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
         class="vg-dot"
         :class="d.class"
@@ -45,7 +45,7 @@ export default {
         cy: -rScale(d.r),
         transform: `rotate(${aScale(d.a)})`,
         r: d.s || dotSize,
-        duration: 0.66667,
+        duration: this.animationDuration,
         order: i
       }
     },

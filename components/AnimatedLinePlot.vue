@@ -3,8 +3,8 @@
     <path v-for="(value, label) in grouped" :key="label" v-if="value.length > 0"
       class="vg-line"
       :class="classed && classed(label)"
-      :d="getGeom(value)"
-      v-draw:[_uid]="{duration: 0.66667}">
+      v-bind="getGeom(value)"
+      v-draw:[_uid]="{duration: animationDuration}">
     </path>
   </g>
 </template>
@@ -57,7 +57,7 @@ export default {
         .x(d => xScale(d.x))
         .y(d => yScale(d.y))
         .curve(curve)
-      return lineGenerator(data)
+      return {d: lineGenerator(data)}
     },
     hasGeom (d) {
       return this.xScale(d.x) != null && this.yScale(d.x) != null

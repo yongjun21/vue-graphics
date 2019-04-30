@@ -10,6 +10,10 @@ export default {
   components: {AnimatedGroup},
   directives: {Animated, Draw, Morph},
   props: {
+    animationDuration: {
+      type: [Number, Function],
+      default: 0.66667
+    },
     animationStagger: {
       type: Number,
       default: 0

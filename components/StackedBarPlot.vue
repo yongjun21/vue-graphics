@@ -1,6 +1,6 @@
 <template>
   <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
-    <animated-group :enter="{y: yScale(0), height: 0}" :exit="{y: yScale(0), height: 0}">
+    <animated-group :enter="{y: yScale(0), height: 0}" :exit="{y: yScale(0), height: 0}" :duration="animationDuration">
       <rect v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
         class="vg-bar"
         :class="d.class"
@@ -73,7 +73,7 @@ export default {
         y: yScale(y0),
         width: xScale.bandwidth(),
         height: yScale(y0 + d.y) - yScale(y0),
-        duration: 0.66667,
+        duration: this.animationDuration,
         order: i
       }
     },
