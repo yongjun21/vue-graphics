@@ -13,33 +13,20 @@ export default {
       type: Number,
       required: true
     },
-    anchor: {
-      validator: prop => [
-        'top',
-        'right',
-        'bottom',
-        'left'
-      ].includes(prop),
-      default: 'left'
-    },
-    rotate: {
-      validator: prop => [
-        -90,
-        0,
-        90,
-        180
-      ].includes(prop),
-      default: -90
+    concave: {
+      validator: prop => [true, false, null].includes(prop),
+      default: null
     }
   },
   render (h, {props, data, scopedSlots}) {
+    const concave = props.concave == null ? isConcave(props) : props.concave
     const guideId = getUid('guide-')
 
     const $guide = h('defs', [
       h(Arc, {
         attrs: {id: guideId},
         props: {
-          a1: -90,
+          a1: concave ? 270 : -90,
           a2: 90,
           r: props.r
         }
@@ -53,7 +40,7 @@ export default {
       attrs: {
         'dy': '0.35em',
         'text-anchor': 'middle',
-        transform: `rotate(${props.a})`
+        transform: `rotate(${concave ? props.a + 180 : props.a})`
       }
     }), [
       h('textPath', {
@@ -70,4 +57,12 @@ export default {
       $label
     ])
   }
+}
+
+function isConcave (props) {
+  let a = props.a
+  if (props.r < 0) a += 180
+  a = a % 360
+  if (a < 0) a += 360
+  return a > 90 && a < 270
 }

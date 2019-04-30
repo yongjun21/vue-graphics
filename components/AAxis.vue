@@ -28,7 +28,6 @@ export default {
   name: 'AAxis',
   components: {Arc, RadialTextLabel},
   mixins: [associateDataMixin],
-  inheritAttrs: false,
   props: {
     interval: {
       type: Function,

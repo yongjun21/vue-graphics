@@ -8,7 +8,7 @@
           :class="classed && classed(r.label)"
           :x="tickSize + tickPadding"
           :y="-r.value"
-          :anchor="tickSize < 0 ? 'right' : 'left'"
+          :anchor="anchor"
           v-associate="r.label">
           {{formatted(r.label, i)}}
         </text-label>
@@ -26,7 +26,6 @@ export default {
   name: 'RAxis',
   components: {TextLabel},
   mixins: [associateDataMixin],
-  inheritAttrs: false,
   props: {
     interval: {
       type: Function,
@@ -43,6 +42,10 @@ export default {
     rScale: {
       type: Function,
       required: true
+    },
+    anchor: {
+      validator: prop => ['left', 'right'].includes(prop),
+      default: 'left'
     },
     tickSize: {
       type: Number,

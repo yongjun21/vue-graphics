@@ -20,7 +20,7 @@
       :y-scale="yScale"
       :post-transform="transform"
       :tick-size="0"
-      :tick-padding="-3"
+      :tick-padding="3"
       anchor="top">
     </y-axis>
     <stacked-bar-plot

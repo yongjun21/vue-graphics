@@ -9,7 +9,7 @@ export default {
   },
   computed: {
     dataView () {
-      const keys = ['x', 'y', 'y1', 'y2', 'g', 'a', 'r', 's']
+      const keys = ['x', 'x1', 'x2', 'y', 'y1', 'y2', 'a', 'a1', 'a2', 'r', 'r1', 'r2', 'g', 's']
       const toApply = []
       if (this.k) toApply.push(['key', get(this.k)])
       if (this.c) toApply.push(['class', get(this.c)])
