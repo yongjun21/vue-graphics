@@ -2,7 +2,7 @@
   <g class="vg-axis vg-r-axis" :transform="`rotate(${a})`">
     <line class="vg-baseline" :y1="-rRange[0]" :y2="-rRange[rRange.length - 1]"></line>
     <g class="vg-ticks" v-on="wrappedListeners">
-      <g v-for="(r, i) in rInterval" :key="r.label" class="vg-tick">
+      <g v-for="(r, i) in rInterval" :key="getKey(r.label, i)" class="vg-tick">
         <line :x2="tickSize" :y1="-r.value" :y2="-r.value"></line>
         <text-label
           :class="classed && classed(r.label)"

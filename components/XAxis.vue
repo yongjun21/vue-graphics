@@ -2,7 +2,7 @@
   <g class="vg-axis vg-x-axis">
     <line class="vg-baseline" :x1="xRange[0]" :x2="xRange[xRange.length - 1]" :y1="y" :y2="y"></line>
     <g class="vg-ticks" v-on="wrappedListeners">
-      <g v-for="(x, i) in xInterval" :key="x.label" class="vg-tick">
+      <g v-for="(x, i) in xInterval" :key="getKey(x.label, i)" class="vg-tick">
         <line :x1="x.value" :x2="x.value" :y1="y" :y2="y - tickSize"></line>
         <text-label
           :class="classed && classed(x.label)"
@@ -67,6 +67,11 @@ export default {
     },
     y () {
       return this.yScale(this.yTranslate)
+    }
+  },
+  methods: {
+    getKey (v, i) {
+      return (typeof v === 'string' || typeof v === 'number') ? v : i
     }
   }
 }

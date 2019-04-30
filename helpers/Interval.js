@@ -22,15 +22,26 @@ export function MIDDLE () {
   }
 }
 
-export function DIVIDER () {
+export function BETWEEN (includeStart = false, includeEnd = includeStart) {
   return scale => {
     const domain = scale.domain()
     const range = scale.range()
-    const step = scale.step()
-    return domain.map((v, i) => {
-      const label = i === 0 ? [null, v] : [domain[i - 1], v]
-      const value = range[0] + i * step
-      return {label, value}
-    }).concat({label: [domain[domain.length - 1], null], value: range[range.length - 1]})
+    const interval = []
+    if (includeStart) interval.push({label: [null, domain[0]], value: range[0]})
+    MIDDLE()(scale).forEach((v, i, arr) => {
+      if (i === domain.length - 1) return
+      const [t1, t2] = [v, arr[i + 1]]
+      interval.push({
+        label: [t1.label, t2.label],
+        value: 0.5 * t1.value + 0.5 * t2.value
+      })
+    })
+    if (includeEnd) {
+      interval.push({
+        label: [domain[domain.length - 1], null],
+        value: range[range.length - 1]
+      })
+    }
+    return interval
   }
 }

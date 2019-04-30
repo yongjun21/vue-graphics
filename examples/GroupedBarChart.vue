@@ -126,8 +126,8 @@ export default {
     }
   },
   methods: {
-    xDivider: IntervalHelper.DIVIDER('x'),
-    xLabel: IntervalHelper.MIDDLE('x')
+    xDivider: IntervalHelper.BETWEEN(true),
+    xLabel: IntervalHelper.MIDDLE()
   }
 }
 </script>

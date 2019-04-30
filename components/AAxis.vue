@@ -2,7 +2,7 @@
   <g class="vg-axis vg-a-axis">
     <arc class="vg-baseline" :a1="aRange[0]" :a2="aRange[aRange.length - 1]" :r="r"></arc>
     <g class="vg-ticks" v-on="wrappedListeners">
-      <g v-for="(a, i) in aInterval" :key="a.label" class="vg-tick">
+      <g v-for="(a, i) in aInterval" :key="getKey(a.label, i)" class="vg-tick">
         <line :y1="-r" :y2="-(r + tickSize)" :transform="`rotate(${a.value})`"></line>
         <radial-text-label
           :class="classed && classed(a.label)"
@@ -72,6 +72,11 @@ export default {
     },
     ccw () {
       return this.aRange[0] > this.aRange[1]
+    }
+  },
+  methods: {
+    getKey (v, i) {
+      return (typeof v === 'string' || typeof v === 'number') ? v : i
     }
   }
 }
