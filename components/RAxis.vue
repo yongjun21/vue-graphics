@@ -44,7 +44,12 @@ export default {
       required: true
     },
     anchor: {
-      validator: prop => ['left', 'right'].includes(prop),
+      validator: prop => [
+        'left',
+        'top',
+        'right',
+        'bottom'
+      ].includes(prop),
       default: 'left'
     },
     tickSize: {

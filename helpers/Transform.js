@@ -120,7 +120,7 @@ export default class TransformHelper {
   }
 
   rotate (A, x0 = 0, y0 = 0) {
-    if (A == null) return this
+    if (!A) return this
     if (Array.isArray(x0)) {
       [x0, y0] = x0 // allows origin to be passed in in the form of an array
     }
@@ -139,7 +139,7 @@ export default class TransformHelper {
   }
 
   skewX (A, x0 = 0) {
-    if (A == null) return this
+    if (!A) return this
     const tanA = Math.tan(A * Math.PI / 180)
     return this.applyOrigin(function () {
       const {a, b, c, d, e, f} = this.params
@@ -150,7 +150,7 @@ export default class TransformHelper {
   }
 
   skewY (A, y0 = 0) {
-    if (A == null) return this
+    if (!A) return this
     const tanA = Math.tan(A * Math.PI / 180)
     return this.applyOrigin(function () {
       const {a, b, c, d, e, f} = this.params
@@ -199,35 +199,37 @@ export default class TransformHelper {
 
   decompose () {
     const {a, b, c, d, e: translateX, f: translateY} = this.params
-    let scaleX, skewX, scaleY, rotate
+    let scaleX, scaleY, skewX, rotate
     if (a === 0 && b === 0 && c === 0 && d === 0) {
-      scaleX = skewX = scaleY = rotate = 0
+      scaleX = scaleY = skewX = rotate = 0
     } else if (c === 0 && d === 0) {
       rotate = Math.atan2(b, a) * 180 / Math.PI
       scaleX = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
-      skewX = scaleY = 0
+      scaleY = skewX = 0
     } else if (a === 0 && b === 0) {
       rotate = -Math.atan2(c, d) * 180 / Math.PI
       scaleY = Math.sqrt(Math.pow(c, 2) + Math.pow(d, 2))
       scaleX = skewX = 0
     } else {
+      const det = a * d - b * c
       scaleX = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2))
       rotate = Math.atan2(b, a) * 180 / Math.PI
-      if (a < 0 && (a * d - b * c) < 0) {
+      if (a < 0 && det < 0) {
         scaleX = -scaleX
         rotate = rotate >= 0 ? rotate - 180 : rotate + 180
       }
-      skewX = a * c + b * d / scaleX
-      scaleY = a * d - b * c / scaleX
+      scaleY = det / scaleX
+      skewX = Math.atan2(a * c + b * d, det) * 180 / Math.PI
     }
     if (rotate < -180 + epsilon) rotate = -rotate
-    return {scaleX, skewX, scaleY, rotate, translateX, translateY}
+    return {scaleX, scaleY, skewX, rotate, translateX, translateY, toString: decomposedToString}
   }
 
   static recompose (decomposed) {
-    const {scaleX, skewX, scaleY, rotate, translateX, translateY} = decomposed
+    const {scaleX, scaleY, skewX, rotate, translateX, translateY} = decomposed
     return new TransformHelper()
-      .matrix(scaleX, 0, skewX, scaleY, 0, 0)
+      .scale(scaleX, scaleY)
+      .skewX(skewX)
       .rotate(rotate)
       .translate(translateX, translateY)
   }
@@ -322,8 +324,8 @@ export function interpolateTransform2 (from, to) {
   to = to.clone().translate(-e, -f)
   const fromParams = {
     scaleX: 1,
-    skewX: 0,
     scaleY: 1,
+    skewX: 0,
     rotate: 0,
     translateX: 0,
     translateY: 0
@@ -349,4 +351,22 @@ function round (dp) {
     if (n === dp) rounded.pop()
     return rounded.join('')
   }
+}
+
+function decomposedToString () {
+  const {scaleX, scaleY, skewX, rotate, translateX, translateY} = this
+  const transformations = []
+  if (translateX !== 0 || translateY !== 0) {
+    transformations.push(`translate(${translateX} ${translateY})`)
+  }
+  if (rotate !== 0) {
+    transformations.push(`rotate${rotate}`)
+  }
+  if (skewX !== 0) {
+    transformations.push(`skewX(${skewX})`)
+  }
+  if (scaleX !== 0 || scaleY !== 0) {
+    transformations.push(`scale(${scaleX} ${scaleY})`)
+  }
+  return transformations.join(' ')
 }
