@@ -4,12 +4,8 @@
       class="vg-annotation"
       :class="d.class"
       :animation-group="_uid"
-      v-bind="getTextGeom(d, i)">
-      <animated-number
-        :animation-group="_uid"
-        v-bind="getNumberGeom(d, i)"
-        v-associate="d">
-      </animated-number>
+      v-bind="getTextGeom(d, i)"
+      v-associate="d">
     </animated-text-label>
   </animated-group>
 </template>
@@ -22,14 +18,16 @@ import {makeAnimated} from '../animation'
 export default {
   name: 'Annotations',
   components: {
-    AnimatedTextLabel: makeAnimated(TextLabel, ['x', 'y']),
-    AnimatedNumber: makeAnimated({
+    AnimatedTextLabel: makeAnimated({
       functional: true,
       props: ['value', 'formatted'],
       render (h, {data, props}) {
-        return h('tspan', data, props.formatted(props.value))
+        return h(TextLabel, {
+          class: data.class,
+          attrs: data.attrs
+        }, props.formatted(props.value))
       }
-    }, ['value'])
+    }, ['x', 'y', 'value'])
   },
   mixins: [animationMixin, associateDataMixin],
   inheritAttrs: false,
@@ -74,18 +72,11 @@ export default {
       return Object.assign({
         x: getX(geom),
         y: getY(geom),
-        duration: geom.duration,
-        order: geom.order
-      }, this.$attrs)
-    },
-    getNumberGeom (d, i) {
-      const geom = this.getGeom(d, i)
-      return {
         value: this.v(d, i),
         formatted: this.formatted,
         duration: geom.duration,
         order: geom.order
-      }
+      }, this.$attrs)
     }
   }
 }
