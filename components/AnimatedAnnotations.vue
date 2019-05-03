@@ -1,12 +1,12 @@
 <template>
-  <animated-group class="vg-annotations" v-on="wrappedListeners" :enter="enter">
+  <animated-group class="vg-annotations" v-on="wrappedListeners" :enter="enter" :exit="exit">
     <animated-text-label v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-annotation"
       :class="d.class"
       :animation-group="_uid"
       v-bind="getTextGeom(d, i)">
       <animated-number
-        :name="_uid"
+        :animation-group="_uid"
         v-bind="getNumberGeom(d, i)"
         v-associate="d">
       </animated-number>
@@ -62,7 +62,8 @@ export default {
       type: Function,
       default: v => Math.round(v).toLocaleString()
     },
-    enter: Object
+    enter: Object,
+    exit: Object
   },
   methods: {
     getTextGeom (d, i) {

@@ -15,6 +15,7 @@
           :y="g => g.height + 10"
           :v="d => d.y"
           :enter="{y: 10}"
+          :exit="{y: 10}"
           anchor="bottom"
           :post-transform="transform"
           v-on="$listeners">

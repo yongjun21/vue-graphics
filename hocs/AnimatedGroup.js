@@ -25,7 +25,7 @@ export default {
     }
 
     if (props.exit) {
-      on.exit = function (el, done) {
+      on.leave = function (el, done) {
         if (!props.exit || !el[_ANIMATE_]) return done()
         const vars = Object.assign({
           duration: props.duration,

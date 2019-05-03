@@ -365,7 +365,7 @@ function decomposedToString () {
   if (skewX !== 0) {
     transformations.push(`skewX(${skewX})`)
   }
-  if (scaleX !== 0 || scaleY !== 0) {
+  if (scaleX !== 1 || scaleY !== 1) {
     transformations.push(`scale(${scaleX} ${scaleY})`)
   }
   return transformations.join(' ')

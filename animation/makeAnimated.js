@@ -49,6 +49,10 @@ export default function (Target, animatedProps = []) {
     },
     methods: {
       animate (vars, done, reverse) {
+        let destroyCalled = false
+        const _destroy = this.$destroy
+        this.$destroy = () => { destroyCalled = true }
+
         vars = Object.assign({}, vars)
         let duration = vars.duration
         const order = vars.order || 0
@@ -74,6 +78,8 @@ export default function (Target, animatedProps = []) {
           },
           onComplete: () => {
             this.class['vg-animating'] = false
+            if (destroyCalled) _destroy.call(this)
+            else this.$destroy = _destroy
             done && done()
           },
           onUpdate: () => {
