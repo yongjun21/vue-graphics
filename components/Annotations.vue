@@ -58,8 +58,7 @@ export default {
       return Object.assign({
         x: xValue,
         y: yValue,
-        duration: geom.duration,
-        order: geom.order
+        animation: geom.animation
       }, this.$attrs)
     }
   }

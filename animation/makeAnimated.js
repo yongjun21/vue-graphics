@@ -1,35 +1,13 @@
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATE_, currentAnimations} from './shared'
+import {_ANIMATE_, currentAnimations, defaultConfig} from './shared'
 
 export default function (Target, animatedProps = []) {
   if (animatedProps.length === 0) return Target
 
   const props = {
-    animationGroup: {
-      type: [String, Number, Symbol],
-      default: 'default'
-    },
-    duration: {
-      type: [Number, Function],
-      default: 0.66667
-    },
-    order: {
-      type: Number,
-      default: 0
-    }
+    animation: Object
   }
-  const interpolatedProps = {}
-  const watch = {}
-
-  animatedProps = animatedProps.map(prop => {
-    if (typeof prop === 'object') {
-      if (prop.interpolate) interpolatedProps[prop.name] = prop.interpolate
-      prop = prop.name
-    }
-    props[prop] = null
-    watch[prop] = 'onUpdate'
-    return prop
-  })
+  animatedProps.forEach(prop => { props[prop] = null })
 
   return {
     inheritAttrs: false,
@@ -53,24 +31,35 @@ export default function (Target, animatedProps = []) {
         const _destroy = this.$destroy
         this.$destroy = () => { destroyCalled = true }
 
-        vars = Object.assign({}, vars)
-        let duration = vars.duration
-        const order = vars.order || 0
-        delete vars.duration
-        delete vars.order
         const target = this.animating
-        if (typeof duration === 'function') duration = duration(vars, target)
+        vars = Object.assign({}, vars)
+        const options = Object.assign({}, defaultConfig, vars.animation)
+        delete vars.animation
+        if (typeof options.duration === 'function') {
+          options.duration = options.duration(vars, target)
+        }
 
+        let animating = false
         const interpolators = {}
         Object.keys(vars).forEach(prop => {
-          if (prop in interpolatedProps) {
-            interpolators[prop] = interpolatedProps[prop](target[prop], vars[prop])
+          if (vars[prop] !== target[prop]) {
+            animating = true
+            if (options.interpolate[prop]) {
+              interpolators[prop] = options.interpolate[prop](target[prop], vars[prop])
+              delete vars[prop]
+            }
+          } else {
             delete vars[prop]
           }
-          if (!(prop in target)) delete vars[prop]
         })
 
-        TweenLite.to(target, 0, {_t: 0}) // force reset t
+        if (!animating) {
+          if (destroyCalled) _destroy.call(this)
+          else this.$destroy = _destroy
+          return
+        }
+
+        if (Object.keys(interpolators).length > 0) TweenLite.to(target, 0, {_t: 0}) // force reset t
         Object.assign(vars, {
           _t: 1,
           onStart: () => {
@@ -88,29 +77,20 @@ export default function (Target, animatedProps = []) {
             })
           }
         })
-        const tween = TweenLite[reverse ? 'from' : 'to'](target, duration, vars)
-        if (this.animationGroup in currentAnimations) {
-          currentAnimations[this.animationGroup].push([order, tween])
+        const tween = TweenLite[reverse ? 'from' : 'to'](target, options.duration, vars)
+        if (options.group in currentAnimations) {
+          currentAnimations[options.group].push([options.order, tween])
         }
-      },
-      onUpdate () {
-        const vars = {
-          duration: this.duration,
-          order: this.order
-        }
-        animatedProps.forEach(prop => {
-          vars[prop] = this[prop]
-        })
-        this.animate(vars)
       }
     },
-    watch,
     mounted () {
       this.$el[_ANIMATE_] = this.animate.bind(this)
+      this.$watch(vm => animatedProps.map(prop => vm[prop]), () => this.animate(this.$props))
     },
     render (h) {
       const {animating, $attrs, $scopedSlots} = this
       const attrs = Object.assign({}, animating, $attrs)
+      delete attrs._t
       return h(Target, {class: this.class, attrs, scopedSlots: $scopedSlots})
     }
   }

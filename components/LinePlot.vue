@@ -7,7 +7,6 @@
       v-enlarge-target
       v-associate="{label, value}">
     </path>
-    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 

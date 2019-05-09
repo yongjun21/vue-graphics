@@ -1,10 +1,10 @@
 <template>
   <g class="vg-plot vg-line-plot">
-    <path v-for="(value, label) in grouped" :key="label" v-if="value.length > 0"
+    <path v-for="(value, label, i) in grouped" :key="label" v-if="value.length > 0"
       class="vg-line"
       :class="classed && classed(label)"
       v-bind="getGeom(value)"
-      v-draw:[_uid]="{duration: animationDuration}">
+      v-draw="getAnimation(i)">
     </path>
   </g>
 </template>

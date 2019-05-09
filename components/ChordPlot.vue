@@ -1,17 +1,18 @@
 <template>
   <g class="vg-plot vg-chord-plot" v-on="wrappedListeners">
-    <path v-for="d in dataView" :key="d.key" v-if="hasGeom(d)"
+    <path v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-chord"
       :class="d.class"
       v-bind="getGeom(d)"
       v-associate="d"
-      v-draw:[_uid]="{duration: 0.66667, order: d.index}">
+      v-draw="getAnimation(i)">
     </path>
   </g>
 </template>
 
 <script>
 import {animationMixin, associateDataMixin} from '../mixins'
+import {queueAnimations, flushAnimations} from '../animation'
 import {path} from 'd3-path'
 import {polar2xy} from '../util'
 
@@ -46,6 +47,14 @@ export default {
     hasGeom (d) {
       return this.aScale(d.a1) != null && this.aScale(d.a2) != null
     }
+  },
+  created () {
+    queueAnimations(this.animationGroup || this._uid)
+    this.$nextTick(function () {
+      const tweens = flushAnimations(this.animationGroup || this._uid)
+      if (tweens.length === 0) return
+      new TimelineLite({tweens, stagger: this.animationStagger}) // eslint-disable-line
+    })
   }
 }
 </script>

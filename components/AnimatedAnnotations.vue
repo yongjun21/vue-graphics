@@ -1,9 +1,8 @@
 <template>
-  <animated-group class="vg-annotations" v-on="wrappedListeners" :enter="enter" :exit="exit">
+  <animated-group class="vg-annotations" :enter="enter" :exit="exit" v-on="wrappedListeners">
     <animated-text-label v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-annotation"
       :class="d.class"
-      :animation-group="_uid"
       v-bind="getTextGeom(d, i)"
       v-associate="d">
     </animated-text-label>
@@ -74,8 +73,7 @@ export default {
         y: getY(geom),
         value: this.v(d, i),
         formatted: this.formatted,
-        duration: geom.duration,
-        order: geom.order
+        animation: geom.animation
       }, this.$attrs)
     }
   }

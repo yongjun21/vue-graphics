@@ -1,14 +1,16 @@
 <template>
-  <g class="vg-chart vg-grouped-bar-chart" v-animated-transform="transform">
+  <g class="vg-chart vg-grouped-bar-chart" v-animated:transform="transform">
     <x-gridlines
       :interval="xDivider"
       :x-scale="xScale"
-      :y-scale="yScale">
+      :y-scale="yScale"
+      :animation="scaleAnimation">
     </x-gridlines>
     <x-axis
       :interval="xLabel"
       :x-scale="xScale"
       :y-scale="yScale"
+      :animation="scaleAnimation"
       :post-transform="transform"
       :tick-size="0"
       :tick-padding="20"
@@ -30,7 +32,7 @@
 import GroupedBarPlot from '../components/GroupedBarPlot.vue'
 import XGridlines from '../components/XGridlines.js'
 import XAxis from '../components/XAxis.vue'
-import AnimatedTransform from '../animation/directives/v-animated-transform-2.js'
+import Animated from '../animation/directives/v-animated.js'
 import {makeAnimated} from '../animation'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
 import {DomainHelper, IntervalHelper, TransformHelper} from '../helpers'
@@ -45,19 +47,14 @@ function interpolateScale (from, to) {
   }
 }
 
-const animatedScaleProps = [
-  {name: 'xScale', interpolate: interpolateScale},
-  {name: 'yScale', interpolate: interpolateScale}
-]
-
 export default {
   name: 'GroupedBarChart',
   components: {
     GroupedBarPlot,
-    XGridlines: makeAnimated(XGridlines, animatedScaleProps),
-    XAxis: makeAnimated(XAxis, animatedScaleProps)
+    XGridlines: makeAnimated(XGridlines, ['xScale', 'yScale']),
+    XAxis: makeAnimated(XAxis, ['xScale', 'yScale'])
   },
-  directives: {AnimatedTransform},
+  directives: {Animated},
   mixins: [dataViewMixin, userSpaceMixin],
   inheritAttrs: false,
   props: {
@@ -123,6 +120,14 @@ export default {
         .paddingInner(this.padding)
         .paddingOuter(this.padding / 2)
         .round(true)
+    },
+    scaleAnimation () {
+      return {
+        interpolate: {
+          xScale: interpolateScale,
+          yScale: interpolateScale
+        }
+      }
     }
   },
   methods: {

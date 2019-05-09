@@ -1,14 +1,14 @@
 <template>
   <g class="vg-plot vg-bar-plot" v-on="wrappedListeners">
-    <animated-group :enter="{y: yScale(0), height: 0}" :exit="{y: yScale(0), height: 0}" :duration="animationDuration">
+    <animated-group :enter="enterGeom" :exit="exitGeom">
       <rect v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
         class="vg-bar"
         :class="d.class"
         v-associate="d"
-        v-animated:[_uid]="getGeom(d, i)">
+        v-animated="getGeom(d, i)">
       </rect>
     </animated-group>
-    <slot v-bind="{getGeom, hasGeom}"></slot>
+    <slot v-bind="{getGeom, hasGeom, getAnimation}"></slot>
   </g>
 </template>
 
@@ -62,6 +62,20 @@ export default {
         })
 
       return d => offset.get(d)
+    },
+    enterGeom () {
+      return {
+        y: this.yScale(0),
+        height: 0,
+        animation: this.getAnimation(Infinity)
+      }
+    },
+    exitGeom () {
+      return {
+        y: this.yScale(0),
+        height: 0,
+        animation: this.getAnimation(-Infinity)
+      }
     }
   },
   methods: {
@@ -73,8 +87,7 @@ export default {
         y: yScale(y0),
         width: xScale.bandwidth(),
         height: yScale(y0 + d.y) - yScale(y0),
-        duration: this.animationDuration,
-        order: i
+        animation: this.getAnimation(i)
       }
     },
     hasGeom (d) {

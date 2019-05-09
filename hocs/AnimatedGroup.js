@@ -4,34 +4,19 @@ export default {
   functional: true,
   props: {
     enter: Object,
-    exit: Object,
-    duration: {
-      type: [Number, Function],
-      default: 0.66667
-    }
+    exit: Object
   },
   render (h, {props, data, scopedSlots}) {
     const $children = scopedSlots.default && scopedSlots.default()
-    const on = {}
-    if (props.enter) {
-      on.enter = function (el, done) {
-        if (!el[_ANIMATE_]) return done()
-        const vars = Object.assign({
-          duration: props.duration,
-          order: Infinity
-        }, props.enter)
-        el[_ANIMATE_](vars, done, true)
-      }
-    }
 
-    if (props.exit) {
-      on.leave = function (el, done) {
-        if (!props.exit || !el[_ANIMATE_]) return done()
-        const vars = Object.assign({
-          duration: props.duration,
-          order: -Infinity
-        }, props.exit)
-        el[_ANIMATE_](vars, done, false)
+    const listeners = {
+      enter: props.enter && function (el, done) {
+        if (!el[_ANIMATE_]) return done()
+        el[_ANIMATE_](props.enter, done, true)
+      },
+      leave: props.exit && function (el, done) {
+        if (!el[_ANIMATE_]) return done()
+        el[_ANIMATE_](props.exit, done, false)
       }
     }
 
@@ -41,7 +26,7 @@ export default {
         tag: 'g',
         appear: true
       },
-      on: Object.assign(on, data.on)
+      on: Object.assign(listeners, data.on)
     }, $children)
   }
 }

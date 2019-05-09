@@ -307,6 +307,8 @@ export default class TransformHelper {
 }
 
 export function interpolateTransform (from, to) {
+  from = from instanceof TransformHelper ? from : TransformHelper.parse(from)
+  to = to instanceof TransformHelper ? to : TransformHelper.parse(to)
   const fromParams = Object.assign(from.params)
   const toParams = Object.assign(to.params)
   return t => {
@@ -319,6 +321,8 @@ export function interpolateTransform (from, to) {
 }
 
 export function interpolateTransform2 (from, to) {
+  from = from instanceof TransformHelper ? from : TransformHelper.parse(from)
+  to = to instanceof TransformHelper ? to : TransformHelper.parse(to)
   const {e, f} = from.params
   from = from.clone().translate(-e, -f)
   to = to.clone().translate(-e, -f)

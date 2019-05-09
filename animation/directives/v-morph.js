@@ -1,28 +1,23 @@
 import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATE_, currentAnimations} from '../shared'
+import {_ANIMATE_, currentAnimations, defaultConfig} from '../shared'
 import {interpolatePath} from 'd3-interpolate-path'
 
 export default {
   bind (el, binding) {
-    const name = binding.arg || 'default'
-
     let d = el.getAttribute('d')
 
     el.classList.add('vg-animated')
 
     el[_ANIMATE_] = function (options) {
-      options = Object.assign({
-        duration: 0.66667,
-        order: 0
-      }, options)
-
       const updated = el.getAttribute('d')
       el.setAttribute('d', d)
 
+      options = Object.assign({}, defaultConfig, options)
       if (typeof options.duration === 'function') {
         options.duration = options.duration(updated, d)
       }
+
       const target = {t: 0}
       const interpolator = interpolatePath(d, updated)
       const vars = {
@@ -35,7 +30,9 @@ export default {
         }
       }
       const tween = TweenLite.to(target, options.duration, vars)
-      if (name in currentAnimations) currentAnimations[name].push([options.order, tween])
+      if (options.group in currentAnimations) {
+        currentAnimations[options.group].push([options.order, tween])
+      }
     }
   },
   update (el, binding) {

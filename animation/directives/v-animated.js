@@ -1,51 +1,48 @@
 import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATE_, currentAnimations} from '../shared'
+import {_ANIMATE_, currentAnimations, defaultConfig} from '../shared'
 
 export default {
   bind (el, binding) {
-    const name = binding.arg || 'default'
-    const target = {}
-
-    const vars = Object.assign({}, binding.value)
-    delete vars.duration
-    delete vars.order
+    const target = {_t: 0}
+    const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
     Object.keys(vars).forEach(prop => {
-      addProperty(target, vars, prop)
-      if (prop[0] !== '_') el.setAttribute(prop, target[prop])
+      if (prop === 'animation') return
+      el.setAttribute(prop, target[prop] = vars[prop])
     })
 
     el.classList.add('vg-animated')
 
     el[_ANIMATE_] = function (vars, done, reverse) {
       vars = Object.assign({}, vars)
-      let duration = vars.duration || 0.66667
-      const order = vars.order || 0
-      delete vars.duration
-      delete vars.order
-      if (typeof duration === 'function') duration = duration(vars, target)
+      const options = Object.assign({}, defaultConfig, vars.animation)
+      delete vars.animation
+      if (typeof options.duration === 'function') {
+        options.duration = options.duration(vars, target)
+      }
       Object.keys(vars).forEach(prop => {
-        if (typeof vars[prop] === 'function' || !(prop in target)) {
-          addProperty(target, vars, prop)
-          if (prop[0] !== '_') el.setAttribute(prop, target[prop])
-        }
+        if (!(prop in target)) el.setAttribute(prop, target[prop] = vars[prop])
       })
 
       const animating = []
+      const interpolators = {}
       Object.keys(vars).forEach(prop => {
-        if (typeof vars[prop] === 'function') {
+        if (vars[prop] !== target[prop]) {
           animating.push(prop)
-          delete vars[prop]
-        } else if (vars[prop] !== target[prop]) {
-          animating.push(prop)
+          if (options.interpolate[prop]) {
+            interpolators[prop] = options.interpolate[prop](target[prop], vars[prop])
+            delete vars[prop]
+          }
         } else {
           delete vars[prop]
         }
       })
 
-      if (Object.keys(vars).length === 0) return
+      if (animating.length === 0) return
 
+      if (Object.keys(interpolators).length > 0) TweenLite.to(target, 0, {_t: 0}) // force reset t
       Object.assign(vars, {
+        _t: 1,
         onStart () {
           el.classList.add('vg-animating')
         },
@@ -54,28 +51,22 @@ export default {
           done && done()
         },
         onUpdate () {
+          Object.keys(interpolators).forEach(prop => {
+            target[prop] = interpolators[prop](target._t)
+          })
           animating.forEach(prop => {
-            if (prop[0] !== '_') el.setAttribute(prop, target[prop])
+            el.setAttribute(prop, target[prop])
           })
         }
       })
-      const tween = TweenLite[reverse ? 'from' : 'to'](target, duration, vars)
-      if (name in currentAnimations) currentAnimations[name].push([order, tween])
+      const tween = TweenLite[reverse ? 'from' : 'to'](target, options.duration, vars)
+      if (options.group in currentAnimations) {
+        currentAnimations[options.group].push([options.order, tween])
+      }
     }
   },
-  update (el, binding) {
-    el[_ANIMATE_](binding.value)
-  }
-}
-
-function addProperty (target, vars, prop) {
-  if (typeof vars[prop] === 'function') {
-    Object.defineProperty(target, prop, {
-      configurable: true,
-      enumerable: true,
-      get: vars[prop]
-    })
-  } else {
-    target[prop] = vars[prop]
+  update (el, binding, vnode, oldVnode) {
+    const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
+    el[_ANIMATE_](vars)
   }
 }
