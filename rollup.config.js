@@ -1,3 +1,4 @@
+import babel from 'rollup-plugin-babel'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import VuePlugin from 'rollup-plugin-vue'
@@ -18,9 +19,14 @@ const config = {
     sourcemap: true
   },
   plugins: [
+    babel({
+      presets: ['@babel/preset-env']
+    }),
     resolve(),
     commonjs(),
-    VuePlugin()
+    VuePlugin({
+      css: false
+    })
   ]
 }
 

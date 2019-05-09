@@ -14,7 +14,7 @@ import WaterfallChart from '../examples/WaterfallChart.vue'
 // testWaterfallChart()
 // testChordDiagram()
 // testStackedBar()
-testGroupedBar()
+// testGroupedBar()
 
 function testBarChart () {
   window.vm = createVM(BarChart, {
@@ -22,10 +22,8 @@ function testBarChart () {
     x: (d, i) => i,
     y: (d, i) => d
   }, {
-    on: {
-      mouseover: console.log,
-      mouseout: console.log
-    }
+    mouseover: console.log,
+    mouseout: console.log
   })
 }
 
@@ -47,7 +45,7 @@ function testWaterfallChart () {
       })
       window.vm = createVM(WaterfallChart, {
         data: tallData
-      }, null, {props: {height: 800}})
+      }, null, {height: 800})
     })
 }
 
@@ -64,7 +62,7 @@ function testChordDiagram () {
         g: 'region',
         gDomain: ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania']
       }
-      window.vm = createVM(ChordDiagram, data, null, {props: {height: 800}})
+      window.vm = createVM(ChordDiagram, data, null, {height: 800})
     }
   })
 }
@@ -115,18 +113,20 @@ function testGroupedBar () {
     })
 }
 
-function createVM (Component, data, options, svgOptions) {
+function createVM (Component, props, listeners, svgProps) {
   return new Vue({
     el: 'main',
-    data,
+    data: props,
     render (h) {
-      return h(SvgWithPadding, Object.assign({
+      return h(SvgWithPadding, {
+        props: svgProps,
         scopedSlots: {
-          default: sizing => h(Component, Object.assign({
-            attrs: Object.assign(sizing, this.$data)
-          }, options))
+          default: sizing => h(Component, {
+            attrs: Object.assign(sizing, this.$data),
+            on: listeners
+          })
         }
-      }, svgOptions))
+      })
     }
   })
 }

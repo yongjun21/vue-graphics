@@ -1,3 +1,1 @@
-- Launch v2
-- Subset domain & range ScaleHelpers??
-- Storybook
+- Observable demo
