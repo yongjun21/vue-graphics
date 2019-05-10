@@ -40,7 +40,7 @@ export default {
 
       if (animating.length === 0) return
 
-      if (Object.keys(interpolators).length > 0) TweenLite.to(target, 0, {_t: 0}) // force reset t
+      TweenLite.set(target, {_t: 0}) // force reset t
       Object.assign(vars, {
         _t: 1,
         onStart () {
@@ -65,8 +65,15 @@ export default {
       }
     }
   },
-  update (el, binding, vnode, oldVnode) {
+  update (el, binding) {
+    if (shouldNotUpdate(binding.value, binding.oldValue, binding.arg)) return
     const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
     el[_ANIMATE_](vars)
   }
+}
+
+function shouldNotUpdate (value, oldValue, direct) {
+  if (direct) return value === oldValue
+  return Object.keys(value)
+    .every(prop => prop === 'animation' || value[prop] === oldValue[prop])
 }

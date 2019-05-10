@@ -4,7 +4,7 @@
       :data-view="links"
       :a-scale="aScale"
       :r="0.7 * radius - 6"
-      :animation-stagger="0.0166667">
+      :animation-stagger="0.0166667" appear>
     </chord-plot>
     <polar-scatter-plot
       :dataView="sortedDataView"

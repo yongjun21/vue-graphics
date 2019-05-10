@@ -27,10 +27,6 @@ export default function (Target, animatedProps = []) {
     },
     methods: {
       animate (vars, done, reverse) {
-        let destroyCalled = false
-        const _destroy = this.$destroy
-        this.$destroy = () => { destroyCalled = true }
-
         const target = this.animating
         vars = Object.assign({}, vars)
         const options = Object.assign({}, defaultConfig, vars.animation)
@@ -53,13 +49,13 @@ export default function (Target, animatedProps = []) {
           }
         })
 
-        if (!animating) {
-          if (destroyCalled) _destroy.call(this)
-          else this.$destroy = _destroy
-          return
-        }
+        if (!animating) return
 
-        if (Object.keys(interpolators).length > 0) TweenLite.to(target, 0, {_t: 0}) // force reset t
+        let destroyCalled = false
+        const _destroy = this.$destroy
+        this.$destroy = () => { destroyCalled = true }
+
+        TweenLite.set(target, {_t: 0}) // force reset t
         Object.assign(vars, {
           _t: 1,
           onStart: () => {

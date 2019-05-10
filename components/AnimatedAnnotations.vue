@@ -21,10 +21,7 @@ export default {
       functional: true,
       props: ['value', 'formatted'],
       render (h, {data, props}) {
-        return h(TextLabel, {
-          class: data.class,
-          attrs: data.attrs
-        }, props.formatted(props.value))
+        return h(TextLabel, data, props.formatted(props.value))
       }
     }, ['x', 'y', 'value'])
   },
@@ -57,7 +54,7 @@ export default {
     },
     formatted: {
       type: Function,
-      default: v => Math.round(v).toLocaleString()
+      default: v => v ? Math.round(v).toLocaleString() : ''
     },
     enter: Object,
     exit: Object

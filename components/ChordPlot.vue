@@ -12,7 +12,6 @@
 
 <script>
 import {animationMixin, associateDataMixin} from '../mixins'
-import {queueAnimations, flushAnimations} from '../animation'
 import {path} from 'd3-path'
 import {polar2xy} from '../util'
 
@@ -47,14 +46,6 @@ export default {
     hasGeom (d) {
       return this.aScale(d.a1) != null && this.aScale(d.a2) != null
     }
-  },
-  created () {
-    queueAnimations(this.animationGroup || this._uid)
-    this.$nextTick(function () {
-      const tweens = flushAnimations(this.animationGroup || this._uid)
-      if (tweens.length === 0) return
-      new TimelineLite({tweens, stagger: this.animationStagger}) // eslint-disable-line
-    })
   }
 }
 </script>

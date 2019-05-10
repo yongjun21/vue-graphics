@@ -61,7 +61,6 @@ export default {
     hasGeom (d) {
       return this.xScale(d.x) != null && this.yScale(d.y) != null
     }
-  },
-  updated: console.log
+  }
 }
 </script>
