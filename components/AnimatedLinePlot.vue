@@ -11,7 +11,8 @@
 
 <script>
 import {animationMixin} from '../mixins'
-import {line, curveLinear} from 'd3-shape'
+import line from 'd3-shape/src/line'
+import curveLinear from 'd3-shape/src/curve/linear'
 
 export default {
   name: 'AnimatedLinePlot',
@@ -60,7 +61,7 @@ export default {
       return {d: lineGenerator(data)}
     },
     hasGeom (d) {
-      return this.xScale(d.x) != null && this.yScale(d.x) != null
+      return this.xScale(d.x) != null && this.yScale(d.y) != null
     }
   }
 }

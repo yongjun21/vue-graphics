@@ -1,13 +1,14 @@
 {
   "name": "vue-graphics",
-  "version": "0.2.10",
+  "version": "0.2.16",
   "description": "A set of Vue-powered graphics primitives and components for building web visualizations and interactive graphics",
   "main": "index.js",
   "scripts": {
-    "build": "rollup -c rollup.config.js",
+    "build": "rm -f dist/* && rollup -c rollup.config.js",
     "dev": "rollup -c public/rollup.config.js -w",
+    "deploy": "npm run build && AWS_PROFILE=yongjun21 aws s3 sync dist s3://vue-graphics",
     "test": "exit 0",
-    "prepublishOnly": "npm run test"
+    "prepublishOnly": "npm run test && npm run build"
   },
   "repository": {
     "type": "git",
@@ -31,10 +32,11 @@
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
-    "rollup": "^0.57.1",
+    "rollup": "^1.11.3",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^9.2.0",
-    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-vue": "^4.7.2",
     "vue-template-compiler": "^2.6.7"
   }

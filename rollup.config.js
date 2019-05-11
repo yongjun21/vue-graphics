@@ -1,37 +1,41 @@
-import babel from 'rollup-plugin-babel'
+import fs from 'fs'
+import path from 'path'
+
+// import babel from 'rollup-plugin-babel'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import VuePlugin from 'rollup-plugin-vue'
 
-const config = {
+const inputDir = path.join(__dirname, 'examples')
+
+export default {
   external: [
     'vue',
     'd3-scale',
-    'd3-shape',
+    'd3-shape/src/line',
+    'd3-shape/src/curve/linear',
+    'd3-shape/src/curve/step',
     'd3-path',
     'd3-interpolate-path',
     'gsap/TweenLite',
-    'gsap/TimelineLite',
-    'gsap/AttrPlugin'
+    'gsap/TimelineLite'
   ],
+  input: fs.readdirSync(inputDir).map(filename => path.join(inputDir, filename)),
   output: {
-    format: 'cjs',
+    format: 'esm',
+    dir: 'dist',
+    entryFileNames: '[name].mjs',
+    preferConst: true,
     sourcemap: true
   },
   plugins: [
-    babel({
-      presets: ['@babel/preset-env']
-    }),
+    // babel({
+    //   presets: ['@babel/preset-env']
+    // }),
     resolve(),
     commonjs(),
     VuePlugin({
       css: false
     })
   ]
-}
-
-export default args => {
-  const filename = args.input.match(/\/?(\w+)\.\w+$/)[1]
-  config.output.file = `dist/${filename}.js`
-  return config
 }

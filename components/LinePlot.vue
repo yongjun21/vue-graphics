@@ -13,7 +13,8 @@
 <script>
 import {associateDataMixin} from '../mixins'
 import EnlargeTarget from '../directives/v-enlarge-target'
-import {line, curveLinear} from 'd3-shape'
+import line from 'd3-shape/src/line'
+import curveLinear from 'd3-shape/src/curve/linear'
 
 export default {
   name: 'LinePlot',
@@ -63,7 +64,7 @@ export default {
       return {d: lineGenerator(data)}
     },
     hasGeom (d) {
-      return this.xScale(d.x) != null && this.yScale(d.x) != null
+      return this.xScale(d.x) != null && this.yScale(d.y) != null
     }
   }
 }

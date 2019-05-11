@@ -27,7 +27,7 @@ import AnimatedLinePlot from '../components/AnimatedLinePlot.vue'
 import {dataViewMixin, userSpaceMixin} from '../mixins'
 import {DomainHelper, TransformHelper} from '../helpers'
 import {scalePoint, scaleLinear} from 'd3-scale'
-import {curveStepBefore} from 'd3-shape'
+import {stepBefore as curveStepBefore} from 'd3-shape/src/curve/step'
 
 export default {
   name: 'WaterfallChart',
