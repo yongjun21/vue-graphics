@@ -4,9 +4,10 @@
       :data-view="dataView"
       :x-scale="xScale"
       :y-scale="yScale"
+      :animation-stagger="0.5"
       v-bind="$attrs"
       v-on="$listeners">
-      <template v-slot="{getGeom, hasGeom, getAnimation}">
+      <template v-slot="{getGeom, hasGeom}">
         <animated-annotations
           :data-view="dataView"
           :get-geom="getGeom"
@@ -14,8 +15,9 @@
           :x="g => g.x + 0.5 * g.width"
           :y="g => g.height + 10"
           :v="d => d.y"
-          :enter="{y: 10, value: 0, animation: getAnimation(Infinity)}"
-          :exit="{y: 10, value: 0, animation: getAnimation(-Infinity)}"
+          :enter="{y: 10, value: 0}"
+          :exit="{y: 10, value: 0}"
+          :animation-stagger="0.5"
           anchor="bottom"
           :post-transform="transform"
           v-on="$listeners">

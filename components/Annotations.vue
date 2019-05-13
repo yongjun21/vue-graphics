@@ -1,5 +1,5 @@
 <template>
-  <animated-group class="vg-annotations" v-on="wrappedListeners" :enter="enter">
+  <animated-group class="vg-annotations" :enter="enterGeom" :exit="exitGeom" v-on="wrappedListeners">
     <animated-text-label v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-annotation"
       :class="d.class"
@@ -47,7 +47,23 @@ export default {
       type: Function,
       required: true
     },
-    enter: Object
+    enter: Object,
+    exit: Object
+  },
+  computed: {
+    enterGeom () {
+      return this.enter && Object.assign({
+        animation: this.getAnimation(Infinity)
+      }, this.enter)
+    },
+    exitGeom () {
+      return this.exit && Object.assign({
+        animation: this.getAnimation(-Infinity)
+      }, this.exit)
+    },
+    appear () {
+      return this.enterGeom
+    }
   },
   methods: {
     getTextGeom (d, i) {
@@ -58,7 +74,7 @@ export default {
       return Object.assign({
         x: xValue,
         y: yValue,
-        animation: geom.animation
+        animation: this.getAnimation(i)
       }, this.$attrs)
     }
   }

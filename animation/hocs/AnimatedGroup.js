@@ -1,4 +1,4 @@
-import {_ANIMATE_} from '../animation'
+import {_ANIMATE_} from '../shared'
 
 export default {
   functional: true,
@@ -20,13 +20,9 @@ export default {
       }
     }
 
-    return h('transition-group', {
-      class: data.class,
-      props: {
-        tag: 'g',
-        appear: true
-      },
-      on: Object.assign(listeners, data.on)
-    }, $children)
+    data.props = {tag: 'g', appear: true}
+    data.on = Object.assign(data.on || {}, listeners)
+
+    return h('transition-group', data, $children)
   }
 }

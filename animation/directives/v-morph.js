@@ -5,18 +5,22 @@ import {interpolatePath} from 'd3-interpolate-path'
 
 export default {
   bind (el, binding) {
-    let d = el.getAttribute('d')
-
     el.classList.add('vg-animated')
+    const group = (binding.value && binding.value.group) || defaultConfig.group
+    el.setAttribute('data-vg-animated', group)
+    let d = el.getAttribute('d')
 
     el[_ANIMATE_] = function (options) {
       const updated = el.getAttribute('d')
+      if (d === updated) return
       el.setAttribute('d', d)
 
       options = Object.assign({}, defaultConfig, options)
       if (typeof options.duration === 'function') {
         options.duration = options.duration(updated, d)
       }
+
+      el.setAttribute('data-vg-animated', options.group)
 
       const target = {t: 0}
       const interpolator = interpolatePath(d, updated)
@@ -33,9 +37,11 @@ export default {
       if (options.group in currentAnimations) {
         currentAnimations[options.group].push([options.order, tween])
       }
+      return tween
     }
   },
   update (el, binding) {
+    el.classList.add('vg-animated')
     el[_ANIMATE_](binding.value)
   }
 }

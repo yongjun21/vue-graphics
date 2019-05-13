@@ -1,3 +1,6 @@
 export {default as Associate} from './v-associate'
 export {default as EnlargeTarget} from './v-enlarge-target'
 export {default as MeasureText} from './v-measure-text'
+export {default as Animated} from '../animation/directives/v-animated'
+export {default as Draw} from '../animation/directives/v-draw'
+export {default as Morph} from '../animation/directives/v-morph'

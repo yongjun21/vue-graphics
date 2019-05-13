@@ -4,7 +4,7 @@
       :data-view="links"
       :a-scale="aScale"
       :r="0.7 * radius - 6"
-      :animation-stagger="0.0166667" appear>
+      :animation-stagger="0.0166667">
     </chord-plot>
     <polar-scatter-plot
       :dataView="sortedDataView"
@@ -128,11 +128,14 @@ export default {
         .align(0)
     },
     aSubScales () {
+      const {aScale, getMidpoint} = this
       return this.groupedADomain.map((subset, i) => {
-        const reverse = ['Americas', 'Africa', 'Oceania'].includes(this.domain.g[i])
-        const start = reverse ? subset[subset.length - 1] : subset[0]
-        const stop = reverse ? subset[0] : subset[subset.length - 1]
-        return ScaleHelper.SUBSET(this.aScale, start, stop)
+        const subScale = ScaleHelper.SUBSET(aScale, subset[0], subset[subset.length - 1])
+        if (getMidpoint(subScale) > 180) {
+          subScale.domain(subScale.domain().reverse())
+          subScale.range(subScale.range().reverse())
+        }
+        return subScale
       })
     },
     measure () {

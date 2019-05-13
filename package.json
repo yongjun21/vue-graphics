@@ -1,6 +1,6 @@
 {
   "name": "vue-graphics",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "description": "A set of Vue-powered graphics primitives and components for building web visualizations and interactive graphics",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,8 @@
     "d3-shape": "^1.2.0",
     "gsap": "^2.1.1",
     "hammerjs": "^2.0.8",
-    "vue": "^2.6.7"
+    "vue": "^2.6.7",
+    "vue-observe-visibility": "^0.4.4"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",

@@ -33,6 +33,11 @@ export default {
       default: v => v
     }
   },
+  computed: {
+    appear () {
+      return this.getAnimation()
+    }
+  },
   methods: {
     getGeom (d) {
       const {aScale, rScale} = this

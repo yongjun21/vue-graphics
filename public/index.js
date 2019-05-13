@@ -1,4 +1,4 @@
-/* globals Vue */
+/* globals Vue, d3 */
 
 import {SvgWithPadding} from '../hocs'
 
@@ -11,8 +11,8 @@ import WaterfallChart from '../examples/WaterfallChart.vue'
 // TouchEmulator()
 
 // testBarChart()
-testWaterfallChart()
-// testChordDiagram()
+// testWaterfallChart()
+testChordDiagram()
 // testStackedBar()
 // testGroupedBar()
 
@@ -50,20 +50,14 @@ function testWaterfallChart () {
 }
 
 function testChordDiagram () {
-  Papa.parse('visa.csv', {
-    header: true,
-    dynamicTyping: true,
-    download: true,
-    complete (parsed) {
-      const data = {
-        data: parsed.data,
-        k: 'code',
-        a: 'country',
-        g: 'region',
-        gDomain: ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania']
-      }
-      window.vm = createVM(ChordDiagram, data, null, {height: 800})
-    }
+  d3.csv('visa.csv').then(json => {
+    window.vm = createVM(ChordDiagram, {
+      data: json,
+      k: 'code',
+      a: 'country',
+      g: 'region',
+      gDomain: ['Asia', 'Europe', 'Americas', 'Africa', 'Oceania']
+    }, null, {height: 800})
   })
 }
 

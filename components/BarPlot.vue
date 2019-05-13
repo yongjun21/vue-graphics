@@ -8,7 +8,7 @@
         v-animated="getGeom(d, i)">
       </rect>
     </animated-group>
-    <slot v-bind="{getGeom, hasGeom, getAnimation}"></slot>
+    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 
@@ -45,6 +45,9 @@ export default {
         height: 0,
         animation: this.getAnimation(-Infinity)
       }
+    },
+    appear () {
+      return this.enterGeom
     }
   },
   methods: {

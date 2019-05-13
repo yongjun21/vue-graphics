@@ -8,7 +8,7 @@
         v-animated="getGeom(d, i)">
       </circle>
     </animated-group>
-    <slot v-bind="{getGeom, hasGeom, getAnimation}"></slot>
+    <slot v-bind="{getGeom, hasGeom}"></slot>
   </g>
 </template>
 

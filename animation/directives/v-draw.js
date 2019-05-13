@@ -21,6 +21,8 @@ export default {
         options.duration = options.duration(totalLength)
       }
 
+      el.setAttribute('data-vg-animated', options.group)
+
       const target = {offset: totalLength}
       const vars = {
         offset: 0,
@@ -33,11 +35,13 @@ export default {
       if (options.group in currentAnimations) {
         currentAnimations[options.group].push([options.order, tween])
       }
+      return tween
     }
 
     el[_ANIMATE_](binding.value)
   },
   update (el, binding, vnode, oldVnode) {
+    el.classList.add('vg-animated')
     if (
       vnode.data.attrs.d === oldVnode.data.attrs.d &&
       el.getAttribute('stroke-dashoffset') === '0'

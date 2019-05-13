@@ -1,7 +1,7 @@
-import responsiveMixin from '../mixins/responsiveMixin'
+import responsiveMixin from '../mixins/responsive'
 
 export default {
-  name: 'ResponsiveWrapper',
+  name: 'ResponsiveSvg',
   extends: responsiveMixin,
   props: {
     paddingTop: [String, Number],

@@ -1,5 +1,5 @@
 export {default as dataViewMixin} from './dataView'
 export {default as userSpaceMixin} from './userSpace'
-export {default as animationMixin} from './animation'
+export {default as animationMixin} from '../animation/animationMixin'
 export {default as associateDataMixin} from './associateData'
-export {default as responsiveMixin} from './responsiveMixin'
+export {default as responsiveMixin} from './responsive'

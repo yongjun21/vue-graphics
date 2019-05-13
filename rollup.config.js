@@ -18,7 +18,8 @@ export default {
     'd3-path',
     'd3-interpolate-path',
     'gsap/TweenLite',
-    'gsap/TimelineLite'
+    'gsap/TimelineLite',
+    'vue-observe-visibility'
   ],
   input: fs.readdirSync(inputDir).map(filename => path.join(inputDir, filename)),
   output: {

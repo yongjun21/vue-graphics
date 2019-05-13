@@ -22,6 +22,7 @@ export default function (Target, animatedProps = []) {
           'vg-animated': true,
           'vg-animating': false
         },
+        group: (this.animation && this.animation.group) || defaultConfig.group,
         animating
       }
     },
@@ -34,6 +35,8 @@ export default function (Target, animatedProps = []) {
         if (typeof options.duration === 'function') {
           options.duration = options.duration(vars, target)
         }
+
+        this.group = options.group
 
         let animating = false
         const interpolators = {}
@@ -77,6 +80,7 @@ export default function (Target, animatedProps = []) {
         if (options.group in currentAnimations) {
           currentAnimations[options.group].push([options.order, tween])
         }
+        return tween
       }
     },
     mounted () {
@@ -85,7 +89,7 @@ export default function (Target, animatedProps = []) {
     },
     render (h) {
       const {animating, $attrs, $scopedSlots} = this
-      const attrs = Object.assign({}, animating, $attrs)
+      const attrs = Object.assign({'data-vg-animated': this.group}, animating, $attrs)
       delete attrs._t
       return h(Target, {class: this.class, attrs, scopedSlots: $scopedSlots})
     }

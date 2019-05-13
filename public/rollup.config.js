@@ -14,7 +14,8 @@ export default {
     'd3-path',
     'd3-interpolate-path',
     'gsap/TweenLite',
-    'gsap/TimelineLite'
+    'gsap/TimelineLite',
+    'vue-observe-visibility'
   ],
   output: {
     file: 'public/bundle.js',
@@ -28,7 +29,8 @@ export default {
       'd3-path': 'd3',
       'd3-interpolate-path': 'd3',
       'gsap/TweenLite': 'TweenLite',
-      'gsap/TimelineLite': 'TimelineLite'
+      'gsap/TimelineLite': 'TimelineLite',
+      'vue-observe-visibility': 'VueObserveVisibility'
     },
     preferConst: true
   },
