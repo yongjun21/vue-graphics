@@ -11,17 +11,18 @@ export default {
 
     el.classList.add('vg-animated')
 
+    const group = (binding.value && binding.value.group) || defaultConfig.group
+
     el[_ANIMATE_] = function (options) {
       const totalLength = el.getTotalLength()
       el.setAttribute('stroke-dasharray', totalLength)
       el.setAttribute('stroke-dashoffset', totalLength)
 
       options = Object.assign({}, defaultConfig, options)
+      if (options.group !== group) return
       if (typeof options.duration === 'function') {
         options.duration = options.duration(totalLength)
       }
-
-      el.setAttribute('data-vg-animated', options.group)
 
       const target = {offset: totalLength}
       const vars = {

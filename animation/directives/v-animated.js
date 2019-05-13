@@ -8,23 +8,21 @@ export default {
 
     const target = {_t: 0}
     const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
+    const group = (vars.animation && vars.animation.group) || defaultConfig.group
     Object.keys(vars).forEach(prop => {
       if (prop === 'animation') return
       el.setAttribute(prop, target[prop] = vars[prop])
     })
 
-    const group = (vars.animation && vars.animation.group) || defaultConfig.group
-    el.setAttribute('data-vg-animated', group)
-
     el[_ANIMATE_] = function (vars, done, reverse) {
       vars = Object.assign({}, vars)
       const options = Object.assign({}, defaultConfig, vars.animation)
+      if (options.group !== group) return
       delete vars.animation
       if (typeof options.duration === 'function') {
         options.duration = options.duration(vars, target)
       }
 
-      el.setAttribute('data-vg-animated', options.group)
       Object.keys(vars).forEach(prop => {
         if (!(prop in target)) el.setAttribute(prop, target[prop] = vars[prop])
       })

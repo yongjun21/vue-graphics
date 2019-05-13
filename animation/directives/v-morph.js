@@ -6,9 +6,8 @@ import {interpolatePath} from 'd3-interpolate-path'
 export default {
   bind (el, binding) {
     el.classList.add('vg-animated')
-    const group = (binding.value && binding.value.group) || defaultConfig.group
-    el.setAttribute('data-vg-animated', group)
     let d = el.getAttribute('d')
+    const group = (binding.value && binding.value.group) || defaultConfig.group
 
     el[_ANIMATE_] = function (options) {
       const updated = el.getAttribute('d')
@@ -16,11 +15,10 @@ export default {
       el.setAttribute('d', d)
 
       options = Object.assign({}, defaultConfig, options)
+      if (options.group !== group) return
       if (typeof options.duration === 'function') {
         options.duration = options.duration(updated, d)
       }
-
-      el.setAttribute('data-vg-animated', options.group)
 
       const target = {t: 0}
       const interpolator = interpolatePath(d, updated)

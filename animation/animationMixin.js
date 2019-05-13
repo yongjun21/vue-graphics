@@ -13,7 +13,12 @@ export default {
   components: {AnimatedGroup},
   directives: {Animated, Draw, Morph},
   props: {
-    animationGroup: [String, Number, Symbol],
+    animationGroup: {
+      type: [String, Number, Symbol],
+      default () {
+        return this._uid
+      }
+    },
     animationDuration: {
       type: [Number, Function],
       default: defaultConfig.duration
@@ -26,7 +31,7 @@ export default {
   methods: {
     getAnimation (order) {
       return {
-        group: this.animationGroup || this._uid,
+        group: this.animationGroup,
         duration: this.animationDuration,
         order
       }
@@ -35,7 +40,7 @@ export default {
       if (arguments.length > 0) {
         if (this[_ANIMATION_]) return
         const tweens = Array.prototype.map.call(
-          this.$el.querySelectorAll(`[data-vg-animated="${this.animationGroup || this._uid}"]`),
+          this.$el.querySelectorAll('.vg-animated'),
           el => el[_ANIMATE_].apply(el, arguments)
         ).filter(t => t != null)
         this[_ANIMATION_] = new TimelineLite({
@@ -45,9 +50,9 @@ export default {
         })
       } else {
         if (this[_ANIMATION_]) this[_ANIMATION_].kill()
-        queueAnimations(this.animationGroup || this._uid)
+        queueAnimations(this.animationGroup)
         this.$nextTick(function () {
-          const tweens = flushAnimations(this.animationGroup || this._uid)
+          const tweens = flushAnimations(this.animationGroup)
           if (tweens.length === 0) return
           this[_ANIMATION_] = new TimelineLite({
             tweens,

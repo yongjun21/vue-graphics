@@ -32,11 +32,10 @@ export default function (Target, animatedProps = []) {
         vars = Object.assign({}, vars)
         const options = Object.assign({}, defaultConfig, vars.animation)
         delete vars.animation
+        if (options.group !== this.group) return
         if (typeof options.duration === 'function') {
           options.duration = options.duration(vars, target)
         }
-
-        this.group = options.group
 
         let animating = false
         const interpolators = {}
@@ -89,7 +88,7 @@ export default function (Target, animatedProps = []) {
     },
     render (h) {
       const {animating, $attrs, $scopedSlots} = this
-      const attrs = Object.assign({'data-vg-animated': this.group}, animating, $attrs)
+      const attrs = Object.assign({}, animating, $attrs)
       delete attrs._t
       return h(Target, {class: this.class, attrs, scopedSlots: $scopedSlots})
     }

@@ -18,10 +18,12 @@
       anchor="top">
     </x-axis>
     <grouped-bar-plot
+      ref="bars"
       :data-view="dataView"
       :x-scale="xScale"
       :y-scale="yScale"
       :g-scale="gScale"
+      :animation-stagger="0.05"
       v-bind="$attrs"
       v-on="$listeners">
     </grouped-bar-plot>
@@ -133,6 +135,11 @@ export default {
   methods: {
     xDivider: IntervalHelper.BETWEEN(true),
     xLabel: IntervalHelper.MIDDLE()
+  },
+  watch: {
+    transform () {
+      this.$refs.bars.animate()
+    }
   }
 }
 </script>

@@ -4,7 +4,6 @@
       :data-view="dataView"
       :x-scale="xScale"
       :y-scale="yScale"
-      :animation-stagger="0.5"
       v-bind="$attrs"
       v-on="$listeners">
       <template v-slot="{getGeom, hasGeom}">
@@ -17,7 +16,6 @@
           :v="d => d.y"
           :enter="{y: 10, value: 0}"
           :exit="{y: 10, value: 0}"
-          :animation-stagger="0.5"
           anchor="bottom"
           :post-transform="transform"
           v-on="$listeners">
