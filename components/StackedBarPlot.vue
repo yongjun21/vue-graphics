@@ -85,11 +85,13 @@ export default {
     getGeom (d, i) {
       const {xScale, yScale, yOffset} = this
       const y0 = yOffset(d)
+      const y1 = yScale(y0)
+      const y2 = yScale(y0 + d.y)
       return {
         x: xScale(d.x),
-        y: yScale(y0),
+        y: Math.min(y1, y2),
         width: xScale.bandwidth(),
-        height: yScale(y0 + d.y) - yScale(y0),
+        height: Math.abs(y2 - y1),
         animation: this.getAnimation(i)
       }
     },

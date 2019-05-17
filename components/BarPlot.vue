@@ -36,12 +36,14 @@ export default {
   computed: {
     enterGeom () {
       return {
+        y: this.yScale(0),
         height: 0,
         animation: this.getAnimation(Infinity)
       }
     },
     exitGeom () {
       return {
+        y: this.yScale(0),
         height: 0,
         animation: this.getAnimation(-Infinity)
       }
@@ -53,11 +55,13 @@ export default {
   methods: {
     getGeom (d, i) {
       const {xScale, yScale} = this
+      const y0 = yScale(0)
+      const y1 = yScale(d.y)
       return {
         x: xScale(d.x),
-        y: yScale(0),
+        y: Math.min(y0, y1),
         width: xScale.bandwidth(),
-        height: yScale(d.y) - yScale(0),
+        height: Math.abs(y1 - y0),
         animation: this.getAnimation(i)
       }
     },
