@@ -1,10 +1,9 @@
-import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
 import {_ANIMATE_, currentAnimations, defaultConfig} from '../shared'
 
 export default {
   bind (el, binding) {
-    el.classList.add('vg-animated')
+    el.setAttribute('data-vg-animated', '')
 
     const target = {_t: 0}
     const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
@@ -47,11 +46,11 @@ export default {
       Object.assign(vars, {
         _t: 1,
         onStart () {
-          el.classList.add('vg-animating')
+          el.setAttribute('data-vg-animating', '')
         },
         onComplete () {
-          el.classList.remove('vg-animating')
           done && done()
+          el.removeAttribute('data-vg-animating')
         },
         onUpdate () {
           Object.keys(interpolators).forEach(prop => {
@@ -70,7 +69,6 @@ export default {
     }
   },
   update (el, binding) {
-    el.classList.add('vg-animated')
     if (shouldNotUpdate(binding.value, binding.oldValue, binding.arg)) return
     const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
     el[_ANIMATE_](vars)

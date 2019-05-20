@@ -40,20 +40,24 @@ export default {
       if (arguments.length > 0) {
         if (this[_ANIMATION_]) return
         const tweens = Array.prototype.map.call(
-          this.$el.querySelectorAll('.vg-animated'),
+          this.$el.querySelectorAll('.vg-animated, [data-vg-animated]'),
           el => el[_ANIMATE_].apply(el, arguments)
         ).filter(t => t != null)
+        if (tweens.length === 0) return
         this[_ANIMATION_] = new TimelineLite({
           tweens,
           stagger: this.animationStagger,
           onComplete: () => { this[_ANIMATION_] = null }
         })
       } else {
-        if (this[_ANIMATION_]) this[_ANIMATION_].kill()
+        if (this[_ANIMATION_]) this[_ANIMATION_].pause()
         queueAnimations(this.animationGroup)
         this.$nextTick(function () {
           const tweens = flushAnimations(this.animationGroup)
-          if (tweens.length === 0) return
+          if (tweens.length === 0) {
+            if (this[_ANIMATION_]) this[_ANIMATION_].play()
+            return
+          }
           this[_ANIMATION_] = new TimelineLite({
             tweens,
             stagger: this.animationStagger,
@@ -75,7 +79,7 @@ export default {
     if (this.appear) {
       let wasVisible = true
       ObserveVisibility.bind(this.$el, {
-        value: isVisible => {
+        value: (isVisible, entry) => {
           if (!wasVisible && isVisible) this.animate(this.appear, null, true)
           wasVisible = isVisible
         }

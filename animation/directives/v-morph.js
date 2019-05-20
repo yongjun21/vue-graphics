@@ -5,7 +5,7 @@ import {interpolatePath} from 'd3-interpolate-path'
 
 export default {
   bind (el, binding) {
-    el.classList.add('vg-animated')
+    el.setAttribute('data-vg-animated', '')
     let d = el.getAttribute('d')
     const group = (binding.value && binding.value.group) || defaultConfig.group
 
@@ -24,9 +24,9 @@ export default {
       const interpolator = interpolatePath(d, updated)
       const vars = {
         t: 1,
-        onStart: () => el.classList.add('vg-animating'),
-        onComplete: () => el.classList.remove('vg-animating'),
-        onUpdate: () => {
+        onStart: () => el.setAttribute('data-vg-animating', ''),
+        onComplete: () => el.removeAttribute('data-vg-animating'),
+        onUpdate () {
           d = interpolator(target.t)
           el.setAttribute('d', d)
         }
@@ -39,7 +39,6 @@ export default {
     }
   },
   update (el, binding) {
-    el.classList.add('vg-animated')
     el[_ANIMATE_](binding.value)
   }
 }

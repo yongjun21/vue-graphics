@@ -9,7 +9,7 @@ export default {
       return console.warn('Using directive `v-draw` on unsupported element')
     }
 
-    el.classList.add('vg-animated')
+    el.setAttribute('data-vg-animated', '')
 
     const group = (binding.value && binding.value.group) || defaultConfig.group
 
@@ -28,8 +28,8 @@ export default {
       const vars = {
         offset: 0,
         ease: Linear.easeNone,
-        onStart: () => el.classList.add('vg-animating'),
-        onComplete: () => el.classList.remove('vg-animating'),
+        onStart: () => el.setAttribute('data-vg-animating', ''),
+        onComplete: () => el.removeAttribute('data-vg-animating'),
         onUpdate: () => el.setAttribute('stroke-dashoffset', target.offset)
       }
       const tween = TweenLite.to(target, options.duration, vars)
@@ -42,7 +42,6 @@ export default {
     el[_ANIMATE_](binding.value)
   },
   update (el, binding, vnode, oldVnode) {
-    el.classList.add('vg-animated')
     if (
       vnode.data.attrs.d === oldVnode.data.attrs.d &&
       el.getAttribute('stroke-dashoffset') === '0'
