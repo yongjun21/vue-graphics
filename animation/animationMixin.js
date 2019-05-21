@@ -7,7 +7,7 @@ import Animated from './directives/v-animated'
 import Draw from './directives/v-draw'
 import Morph from './directives/v-morph'
 
-const _ANIMATION_ = Symbol('animation')
+const _ANIMATION_ = Symbol('active animation')
 
 export default {
   components: {AnimatedGroup},
@@ -54,15 +54,16 @@ export default {
         queueAnimations(this.animationGroup)
         this.$nextTick(function () {
           const tweens = flushAnimations(this.animationGroup)
-          if (tweens.length === 0) {
+          if (tweens.length > 0) {
+            if (this[_ANIMATION_]) this[_ANIMATION_].kill()
+            this[_ANIMATION_] = new TimelineLite({
+              tweens,
+              stagger: this.animationStagger,
+              onComplete: () => { this[_ANIMATION_] = null }
+            })
+          } else {
             if (this[_ANIMATION_]) this[_ANIMATION_].play()
-            return
           }
-          this[_ANIMATION_] = new TimelineLite({
-            tweens,
-            stagger: this.animationStagger,
-            onComplete: () => { this[_ANIMATION_] = null }
-          })
         })
       }
     }

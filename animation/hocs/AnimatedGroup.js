@@ -9,12 +9,15 @@ export default {
   render (h, {props, data, scopedSlots}) {
     const $children = scopedSlots.default && scopedSlots.default()
 
-    const listeners = {
-      enter: props.enter && function (el, done) {
+    const listeners = {}
+    if (props.enter) {
+      listeners.enter = function (el, done) {
         if (!el[_ANIMATE_]) return done()
         el[_ANIMATE_](props.enter, done, true)
-      },
-      leave: props.exit && function (el, done) {
+      }
+    }
+    if (props.exit) {
+      listeners.leave = function (el, done) {
         if (!el[_ANIMATE_]) return done()
         el[_ANIMATE_](props.exit, done, false)
       }
