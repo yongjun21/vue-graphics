@@ -1,28 +1,32 @@
 import {interpolateTransform2} from '../helpers/Transform'
 
 export const _ANIMATE_ = Symbol('animate')
+export const _TWEEN_ = Symbol('TWEEN')
 
 export const defaultConfig = {
-  group: 'default',
   duration: 0.66667,
-  order: 0,
+  ease: null,
   interpolate: {transform: interpolateTransform2}
 }
 
-export const currentAnimations = {}
-
-export function queueAnimations (...names) {
-  if (names.length === 0) names.push(defaultConfig.group)
-  if (names.length > 0) {
-    names.forEach(name => {
-      currentAnimations[name] = currentAnimations[name] || []
-    })
-  }
+export function retrieveTweens (elements) {
+  const tweens = Array.prototype.map.call(elements, el => el[_TWEEN_])
+    .filter(r => r != null)
+    .sort((a, b) => a[0] - b[0])
+    .map(r => r[1])
+  return tweens
 }
 
-export function flushAnimations (name = defaultConfig.group) {
-  if (!(name in currentAnimations)) return []
-  const queued = currentAnimations[name]
-  delete currentAnimations[name]
-  return queued.sort((a, b) => a[0] - b[0]).map(r => r[1])
+export function storeTween (el) {
+  let tween = null
+  Object.defineProperty(el, _TWEEN_, {
+    get () {
+      const active = tween
+      tween = null
+      return active
+    },
+    set (value) {
+      tween = value
+    }
+  })
 }

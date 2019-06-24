@@ -1,5 +1,5 @@
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATE_, currentAnimations, defaultConfig} from './shared'
+import {_ANIMATE_, _TWEEN_, storeTween, defaultConfig} from './shared'
 
 export default function (Target, animatedProps = []) {
   if (animatedProps.length === 0) return Target
@@ -22,7 +22,6 @@ export default function (Target, animatedProps = []) {
           'vg-animated': true,
           'vg-animating': false
         },
-        group: (this.animation && this.animation.group) || defaultConfig.group,
         animating
       }
     },
@@ -32,7 +31,6 @@ export default function (Target, animatedProps = []) {
         vars = Object.assign({}, vars)
         const options = Object.assign({}, defaultConfig, vars.animation)
         delete vars.animation
-        if (options.group !== this.group) return
         if (typeof options.duration === 'function') {
           options.duration = options.duration(vars, target)
         }
@@ -65,6 +63,7 @@ export default function (Target, animatedProps = []) {
           },
           onComplete: () => {
             this.class['vg-animating'] = false
+            this.$el[_TWEEN_] = null
             if (destroyCalled) _destroy.call(this)
             else this.$destroy = _destroy
             done && done()
@@ -76,13 +75,12 @@ export default function (Target, animatedProps = []) {
           }
         })
         const tween = TweenLite[reverse ? 'from' : 'to'](target, options.duration, vars)
-        if (options.group in currentAnimations) {
-          currentAnimations[options.group].push([options.order, tween])
-        }
+        this.$el[_TWEEN_] = [options.order, tween]
         return tween
       }
     },
     mounted () {
+      storeTween(this.$el)
       this.$el[_ANIMATE_] = this.animate.bind(this)
       this.$watch(vm => animatedProps.map(prop => vm[prop]), () => this.animate(this.$props))
     },

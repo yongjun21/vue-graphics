@@ -1,6 +1,10 @@
 <template>
   <g class="vg-plot vg-scatter-plot" v-on="wrappedListeners">
-    <animated-group :enter="enterGeom" :exit="exitGeom">
+    <animated-group
+      :watching="dataView"
+      :enter="enterGeom"
+      :exit="exitGeom"
+      :appear="enterGeom">
       <circle v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
         class="vg-dot"
         :class="d.class"
@@ -18,7 +22,6 @@ import {animationMixin, associateDataMixin} from '../mixins'
 export default {
   name: 'PolarScatterPlot',
   mixins: [animationMixin, associateDataMixin],
-  inheritAttrs: false,
   props: {
     dataView: {
       type: Array,
@@ -49,9 +52,6 @@ export default {
         r: 0,
         animation: this.getAnimation(-Infinity)
       }
-    },
-    appear () {
-      return this.enterGeom
     }
   },
   methods: {

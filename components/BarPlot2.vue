@@ -3,7 +3,12 @@
     <clipPath :id="'clip-path-' + _uid">
       <rect v-bind="clipPathGeom"></rect>
     </clipPath>
-    <animated-group :clip-path="`url(#clip-path-${_uid})`" :enter="enterGeom" :exit="exitGeom">
+    <animated-group
+      :clip-path="`url(#clip-path-${_uid})`"
+      :watching="dataView"
+      :enter="enterGeom"
+      :exit="exitGeom"
+      :appear="enterGeom">
       <rect v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
         class="vg-bar"
         :class="d.class"
@@ -21,7 +26,6 @@ import {animationMixin, associateDataMixin} from '../mixins'
 export default {
   name: 'BarPlot',
   mixins: [animationMixin, associateDataMixin],
-  inheritAttrs: false,
   props: {
     dataView: {
       type: Array,
@@ -51,7 +55,8 @@ export default {
       const {xScale} = this
       const xDomain = xScale.domain()
       const xRange = xScale.range()
-      return xScale(xDomain[xDomain.length - 1]) + (xRange[1] >= xRange[0] ? 1 : -1) * xScale.step()
+      const reverse = xRange[0] > xRange[xRange.length - 1]
+      return xScale(xDomain[xDomain.length - 1]) + (reverse ? -1 : 1) * xScale.step()
     },
     enterGeom () {
       return {
@@ -64,9 +69,6 @@ export default {
         x: this.xIn,
         animation: this.getAnimation(-Infinity)
       }
-    },
-    appear () {
-      return this.enterGeom
     }
   },
   methods: {

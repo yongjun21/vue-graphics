@@ -1,13 +1,13 @@
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATE_, currentAnimations, defaultConfig} from '../shared'
+import {_ANIMATE_, _TWEEN_, storeTween, defaultConfig} from '../shared'
 
 export default {
   bind (el, binding) {
     el.setAttribute('data-vg-animated', '')
+    storeTween(el)
 
     const target = {_t: 0}
     const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
-    const group = (vars.animation && vars.animation.group) || defaultConfig.group
     Object.keys(vars).forEach(prop => {
       if (prop === 'animation') return
       el.setAttribute(prop, target[prop] = vars[prop])
@@ -16,7 +16,6 @@ export default {
     el[_ANIMATE_] = function (vars, done, reverse) {
       vars = Object.assign({}, vars)
       const options = Object.assign({}, defaultConfig, vars.animation)
-      if (options.group !== group) return
       delete vars.animation
       if (typeof options.duration === 'function') {
         options.duration = options.duration(vars, target)
@@ -49,8 +48,9 @@ export default {
           el.setAttribute('data-vg-animating', '')
         },
         onComplete () {
-          done && done()
           el.removeAttribute('data-vg-animating')
+          el[_TWEEN_] = null
+          done && done()
         },
         onUpdate () {
           Object.keys(interpolators).forEach(prop => {
@@ -62,9 +62,7 @@ export default {
         }
       })
       const tween = TweenLite[reverse ? 'from' : 'to'](target, options.duration, vars)
-      if (options.group in currentAnimations) {
-        currentAnimations[options.group].push([options.order, tween])
-      }
+      el[_TWEEN_] = [options.order, tween]
       return tween
     }
   },

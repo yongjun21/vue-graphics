@@ -1,5 +1,8 @@
 <template>
-  <g class="vg-plot vg-chord-plot" v-on="wrappedListeners">
+  <animated-group class="vg-plot vg-chord-plot"
+    :watching="dataView"
+    :appear="getAnimation()"
+    v-on="wrappedListeners">
     <path v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-chord"
       :class="d.class"
@@ -7,7 +10,7 @@
       v-associate="d"
       v-draw="getAnimation(i)">
     </path>
-  </g>
+  </animated-group>
 </template>
 
 <script>
@@ -18,7 +21,6 @@ import {polar2xy} from '../util'
 export default {
   name: 'ChordPlot',
   mixins: [animationMixin, associateDataMixin],
-  inheritAttrs: false,
   props: {
     dataView: {
       type: Array,

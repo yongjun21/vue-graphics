@@ -1,7 +1,6 @@
 export {
   _ANIMATE_,
-  queueAnimations,
-  flushAnimations,
+  _TWEEN_,
   defaultConfig
 } from './shared'
 export {default as makeAnimated} from './makeAnimated'

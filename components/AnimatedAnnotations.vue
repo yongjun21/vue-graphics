@@ -1,5 +1,10 @@
 <template>
-  <animated-group class="vg-annotations" :enter="enterGeom" :exit="exitGeom" v-on="wrappedListeners">
+  <animated-group class="vg-annotations"
+    :watching="dataView"
+    :enter="enterGeom"
+    :exit="exitGeom"
+    :appear="enterGeom"
+    v-on="wrappedListeners">
     <animated-text-label v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
       class="vg-annotation"
       :class="d.class"
@@ -69,9 +74,6 @@ export default {
       return this.exit && Object.assign({
         animation: this.getAnimation(-Infinity)
       }, this.exit)
-    },
-    appear () {
-      return this.enterGeom
     }
   },
   methods: {

@@ -138,7 +138,7 @@ export default {
   },
   watch: {
     transform () {
-      this.$refs.bars.animate()
+      this.$refs.bars.$children[0].animate()
     }
   }
 }

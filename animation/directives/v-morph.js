@@ -1,13 +1,13 @@
 import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATE_, currentAnimations, defaultConfig} from '../shared'
+import {_ANIMATE_, _TWEEN_, storeTween, defaultConfig} from '../shared'
 import {interpolatePath} from 'd3-interpolate-path'
 
 export default {
   bind (el, binding) {
     el.setAttribute('data-vg-animated', '')
+    storeTween(el)
     let d = el.getAttribute('d')
-    const group = (binding.value && binding.value.group) || defaultConfig.group
 
     el[_ANIMATE_] = function (options) {
       const updated = el.getAttribute('d')
@@ -15,7 +15,6 @@ export default {
       el.setAttribute('d', d)
 
       options = Object.assign({}, defaultConfig, options)
-      if (options.group !== group) return
       if (typeof options.duration === 'function') {
         options.duration = options.duration(updated, d)
       }
@@ -25,16 +24,17 @@ export default {
       const vars = {
         t: 1,
         onStart: () => el.setAttribute('data-vg-animating', ''),
-        onComplete: () => el.removeAttribute('data-vg-animating'),
+        onComplete: () => {
+          el.removeAttribute('data-vg-animating')
+          el[_TWEEN_] = null
+        },
         onUpdate () {
           d = interpolator(target.t)
           el.setAttribute('d', d)
         }
       }
       const tween = TweenLite.to(target, options.duration, vars)
-      if (options.group in currentAnimations) {
-        currentAnimations[options.group].push([options.order, tween])
-      }
+      el[_TWEEN_] = [options.order, tween]
       return tween
     }
   },

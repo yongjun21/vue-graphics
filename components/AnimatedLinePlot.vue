@@ -1,12 +1,14 @@
 <template>
-  <g class="vg-plot vg-line-plot">
+  <animated-group class="vg-plot vg-line-plot"
+    :watching="dataView"
+    :appear="getAnimation()">
     <path v-for="(value, label, i) in grouped" :key="label" v-if="value.length > 0"
       class="vg-line"
       :class="classed && classed(label)"
       v-bind="getGeom(value)"
       v-draw="getAnimation(i)">
     </path>
-  </g>
+  </animated-group>
 </template>
 
 <script>
@@ -17,7 +19,6 @@ import curveLinear from 'd3-shape/src/curve/linear'
 export default {
   name: 'AnimatedLinePlot',
   mixins: [animationMixin],
-  inheritAttrs: false,
   props: {
     dataView: {
       type: Array,
