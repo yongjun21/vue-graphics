@@ -1,4 +1,6 @@
+import TransformHelper from './Transform'
 import SplitApplyCombine from './SplitApplyCombine'
+import {nestedForEach} from '../util'
 
 export function UNIQUE (of) {
   return data => {
@@ -94,6 +96,32 @@ export function STACKED_ROUNDED_MINMAX (of, by, round) {
       Math.floor(stackedMin / round) * round,
       Math.ceil(stackedMax / round) * round
     ]
+  }
+}
+
+export function BBOX (axis, bearing = 0) {
+  if (axis === 'x') axis = 0
+  if (axis === 'y') axis = 1
+  const nestedLevels = {
+    Point: 0,
+    LineString: 1,
+    Polygon: 2,
+    MultiPoint: 1,
+    MultiLineString: 2,
+    MultiPolygon: 3
+  }
+  const rotate = new TransformHelper().rotate(bearing).apply
+  return features => {
+    let min = Infinity
+    let max = -Infinity
+    features.forEach(f => {
+      nestedForEach(f.geometry.coordinates, pt => {
+        const value = rotate(pt)[axis]
+        if (value < min) min = value
+        if (value > max) max = value
+      }, nestedLevels[f.geometry.type])
+    })
+    return [min, max]
   }
 }
 

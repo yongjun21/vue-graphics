@@ -13,7 +13,7 @@
 
     body > svg {
       display: block;
-      margin: 800px auto;
+      margin: 0 auto;
       width: 70vw;
       max-width: 100vh;
       height: 70vw;
@@ -171,6 +171,56 @@
     .vg-text-label.v-enter-active,
     .vg-text-label.v-leave-active {
       transition: opacity 0.66667s;
+    }
+
+    .top-side-view .vg-top-view-plot .vg-feature {
+      stroke-width: 2;
+      opacity: 0;
+      transition: opacity 0.66667s;
+    }
+
+    .top-side-view .vg-top-view-plot .vg-feature.built {
+      opacity: 1;
+    }
+
+    .top-side-view .vg-side-view-plot .vg-feature {
+      stroke-width: 0;
+    }
+
+    .top-side-view .vg-feature {
+      stroke: none;
+      fill: none;
+      mix-blend-mode: multiply;
+    }
+
+    .top-side-view .vg-feature.y1960 {
+      stroke: #C72A77;
+      fill: #C72A77;
+    }
+
+    .top-side-view .vg-feature.y1970 {
+      stroke: #EA3E66;
+      fill: #EA3E66;
+    }
+
+    .top-side-view .vg-feature.y1980 {
+      stroke: #FF5E51;
+      fill: #FF5E51;
+    }
+
+    .top-side-view .vg-feature.y1990 {
+      stroke: #FF8439;
+      fill: #FF8439;
+    }
+
+    .top-side-view .vg-feature.y2000 {
+      stroke: #FFAC1B;
+      fill: #FFAC1B;
+    }
+
+    .top-side-view .vg-feature.y2010 {
+      stroke: #FFD400;
+      fill: #FFD400;
     }
   </style>
 </head>

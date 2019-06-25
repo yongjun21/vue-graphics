@@ -60,6 +60,11 @@ export function frameRateLimited (cb, context = null) {
   return context ? wrapped.bind(context) : wrapped
 }
 
+export function nestedForEach (arr, fn, levels = 1) {
+  if (levels > 0) arr.forEach(v => nestedForEach(v, fn, levels - 1))
+  else fn(arr)
+}
+
 export function findCenter (domainA, domainR) {
   const minA = Math.min(...domainA)
   const maxA = Math.max(...domainA)

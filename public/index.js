@@ -7,14 +7,16 @@ import StackedBarChart from '../examples/StackedBarChart.vue'
 import GroupedBarChart from '../examples/GroupedBarChart.vue'
 import ChordDiagram from '../examples/ChordDiagram.vue'
 import WaterfallChart from '../examples/WaterfallChart.vue'
+import TopSideView from '../examples/TopSideView.vue'
 
 // TouchEmulator()
 
-testBarChart()
+// testBarChart()
 // testWaterfallChart()
 // testChordDiagram()
 // testStackedBar()
 // testGroupedBar()
+testTopSideView()
 
 function testBarChart () {
   window.vm = createVM(BarChart, {
@@ -104,6 +106,28 @@ function testGroupedBar () {
         horizontal: true,
         padding: 0.4
       })
+    })
+}
+
+function testTopSideView () {
+  window.fetch('/tpy.json')
+    .then(res => res.json())
+    .then(geojson => {
+      geojson.forEach((f, i) => {
+        f.key = i
+      })
+
+      window.vm = createVM(TopSideView, {
+        data: geojson,
+        h: f => f.properties.height || 0,
+        year: 1960,
+        bearing: 0
+      }, null, {height: 880, padding: '5%'})
+
+      setInterval(() => {
+        if (window.vm.year < 2019) window.vm.year++
+        else window.vm.year = 1960
+      }, 200)
     })
 }
 
