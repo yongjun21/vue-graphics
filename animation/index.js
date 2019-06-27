@@ -1,7 +1,6 @@
 export {
-  _ANIMATE_,
-  _TWEEN_,
-  defaultConfig
+  defaultConfig,
+  animate
 } from './shared'
 export {default as makeAnimated} from './makeAnimated'
 export {default as animationMixin} from './animationMixin'

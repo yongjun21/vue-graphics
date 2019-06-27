@@ -1,7 +1,7 @@
 import {interpolateTransform2} from '../helpers/Transform'
 
-export const _ANIMATE_ = Symbol('animate')
-export const _TWEEN_ = Symbol('TWEEN')
+const _ANIMATE_ = Symbol('animate')
+const _TWEEN_ = Symbol('tween')
 
 export const defaultConfig = {
   duration: 0.66667,
@@ -9,24 +9,33 @@ export const defaultConfig = {
   interpolate: {transform: interpolateTransform2}
 }
 
-export function retrieveTweens (elements) {
-  const tweens = Array.prototype.map.call(elements, el => el[_TWEEN_])
-    .filter(r => r != null)
-    .sort((a, b) => a[0] - b[0])
-    .map(r => r[1])
-  return tweens
+export function animate (el, ...args) {
+  if (!el[_ANIMATE_]) return null
+  const tween = el[_ANIMATE_](...args)
+  if (!tween) return null
+  el[_TWEEN_] = tween
+  const onComplete = tween.vars.onComplete
+  if (onComplete) {
+    tween.vars.onComplete = function () {
+      onComplete.apply(this, arguments)
+      el[_TWEEN_] = null
+    }
+  }
+  return tween
 }
 
-export function storeTween (el) {
-  let tween = null
-  Object.defineProperty(el, _TWEEN_, {
-    get () {
-      const active = tween
-      tween = null
-      return active
-    },
-    set (value) {
-      tween = value
+export function bindAnimate (el, animate) {
+  el[_ANIMATE_] = animate
+  return el
+}
+
+export function retrieveTweens (elements) {
+  const tweens = []
+  Array.prototype.map.call(elements, el => {
+    if (el[_TWEEN_]) {
+      tweens.push(el[_TWEEN_])
+      el[_TWEEN_] = null
     }
   })
+  return tweens.sort((a, b) => a.data - b.data)
 }

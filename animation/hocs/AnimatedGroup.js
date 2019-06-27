@@ -1,6 +1,6 @@
 import TimelineLite from 'gsap/TimelineLite'
 import {ObserveVisibility} from 'vue-observe-visibility'
-import {_ANIMATE_, retrieveTweens} from '../shared'
+import {animate, retrieveTweens} from '../shared'
 
 const _ACTIVE_ = Symbol('active tweens')
 
@@ -21,13 +21,30 @@ export default {
       }
     }
   },
+  computed: {
+    listeners () {
+      const {enter, exit} = this
+      const listeners = {}
+      if (enter) {
+        listeners.enter = function (el, done) {
+          animate(el, enter, done, true) || done()
+        }
+      }
+      if (exit) {
+        listeners.leave = function (el, done) {
+          animate(el, exit, done, false) || done()
+        }
+      }
+      return listeners
+    }
+  },
   methods: {
     animate () {
       if (arguments.length > 0) {
         if (this[_ACTIVE_]) return
         const tweens = Array.prototype.map.call(
           this.$el.children,
-          el => el[_ANIMATE_].apply(el, arguments)
+          el => animate(el, ...arguments)
         ).filter(t => t != null)
         if (tweens.length === 0) return
         this[_ACTIVE_] = new TimelineLite({
@@ -73,24 +90,10 @@ export default {
     }
   },
   render (h) {
-    const {enter, exit} = this
-    const listeners = {}
-    if (enter) {
-      listeners.enter = function (el, done) {
-        if (!el[_ANIMATE_]) return done()
-        el[_ANIMATE_](enter, done, true)
-      }
-    }
-    if (exit) {
-      listeners.leave = function (el, done) {
-        if (!el[_ANIMATE_]) return done()
-        el[_ANIMATE_](exit, done, false)
-      }
-    }
     const $children = this.$scopedSlots.default && this.$scopedSlots.default()
     return h('transition-group', {
       props: {tag: 'g', appear: ''},
-      on: listeners
+      on: this.listeners
     }, $children)
   }
 }

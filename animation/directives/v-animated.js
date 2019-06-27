@@ -1,10 +1,9 @@
 import TweenLite from 'gsap/TweenLite'
-import {_ANIMATE_, _TWEEN_, storeTween, defaultConfig} from '../shared'
+import {animate, bindAnimate, defaultConfig} from '../shared'
 
 export default {
   bind (el, binding) {
     el.setAttribute('data-vg-animated', '')
-    storeTween(el)
 
     const target = {_t: 0}
     const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
@@ -13,7 +12,7 @@ export default {
       el.setAttribute(prop, target[prop] = vars[prop])
     })
 
-    el[_ANIMATE_] = function (vars, done, reverse) {
+    bindAnimate(el, function (vars, done, reverse) {
       vars = Object.assign({}, vars)
       const options = Object.assign({}, defaultConfig, vars.animation)
       delete vars.animation
@@ -44,12 +43,12 @@ export default {
       TweenLite.set(target, {_t: 0}) // force reset t
       Object.assign(vars, {
         _t: 1,
+        data: options.order,
         onStart () {
           el.setAttribute('data-vg-animating', '')
         },
         onComplete () {
           el.removeAttribute('data-vg-animating')
-          el[_TWEEN_] = null
           done && done()
         },
         onUpdate () {
@@ -61,15 +60,13 @@ export default {
           })
         }
       })
-      const tween = TweenLite[reverse ? 'from' : 'to'](target, options.duration, vars)
-      el[_TWEEN_] = [options.order, tween]
-      return tween
-    }
+      return TweenLite[reverse ? 'from' : 'to'](target, options.duration, vars)
+    })
   },
   update (el, binding) {
     if (shouldNotUpdate(binding.value, binding.oldValue, binding.arg)) return
     const vars = binding.arg ? {[binding.arg]: binding.value} : binding.value
-    el[_ANIMATE_](vars)
+    animate(el, vars)
   }
 }
 
