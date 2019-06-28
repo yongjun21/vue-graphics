@@ -113,12 +113,12 @@ function testTopSideView () {
   window.fetch('/tpy.json')
     .then(res => res.json())
     .then(geojson => {
-      geojson.forEach((f, i) => {
+      geojson.features.forEach((f, i) => {
         f.key = i
       })
 
       window.vm = createVM(TopSideView, {
-        data: geojson,
+        data: geojson.features,
         h: f => f.properties.height || 0,
         year: 1960,
         bearing: 0

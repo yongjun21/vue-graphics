@@ -60,9 +60,18 @@ export function frameRateLimited (cb, context = null) {
   return context ? wrapped.bind(context) : wrapped
 }
 
-export function nestedForEach (arr, fn, levels = 1) {
-  if (levels > 0) arr.forEach(v => nestedForEach(v, fn, levels - 1))
-  else fn(arr)
+export function bboxFromRange (xRange, yRange) {
+  return [
+    xRange.reduce((min, v) => v < min ? v : min),
+    yRange.reduce((min, v) => v < min ? v : min),
+    xRange.reduce((max, v) => v > max ? v : max),
+    yRange.reduce((max, v) => v > max ? v : max)
+  ]
+}
+
+export function nestedMap (arr, fn, levels = 1) {
+  if (levels === 0) return fn(arr)
+  return arr.map(v => nestedMap(v, fn, levels - 1))
 }
 
 export function findCenter (domainA, domainR) {

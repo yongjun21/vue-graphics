@@ -2,6 +2,7 @@
   <animated-group class="vg-plot vg-side-view-plot"
     :watching="features"
     :enter="enterGeom"
+    :exit="exitGeom"
     v-on="wrappedListeners">
     <rect v-for="g in geoms" :key="g.key"
       class="vg-feature"

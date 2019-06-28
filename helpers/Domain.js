@@ -1,6 +1,6 @@
 import TransformHelper from './Transform'
 import SplitApplyCombine from './SplitApplyCombine'
-import {nestedForEach} from '../util'
+import {nestedMap} from '../util'
 
 export function UNIQUE (of) {
   return data => {
@@ -115,7 +115,7 @@ export function BBOX (axis, bearing = 0) {
     let min = Infinity
     let max = -Infinity
     features.forEach(f => {
-      nestedForEach(f.geometry.coordinates, pt => {
+      nestedMap(f.geometry.coordinates, pt => {
         const value = rotate(pt)[axis]
         if (value < min) min = value
         if (value > max) max = value

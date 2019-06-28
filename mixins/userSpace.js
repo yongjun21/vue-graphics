@@ -20,57 +20,78 @@ export default {
     }
   },
   computed: {
-    $_bbox () {
+    $_transformed () {
       const {left, top, width, height} = this
       const t = this.layout || new TransformHelper()
+      const origin = t.unapply(getOrigin(this.originAt, left, top, left + width, top + height))
       const corners = [
         t.unapply([left, top]),
         t.unapply([left + width, top]),
         t.unapply([left + width, top + height]),
         t.unapply([left, top + height])
       ]
-      return [
+
+      const bbox = [
         Math.min(...corners.map(c => c[0])),
         Math.min(...corners.map(c => c[1])),
         Math.max(...corners.map(c => c[0])),
         Math.max(...corners.map(c => c[1]))
       ]
-    },
-    $_translate () {
-      const bbox = this.$_bbox
-      const originAt = this.originAt || 'xMinYMin'
-      if (Array.isArray(originAt)) {
-        return [
-          (1 - originAt[0]) * bbox[0] + originAt[0] * bbox[2],
-          (1 - originAt[1]) * bbox[1] + originAt[1] * bbox[3]
-        ]
-      }
-      const pattern = /x(Min|Mid|Max)Y(Min|Mid|Max)/
-      const [, xAlign, yAlign] = originAt.match(pattern)
-      const xTranslate = xAlign === 'Min' ? bbox[0]
-                       : xAlign === 'Max' ? bbox[2]
-                       : (bbox[0] + bbox[2]) / 2
-      const yTranslate = yAlign === 'Min' ? bbox[1]
-                       : yAlign === 'Max' ? bbox[3]
-                       : (bbox[1] + bbox[3]) / 2
-      return [xTranslate, yTranslate]
+
+      const dc = t.decompose()
+      const {e: translateX, f: translateY} = new TransformHelper()
+        .skewX(dc.skewX)
+        .rotate(dc.rotate)
+        .translate(dc.translateX, dc.translateY)
+        .rotate(-dc.rotate)
+        .skewX(-dc.skewX)
+        .params
+
+      const xRange = [
+        bbox[0] * dc.scaleX + translateX + origin[0],
+        bbox[2] * dc.scaleX + translateX + origin[0]
+      ]
+
+      const yRange = [
+        bbox[1] * dc.scaleY + translateY + origin[1],
+        bbox[3] * dc.scaleY + translateY + origin[1]
+      ]
+
+      const transform = new TransformHelper()
+        .translate(-origin[0], -origin[1])
+        .skewX(dc.skewX)
+        .rotate(dc.rotate)
+
+      return {xRange, yRange, transform}
     },
     xRange () {
-      return [
-        this.$_bbox[0] - this.$_translate[0],
-        this.$_bbox[2] - this.$_translate[0]
-      ]
+      return this.$_transformed.xRange
     },
     yRange () {
-      return [
-        this.$_bbox[1] - this.$_translate[1],
-        this.$_bbox[3] - this.$_translate[1]
-      ]
+      return this.$_transformed.yRange
     },
     transform () {
-      const t = new TransformHelper()
-      t.translate(this.$_translate[0], this.$_translate[1])
-      return this.layout ? t.chain(this.layout) : t
+      return this.$_transformed.transform
     }
   }
+}
+
+function getOrigin (originAt, xMin, yMin, xMax, yMax) {
+  originAt = originAt || 'xMinYMin'
+  let xt, yt
+  if (Array.isArray(originAt)) {
+    [xt, yt] = originAt
+  }
+  const pattern = /x(Min|Mid|Max)Y(Min|Mid|Max)/
+  const [, xAlign, yAlign] = originAt.match(pattern)
+  xt = xAlign === 'Min' ? 0
+     : xAlign === 'Max' ? 1
+     : 0.5
+  yt = yAlign === 'Min' ? 0
+     : yAlign === 'Max' ? 1
+     : 0.5
+  return [
+    (1 - xt) * xMin + xt * xMax,
+    (1 - yt) * yMin + yt * yMax
+  ]
 }
