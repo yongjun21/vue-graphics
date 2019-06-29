@@ -1,12 +1,12 @@
 <template>
-  <g class="vg-plot vg-top-view-plot" v-on="wrappedListeners">
+  <transition-group tag="g" class="vg-plot vg-top-view-plot" v-on="wrappedListeners">
     <component :is="g.type" v-for="g in geoms" :key="g.key"
       class="vg-feature"
       :class="g.class"
       v-associate="g.feature"
       v-bind="g.attrs">
     </component>
-  </g>
+  </transition-group>
 </template>
 
 <script>

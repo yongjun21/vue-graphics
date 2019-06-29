@@ -175,17 +175,19 @@
 
     .top-side-view .vg-top-view-plot .vg-feature {
       stroke-width: 2;
-      opacity: 0;
-      transition: opacity 0.66667s;
-    }
-
-    .top-side-view .vg-top-view-plot .vg-feature.built {
-      opacity: 1;
     }
 
     .top-side-view .vg-side-view-plot .vg-feature {
       stroke-width: 0;
       mix-blend-mode: multiply;
+    }
+
+    .top-side-view .vg-top-view-plot .vg-feature.v-enter-active {
+      transition: opacity 0.66667s;
+    }
+
+    .top-side-view .vg-top-view-plot .vg-feature.v-enter {
+      opacity: 0;
     }
 
     .top-side-view .vg-feature {
@@ -221,10 +223,6 @@
     .top-side-view .vg-feature.y2010 {
       stroke: #FEE470;
       fill: #FEE470;
-    }
-
-    .top-side-view .vg-tile {
-      display: block;
     }
   </style>
 </head>

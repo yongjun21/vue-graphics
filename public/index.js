@@ -118,6 +118,7 @@ function testTopSideView () {
       })
 
       window.vm = createVM(TopSideView, {
+        bbox: [-0.03, 0, 0, 0.47, 1, 1.2],
         data: geojson.features,
         h: f => f.properties.height || 0,
         year: 1960,

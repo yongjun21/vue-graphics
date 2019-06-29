@@ -16,8 +16,8 @@
         :y-scale="getScale(domain.y, yRange)">
       </tile-plot>
       <top-view-plot
-        :features="data"
-        :classed="f => [getClass(f), {built: f.properties.built <= year}]"
+        :features="filteredData"
+        :classed="getClass"
         :bearing="bearing"
         :x-scale="getScale(domain.x, xRange)"
         :y-scale="getScale(domain.y, yRange)">
@@ -25,9 +25,9 @@
     </user-space>
 
     <user-space v-slot="{xRange, yRange}"
-      :top="width + 20"
+      :top="width"
       :width="width"
-      :height="height - width - 20"
+      :height="height - width"
       :layout="layout"
       :clip-path="`url(#clip-path-${_uid})`">
       <side-view-plot
@@ -68,9 +68,9 @@ export default {
       type: Function,
       required: true
     },
-    hDomain: {
-      type: [Function, Array],
-      default: DomainHelper.CLAMPED_MINMAX('h', 0)
+    bbox: {
+      type: Array,
+      default: () => [0, 0, 0, 1, 1, 1]
     },
     year: {
       type: Number,
@@ -90,23 +90,29 @@ export default {
       return this.data.filter(f => f.properties.built <= year)
     },
     domainStatic () {
-      const {data, h, hDomain} = this
+      const {data, h, bbox} = this
       const xDomain = DomainHelper.BBOX(0)(data)
       const yDomain = DomainHelper.BBOX(1)(data)
-      const hDomain_ = Array.isArray(hDomain) ? hDomain
-                    : hDomain(data.map(f => ({h: h(f)})))
-      const xMid = 0.8 * xDomain[0] + 0.2 * xDomain[1]
-      const yMid = 0.5 * yDomain[0] + 0.5 * yDomain[1]
-      const halfwidth = 0.5 * Math.max((xDomain[1] - xDomain[0]) * 0.4, yDomain[1] - yDomain[0])
-      return [xMid, yMid, halfwidth, hDomain_]
+      const hDomain = DomainHelper.CLAMPED_MINMAX(0, 0)(data.map(f => [h(f)]))
+      const xt = 0.5 * (bbox[0] + bbox[3])
+      const yt = 0.5 * (bbox[1] + bbox[4])
+      const xMid = (1 - xt) * xDomain[0] + xt * xDomain[1]
+      const yMid = (1 - yt) * yDomain[0] + yt * yDomain[1]
+      const halfwidth = 0.5 * Math.max(
+        (xDomain[1] - xDomain[0]) * (bbox[3] - bbox[0]),
+        (yDomain[1] - yDomain[0]) * (bbox[4] - bbox[1])
+      )
+      const hMin = (1 - bbox[2]) * hDomain[0] + bbox[2] * hDomain[1]
+      const hMax = (1 - bbox[5]) * hDomain[0] + bbox[5] * hDomain[1]
+      return [xMid, yMid, halfwidth, hMin, hMax]
     },
     domain () {
-      const [xMid, yMid, halfwidth, hDomain] = this.domainStatic
+      const [xMid, yMid, halfwidth, hMin, hMax] = this.domainStatic
       const [xCenter, yCenter] = new TransformHelper().rotate(this.bearing).apply([xMid, yMid])
       return {
         x: [xCenter - halfwidth, xCenter + halfwidth],
         y: [yCenter - halfwidth, yCenter + halfwidth],
-        h: hDomain
+        h: [hMin, hMax]
       }
     },
     getTileUrl () {
