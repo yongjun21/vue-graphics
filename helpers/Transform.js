@@ -287,7 +287,7 @@ export default class TransformHelper {
 
   isIdentity () {
     const params = this.params
-    return Object.keys(params).every(key => params[key] === IDENTITY[key])
+    return Object.keys(params).every(key => Math.abs(params[key] - IDENTITY[key]) < epsilon)
   }
 
   isCloneOf (t) {
@@ -300,9 +300,9 @@ export default class TransformHelper {
     return Object.keys(params).every(key => params[key] === t.params[key])
   }
 
-  toString (dp = 5) {
+  toString (dp = -Math.log10(epsilon)) {
     const {a, b, c, d, e, f} = this.params
-    return `matrix(${[a, b, c, d, e, f].map(round(5)).join(' ')})`
+    return `matrix(${[a, b, c, d, e, f].map(round(dp)).join(' ')})`
   }
 }
 

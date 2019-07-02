@@ -12,10 +12,10 @@
           :get-geom="getGeom"
           :has-geom="hasGeom"
           :x="g => g.x + 0.5 * g.width"
-          :y="g => g.height + 10"
+          :y="g => g.y - 10"
           :v="d => d.y"
-          :enter="{y: 10, value: 0}"
-          :exit="{y: 10, value: 0}"
+          :enter="{y: yScale(0) - 10, value: 0}"
+          :exit="{y: yScale(0) - 10, value: 0}"
           anchor="bottom"
           :post-transform="transform"
           v-on="$listeners">

@@ -23,7 +23,10 @@ export default {
     $_transformed () {
       const {left, top, width, height} = this
       const t = this.layout || new TransformHelper()
-      const origin = t.unapply(getOrigin(this.originAt, left, top, left + width, top + height))
+      const origin = getOrigin(this.originAt, left, top, left + width, top + height)
+      t.params.e = origin[0]
+      t.params.f = origin[1]
+
       const corners = [
         t.unapply([left, top]),
         t.unapply([left + width, top]),
@@ -39,29 +42,12 @@ export default {
       ]
 
       const dc = t.decompose()
-      const {e: translateX, f: translateY} = new TransformHelper()
+      const xRange = [bbox[0] * dc.scaleX, bbox[2] * dc.scaleX]
+      const yRange = [bbox[1] * dc.scaleY, bbox[3] * dc.scaleY]
+      const transform = new TransformHelper()
         .skewX(dc.skewX)
         .rotate(dc.rotate)
         .translate(dc.translateX, dc.translateY)
-        .rotate(-dc.rotate)
-        .skewX(-dc.skewX)
-        .params
-
-      const xRange = [
-        bbox[0] * dc.scaleX + translateX + origin[0],
-        bbox[2] * dc.scaleX + translateX + origin[0]
-      ]
-
-      const yRange = [
-        bbox[1] * dc.scaleY + translateY + origin[1],
-        bbox[3] * dc.scaleY + translateY + origin[1]
-      ]
-
-      const transform = new TransformHelper()
-        .translate(-origin[0], -origin[1])
-        .skewX(dc.skewX)
-        .rotate(dc.rotate)
-
       return {xRange, yRange, transform}
     },
     xRange () {
