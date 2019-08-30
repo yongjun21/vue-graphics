@@ -1,4 +1,3 @@
-import '../../polyfills/SVGElement.prototype.classList'
 import TweenLite from 'gsap/TweenLite'
 import {animate, bindAnimate, defaultConfig} from '../shared'
 import {interpolatePath} from 'd3-interpolate-path'
