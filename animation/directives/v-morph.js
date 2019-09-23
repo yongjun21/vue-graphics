@@ -35,6 +35,6 @@ export default {
     })
   },
   update (el, binding) {
-    animate(binding.value)
+    animate(el, binding.value)
   }
 }
