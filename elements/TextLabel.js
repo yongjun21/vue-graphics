@@ -53,11 +53,11 @@ function getTextAttrs (props) {
   return {
     x: props.x,
     y: props.y,
-    'dy': ['topleft', 'top', 'topright'].includes(anchor) ? '0.7em'
-        : ['bottomleft', 'bottom', 'bottomright'].includes(anchor) ? '0'
+    'dy': anchor.includes('top') ? '0.7em'
+        : anchor.includes('bottom') ? '0'
         : '0.35em',
-    'text-anchor': ['topleft', 'left', 'bottomleft'].includes(anchor) ? 'start'
-                : ['topright', 'right', 'bottomright'].includes(anchor) ? 'end'
+    'text-anchor': anchor.includes('left') ? 'start'
+                : anchor.includes('right') ? 'end'
                 : 'middle',
     transform: getTransform(props)
   }

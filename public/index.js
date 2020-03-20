@@ -13,10 +13,10 @@ import TopSideView from '../examples/TopSideView.vue'
 
 // testBarChart()
 // testWaterfallChart()
-// testChordDiagram()
+testChordDiagram()
 // testStackedBar()
 // testGroupedBar()
-testTopSideView()
+// testTopSideView()
 
 function testBarChart () {
   window.vm = createVM(BarChart, {

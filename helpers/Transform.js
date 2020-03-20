@@ -287,7 +287,7 @@ export default class TransformHelper {
 
   isIdentity () {
     const params = this.params
-    return Object.keys(params).every(key => Math.abs(params[key] - IDENTITY[key]) < epsilon)
+    return Object.keys(params).every(key => approach(params[key] - IDENTITY[key]))
   }
 
   isCloneOf (t) {
@@ -360,17 +360,21 @@ function round (dp) {
 function decomposedToString () {
   const {scaleX, scaleY, skewX, rotate, translateX, translateY} = this
   const transformations = []
-  if (translateX !== 0 || translateY !== 0) {
+  if (!approach(translateX, 0) || !approach(translateY, 0)) {
     transformations.push(`translate(${translateX} ${translateY})`)
   }
-  if (rotate !== 0) {
+  if (!approach(rotate, 0)) {
     transformations.push(`rotate${rotate}`)
   }
-  if (skewX !== 0) {
+  if (!approach(skewX, 0)) {
     transformations.push(`skewX(${skewX})`)
   }
-  if (scaleX !== 1 || scaleY !== 1) {
+  if (!approach(scaleX, 1) || !approach(scaleY, 1)) {
     transformations.push(`scale(${scaleX} ${scaleY})`)
   }
   return transformations.join(' ')
+}
+
+function approach (a, b, e = epsilon) {
+  return Math.abs(a - b) < e
 }

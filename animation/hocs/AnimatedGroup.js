@@ -1,3 +1,4 @@
+import '../../polyfills/Element.prototype.closest'
 import TimelineLite from 'gsap/TimelineLite'
 import {ObserveVisibility} from 'vue-observe-visibility'
 import {animate, retrieveTweens} from '../shared'
@@ -81,7 +82,7 @@ export default {
   mounted () {
     if (this.appear) {
       let wasVisible = true
-      ObserveVisibility.bind(this.$el, {
+      ObserveVisibility.bind(this.$el.closest('svg'), {
         value: (isVisible, entry) => {
           if (!wasVisible && isVisible) this.animate(this.appear, null, true)
           wasVisible = isVisible
