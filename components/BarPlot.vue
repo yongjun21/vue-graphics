@@ -5,7 +5,7 @@
       :enter="enterGeom"
       :exit="exitGeom"
       :appear="enterGeom">
-      <rect v-for="(d, i) in dataView" :key="d.key || i" v-if="hasGeom(d)"
+      <rect v-for="(d, i) in dataView.filter(hasGeom)" :key="d.key || i"
         class="vg-bar"
         :class="d.class"
         v-associate="d"
