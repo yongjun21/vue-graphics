@@ -31,6 +31,7 @@ export default {
       validator: prop => ['forwards', 'backwards', 'both', 'none'].includes(prop),
       default: 'both'
     },
+    partition: null,
     classed: Function
   },
   computed: {
@@ -81,12 +82,20 @@ export default {
           }
         })
       }
-      grouped.forEach((curr, i) => {
-        const prev = grouped[i - 1]
-        const next = grouped[i + 1]
-        curr.yMinus = (!prev || curr.start > prev.end) ? 0 : prev.value[prev.value.length - 1].y
-        curr.yPlus = (!next || curr.end < next.start) ? 0 : next.value[0].y
-      })
+      if (this.partition != null) {
+        grouped.forEach(curr => {
+          curr.yMinus = 0
+          curr.yPlus = 0
+        })
+      } else {
+        grouped.forEach((curr, i) => {
+          const prev = grouped[i - 1]
+          const next = grouped[i + 1]
+          curr.yMinus = (!prev || curr.start > prev.end) ? 0 : prev.value[prev.value.length - 1].y
+          curr.yPlus = (!next || curr.end < next.start) ? 0 : next.value[0].y
+        })
+      }
+
       return grouped
     }
   },
