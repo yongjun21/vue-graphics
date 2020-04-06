@@ -38,6 +38,7 @@ export default {
     grouped () {
       const {dataView, xScale, fillMode, hasGeom} = this
       const xDomain = xScale.domain()
+
       const ungrouped = []
       xDomain.forEach((x, i) => {
         const d = dataView.find(d => d.x === x)
@@ -51,6 +52,7 @@ export default {
         }
       })
       if (ungrouped.length === 0) return []
+
       const grouped = []
       let curr = ungrouped.shift()
       grouped.push(curr)
@@ -64,6 +66,7 @@ export default {
           grouped.push(curr)
         }
       }
+
       if (fillMode === 'forwards' || fillMode === 'both') {
         grouped.forEach((curr, i) => {
           const next = (i < grouped.length - 1) ? grouped[i + 1] : {start: xDomain.length}
@@ -77,11 +80,12 @@ export default {
         grouped.forEach((curr, i) => {
           const prev = i > 0 ? grouped[i - 1] : {end: 0}
           for (let k = curr.start - 1; k >= prev.end; k--) {
-            curr.value.push({x: xDomain[k], y: 0})
+            curr.value.unshift({x: xDomain[k], y: 0})
             curr.start--
           }
         })
       }
+
       if (this.partition != null) {
         grouped.forEach(curr => {
           curr.yMinus = 0
