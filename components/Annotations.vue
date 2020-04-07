@@ -65,9 +65,6 @@ export default {
       return this.exit && Object.assign({
         animation: this.getAnimation(-Infinity)
       }, this.exit)
-    },
-    appear () {
-      return this.enterGeom
     }
   },
   methods: {

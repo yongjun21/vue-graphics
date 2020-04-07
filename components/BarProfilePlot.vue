@@ -106,6 +106,8 @@ export default {
   methods: {
     getGeom (data, yMinus, yPlus) {
       const {xScale, yScale} = this
+      const xRange = xScale.range()
+      const reverse = xRange[0] > xRange[xRange.length - 1]
       const step = xScale.step()
       const cp = []
       if (yMinus < data[0].y) {
@@ -117,8 +119,13 @@ export default {
       data.forEach(d => {
         const x = xScale(d.x)
         const y = yScale(d.y)
-        cp.push([x, y])
-        cp.push([x + step, y])
+        if (reverse) {
+          cp.push([x + step, y])
+          cp.push([x, y])
+        } else {
+          cp.push([x, y])
+          cp.push([x + step, y])
+        }
         yMinus = d.y
       })
       if (yPlus < yMinus) {

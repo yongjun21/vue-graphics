@@ -287,7 +287,7 @@ export default class TransformHelper {
 
   isIdentity () {
     const params = this.params
-    return Object.keys(params).every(key => approach(params[key] - IDENTITY[key]))
+    return Object.keys(params).every(key => approach(params[key], IDENTITY[key]))
   }
 
   isCloneOf (t) {
@@ -348,7 +348,7 @@ function round (dp) {
   if (dp === 0) return v => v.toFixed(0)
   return v => {
     let n = 0
-    let rounded = v.toFixed(dp).split('')
+    const rounded = v.toFixed(dp).split('')
     while (rounded[rounded.length - 1] === '0' && n++ < dp) {
       rounded.pop()
     }

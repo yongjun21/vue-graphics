@@ -57,7 +57,8 @@ export default {
       return this.$_transformed.yRange
     },
     transform () {
-      return this.$_transformed.transform
+      const t = this.$_transformed.transform
+      return t.isIdentity() ? null : t
     }
   }
 }
