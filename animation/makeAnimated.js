@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import TweenLite from 'gsap/TweenLite'
 import {bindAnimate, defaultConfig} from './shared'
 
@@ -8,6 +9,8 @@ export default function (Target, animatedProps = []) {
     animation: Object
   }
   animatedProps.forEach(prop => { props[prop] = null })
+
+  const isNative = typeof Target === 'string' && Vue.config.isReservedTag(Target)
 
   return {
     inheritAttrs: false,
@@ -82,10 +85,10 @@ export default function (Target, animatedProps = []) {
       this.$watch(vm => animatedProps.map(prop => vm[prop]), () => this.animate(this.$props))
     },
     render (h) {
-      const {animating, $attrs, $scopedSlots} = this
+      const {animating, $attrs, $listeners, $scopedSlots} = this
       const attrs = Object.assign({}, animating, $attrs)
       delete attrs._t
-      return h(Target, {class: this.class, attrs, scopedSlots: $scopedSlots})
+      return h(Target, {class: this.class, attrs, on: $listeners, scopedSlots: $scopedSlots}, isNative && $scopedSlots.default && $scopedSlots.default())
     }
   }
 }
