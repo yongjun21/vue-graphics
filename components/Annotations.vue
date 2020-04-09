@@ -48,6 +48,7 @@ export default {
       type: [Function, String, Number],
       required: true
     },
+    anchor: [Function, String],
     formatted: {
       type: Function,
       required: true
@@ -70,12 +71,14 @@ export default {
   methods: {
     getTextGeom (d, i) {
       const geom = this.getGeom(d, i)
-      const {x, y} = this
+      const {x, y, anchor} = this
       const xValue = typeof x === 'function' ? x(geom) : geom[x]
       const yValue = typeof y === 'function' ? y(geom) : geom[y]
+      const anchorValue = typeof y === 'function' ? anchor(geom) : anchor
       return Object.assign({
         x: xValue,
         y: yValue,
+        anchor: anchorValue,
         animation: this.getAnimation(i)
       }, this.$attrs)
     }

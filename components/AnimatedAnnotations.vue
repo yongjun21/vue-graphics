@@ -57,6 +57,7 @@ export default {
       type: Function,
       required: true
     },
+    anchor: [Function, String],
     formatted: {
       type: Function,
       default: v => v ? Math.round(v).toLocaleString() : ''
@@ -79,12 +80,14 @@ export default {
   methods: {
     getTextGeom (d, i) {
       const geom = this.getGeom(d, i)
-      const {x, y} = this
-      const getX = typeof x === 'function' ? x : geom => geom[x]
-      const getY = typeof y === 'function' ? y : geom => geom[y]
+      const {x, y, anchor} = this
+      const xValue = typeof x === 'function' ? x(geom) : geom[x]
+      const yValue = typeof y === 'function' ? y(geom) : geom[y]
+      const anchorValue = typeof y === 'function' ? anchor(geom) : anchor
       return Object.assign({
-        x: getX(geom),
-        y: getY(geom),
+        x: xValue,
+        y: yValue,
+        anchor: anchorValue,
         value: this.v(d, i),
         formatted: this.formatted,
         animation: this.getAnimation(i)
