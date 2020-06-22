@@ -8,18 +8,26 @@ export default {
     }
   },
   mounted () {
-    this.$_resize()
-    this.$_resize = frameRateLimited(this.$_resize)
-    window.addEventListener('resize', this.$_resize)
+    this.vgResize()
+    this.vgResize = frameRateLimited(this.vgResize)
+    window.addEventListener('resize', this.vgResize)
   },
   beforeDestroy () {
-    window.removeEventListener('resize', this.$_resize)
+    window.removeEventListener('resize', this.vgResize)
   },
   methods: {
-    $_resize () {
-      const {width, height} = this.$el.getBoundingClientRect()
+    vgResize () {
+      const $ref = this.$options.vgRef.call(this)
+      const {width, height} = $ref.getBoundingClientRect()
       this.width = width
       this.height = height
     }
+  },
+  vgRef () {
+    return this.$el
+  },
+  track (accessor) {
+    this.vgRef = typeof accessor === 'string' ? function () { return this.$refs[accessor] } : accessor
+    return this
   }
 }
