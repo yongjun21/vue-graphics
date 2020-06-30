@@ -238,6 +238,25 @@ export default class TransformHelper {
     return from.inverse().chain(to)
   }
 
+  static solve2 (line0, line1) {
+    const [[ax, ay], [bx, by]] = line0
+    const [[cx, cy], [dx, dy]] = line1
+    const A = [bx - ax, by - ay]
+    const B = [dx - cx, dy - cy]
+    const theta = Math.atan2(B[1], B[0]) - Math.atan2(A[1], A[0])
+    const scale = Math.sqrt(
+      (Math.pow(B[0], 2) + Math.pow(B[1], 2)) /
+      (Math.pow(A[0], 2) + Math.pow(A[1], 2))
+    )
+    const translateX = cx - ax
+    const translateY = cy - ay
+
+    return new TransformHelper()
+      .translate(translateX, translateY)
+      .rotate(theta * 180 / Math.PI, cx, cy)
+      .scale(scale, [cx, cy])
+  }
+
   static parse (str) {
     const parsed = new TransformHelper()
     if (!str) return parsed

@@ -10,7 +10,8 @@ export default {
   directives: {Animated, Draw, Morph},
   provide () {
     return {
-      animationStagger: this.animationStagger
+      animationStagger: this.animationStagger,
+      animationDelay: this.animationDelay
     }
   },
   props: {
@@ -23,6 +24,10 @@ export default {
       default: defaultConfig.ease
     },
     animationStagger: {
+      type: Number,
+      default: 0
+    },
+    animationDelay: {
       type: Number,
       default: 0
     }

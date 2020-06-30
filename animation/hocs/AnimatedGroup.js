@@ -8,7 +8,8 @@ const _ACTIVE_ = Symbol('active tweens')
 export default {
   name: 'AnimatedGroup',
   inject: {
-    animationStagger: {default: 0}
+    animationStagger: {default: 0},
+    animationDelay: {default: 0}
   },
   props: {
     watching: null,
@@ -19,6 +20,12 @@ export default {
       type: Number,
       default () {
         return this.animationStagger
+      }
+    },
+    delay: {
+      type: Number,
+      default () {
+        return this.animationDelay
       }
     }
   },
@@ -51,6 +58,7 @@ export default {
         this[_ACTIVE_] = new TimelineLite({
           tweens,
           stagger: this.stagger,
+          delay: this.delay,
           onComplete: () => { this[_ACTIVE_] = null }
         })
       } else {
@@ -62,6 +70,7 @@ export default {
             this[_ACTIVE_] = new TimelineLite({
               tweens,
               stagger: this.stagger,
+              delay: this.delay,
               onComplete: () => { this[_ACTIVE_] = null }
             })
           } else {

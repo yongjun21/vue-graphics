@@ -85,7 +85,7 @@ export default {
     },
     xScale: {
       type: Function,
-      required: true
+      default: v => v
     },
     yScale: {
       type: Function,
