@@ -1,10 +1,9 @@
 <template>
-  <g class="vg-plot vg-line-plot" v-on="wrappedListeners">
-    <path v-for="(value, label) in grouped" :key="label"
-      class="vg-line"
+  <g class="vg-plot vg-area-plot" v-on="wrappedListeners">
+    <path v-for="{label, value} in grouped" :key="label"
+      class="vg-area"
       :class="classed && classed(label)"
       v-bind="getGeom(value)"
-      v-enlarge-target
       v-associate="{label, value}">
     </path>
   </g>
@@ -12,13 +11,11 @@
 
 <script>
 import {associateDataMixin} from '../mixins'
-import EnlargeTarget from '../directives/v-enlarge-target'
 import line from 'd3-shape/src/line'
 import curveLinear from 'd3-shape/src/curve/linear'
 
 export default {
-  name: 'LinePlot',
-  directives: {EnlargeTarget},
+  name: 'AreaPlot',
   mixins: [associateDataMixin],
   inheritAttrs: false,
   props: {
@@ -47,7 +44,7 @@ export default {
   computed: {
     grouped () {
       const {gDomain, dataView, hasGeom} = this
-      const grouped = {}
+      const grouped = []
       gDomain.forEach(g => {
         const filtered = dataView.filter(d => d.g === g && hasGeom(d))
         if (filtered.length > 0) grouped.push({label: g, value: filtered})
@@ -58,11 +55,13 @@ export default {
   methods: {
     getGeom (data) {
       const {xScale, yScale, curve} = this
+      const first = Object.assign({}, data[0], {y: 0})
+      const last = Object.assign({}, data[data.length - 1], {y: 0})
       const lineGenerator = line()
         .x(d => xScale(d.x))
         .y(d => yScale(d.y))
         .curve(curve)
-      return {d: lineGenerator(data)}
+      return {d: lineGenerator([first, ...data, last])}
     },
     hasGeom (d) {
       return this.xScale(d.x) != null && this.yScale(d.y) != null

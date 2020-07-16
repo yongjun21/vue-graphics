@@ -1,3 +1,9 @@
+export function SPECIFIED (values) {
+  return scale => {
+    return values.map(v => ({label: v, value: scale(v)}))
+  }
+}
+
 export function MULTIPLES_OF (unit) {
   return scale => {
     const domain = scale.domain()
