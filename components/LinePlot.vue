@@ -1,6 +1,6 @@
 <template>
   <g class="vg-plot vg-line-plot" v-on="wrappedListeners">
-    <path v-for="(value, label) in grouped" :key="label"
+    <path v-for="{label, value} in grouped" :key="label"
       class="vg-line"
       :class="classed && classed(label)"
       v-bind="getGeom(value)"
@@ -47,7 +47,7 @@ export default {
   computed: {
     grouped () {
       const {gDomain, dataView, hasGeom} = this
-      const grouped = {}
+      const grouped = []
       gDomain.forEach(g => {
         const filtered = dataView.filter(d => d.g === g && hasGeom(d))
         if (filtered.length > 0) grouped.push({label: g, value: filtered})
