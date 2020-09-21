@@ -39,6 +39,10 @@ export default {
       type: Function,
       default: x => 0
     },
+    z: {
+      type: Function,
+      default: () => 0
+    },
     classed: Function,
     curve: {
       type: Function,
@@ -73,7 +77,7 @@ export default {
         .sort((a, b) => a.x - b.x)
     },
     grouped () {
-      const {groupedByX, gDomain, yScale, y0} = this
+      const {groupedByX, gDomain, yScale, y0, z} = this
       const grouped = []
 
       groupedByX.forEach(d => {
@@ -95,10 +99,10 @@ export default {
         })
         if (valueMin.length === 0) return
         const value = valueMin.concat(valueMax.reverse())
-        grouped.push({label, value})
+        grouped.push({label, value, order: z(label)})
       })
 
-      return grouped
+      return grouped.sort((a, b) => a.order - b.order)
     }
   },
   methods: {
