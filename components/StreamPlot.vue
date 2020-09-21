@@ -1,6 +1,6 @@
 <template>
   <g class="vg-plot vg-stream-plot" v-on="wrappedListeners">
-    <path v-for="{label, value} in grouped" :key="label"
+    <path v-for="{label, value} in sorted" :key="label"
       class="vg-area"
       :class="classed && classed(label)"
       v-bind="getGeom(value)"
@@ -77,7 +77,7 @@ export default {
         .sort((a, b) => a.x - b.x)
     },
     grouped () {
-      const {groupedByX, gDomain, yScale, y0, z} = this
+      const {groupedByX, gDomain, yScale, y0} = this
       const grouped = []
 
       groupedByX.forEach(d => {
@@ -99,9 +99,16 @@ export default {
         })
         if (valueMin.length === 0) return
         const value = valueMin.concat(valueMax.reverse())
-        grouped.push({label, value, order: z(label)})
+        grouped.push({label, value})
       })
 
+      return grouped
+    },
+    sorted () {
+      const {grouped, z} = this
+      grouped.forEach(row => {
+        row.order = z(row.label)
+      })
       return grouped.sort((a, b) => a.order - b.order)
     }
   },
